@@ -1,0 +1,485 @@
+# -*- coding: utf-8 -*-
+
+from __future__ import annotations
+
+import sqlite3
+from typing import Callable, Optional
+
+
+def init_schema(conn: sqlite3.Connection) -> None:
+    c = conn.cursor()
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS users(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT UNIQUE NOT NULL,
+        salt TEXT NOT NULL,
+        pass_hash TEXT NOT NULL,
+        role TEXT NOT NULL DEFAULT 'user',
+        created_at TEXT NOT NULL
+    );""")
+
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS settings(
+        key TEXT PRIMARY KEY,
+        value TEXT NOT NULL
+    );""")
+
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS cariler(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        ad TEXT UNIQUE NOT NULL,
+        tur TEXT DEFAULT '',
+        telefon TEXT DEFAULT '',
+        notlar TEXT DEFAULT '',
+        acilis_bakiye REAL DEFAULT 0,
+        aktif INTEGER NOT NULL DEFAULT 1
+    );""")
+
+
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS cari_hareket(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        tarih TEXT NOT NULL,
+        cari_id INTEGER NOT NULL,
+        tip TEXT NOT NULL,
+        tutar REAL NOT NULL,
+        para TEXT DEFAULT 'TL',
+        aciklama TEXT DEFAULT '',
+        odeme TEXT DEFAULT '',
+        belge TEXT DEFAULT '',
+        etiket TEXT DEFAULT '',
+        FOREIGN KEY(cari_id) REFERENCES cariler(id)
+    );""")
+
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS kasa_hareket(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        tarih TEXT NOT NULL,
+        tip TEXT NOT NULL,
+        tutar REAL NOT NULL,
+        para TEXT DEFAULT 'TL',
+        odeme TEXT DEFAULT '',
+        kategori TEXT DEFAULT '',
+        cari_id INTEGER,
+        aciklama TEXT DEFAULT '',
+        belge TEXT DEFAULT '',
+        etiket TEXT DEFAULT '',
+        FOREIGN KEY(cari_id) REFERENCES cariler(id)
+    );""")
+
+    # -----------------
+    # Banka Hareketleri
+    # -----------------
+    # Not:
+    # - Çoklu banka/hesap desteği için banka+hesap alanları serbest metindir.
+    # - Import tarafında "Giriş/Çıkış" tipine normalize edilir.
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS banka_hareket(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        tarih TEXT NOT NULL,
+        banka TEXT DEFAULT '',
+        hesap TEXT DEFAULT '',
+        tip TEXT NOT NULL, -- 'Giriş' / 'Çıkış'
+        tutar REAL NOT NULL,
+        para TEXT DEFAULT 'TL',
+        aciklama TEXT DEFAULT '',
+        referans TEXT DEFAULT '',
+        belge TEXT DEFAULT '',
+        etiket TEXT DEFAULT '',
+        import_grup TEXT DEFAULT '',
+        bakiye REAL
+    );""")
+
+    # -----------------
+    # Faturalar
+    # -----------------
+    c.execute(
+        """
+    CREATE TABLE IF NOT EXISTS fatura(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        tarih TEXT NOT NULL,
+        vade TEXT DEFAULT '',
+        tur TEXT NOT NULL DEFAULT 'Satış',
+        durum TEXT NOT NULL DEFAULT 'Taslak',
+        fatura_no TEXT NOT NULL UNIQUE,
+        seri TEXT DEFAULT '',
+
+        cari_id INTEGER,
+        cari_ad TEXT DEFAULT '',
+        cari_vkn TEXT DEFAULT '',
+        cari_vergi_dairesi TEXT DEFAULT '',
+        cari_adres TEXT DEFAULT '',
+        cari_eposta TEXT DEFAULT '',
+
+        para TEXT DEFAULT 'TL',
+        ara_toplam REAL DEFAULT 0,
+        iskonto_toplam REAL DEFAULT 0,
+        kdv_toplam REAL DEFAULT 0,
+        genel_toplam REAL DEFAULT 0,
+
+        notlar TEXT DEFAULT '',
+        etiket TEXT DEFAULT '',
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY(cari_id) REFERENCES cariler(id)
+    );"""
+    )
+
+    c.execute(
+        """
+    CREATE TABLE IF NOT EXISTS fatura_kalem(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        fatura_id INTEGER NOT NULL,
+        sira INTEGER NOT NULL DEFAULT 1,
+        urun TEXT DEFAULT '',
+        aciklama TEXT DEFAULT '',
+        miktar REAL DEFAULT 0,
+        birim TEXT DEFAULT 'Adet',
+        birim_fiyat REAL DEFAULT 0,
+        iskonto_oran REAL DEFAULT 0,
+        kdv_oran REAL DEFAULT 20,
+        ara_tutar REAL DEFAULT 0,
+        iskonto_tutar REAL DEFAULT 0,
+        kdv_tutar REAL DEFAULT 0,
+        toplam REAL DEFAULT 0,
+        FOREIGN KEY(fatura_id) REFERENCES fatura(id) ON DELETE CASCADE
+    );"""
+    )
+
+    c.execute(
+        """
+    CREATE TABLE IF NOT EXISTS fatura_odeme(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        fatura_id INTEGER NOT NULL,
+        tarih TEXT NOT NULL,
+        tutar REAL NOT NULL DEFAULT 0,
+        para TEXT DEFAULT 'TL',
+        odeme TEXT DEFAULT '',
+        aciklama TEXT DEFAULT '',
+        ref TEXT DEFAULT '',
+        kasa_hareket_id INTEGER,
+        banka_hareket_id INTEGER,
+        FOREIGN KEY(fatura_id) REFERENCES fatura(id) ON DELETE CASCADE,
+        FOREIGN KEY(kasa_hareket_id) REFERENCES kasa_hareket(id) ON DELETE SET NULL,
+        FOREIGN KEY(banka_hareket_id) REFERENCES banka_hareket(id) ON DELETE SET NULL
+    );"""
+    )
+
+    c.execute(
+        """
+    CREATE TABLE IF NOT EXISTS fatura_seri(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        seri TEXT NOT NULL,
+        yil INTEGER NOT NULL,
+        prefix TEXT DEFAULT 'FTR',
+        last_no INTEGER NOT NULL DEFAULT 0,
+        padding INTEGER NOT NULL DEFAULT 6,
+        format TEXT DEFAULT '{yil}{seri}{no_pad}',
+        aktif INTEGER NOT NULL DEFAULT 1,
+        UNIQUE(seri,yil)
+    );"""
+    )
+
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS logs(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        ts TEXT NOT NULL,
+        islem TEXT NOT NULL,
+        detay TEXT DEFAULT ''
+    );""")
+
+    # -----------------
+    # Maaş Takibi
+    # -----------------
+    c.execute(
+        """
+    CREATE TABLE IF NOT EXISTS maas_meslek(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        ad TEXT NOT NULL,
+        aktif INTEGER NOT NULL DEFAULT 1,
+        notlar TEXT DEFAULT '',
+        UNIQUE(ad)
+    );"""
+    )
+
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS maas_calisan(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        ad TEXT NOT NULL,
+        aylik_tutar REAL NOT NULL DEFAULT 0,
+        para TEXT DEFAULT 'TL',
+        meslek_id INTEGER,
+        aktif INTEGER NOT NULL DEFAULT 1,
+        notlar TEXT DEFAULT '',
+        UNIQUE(ad)
+    );""")
+
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS maas_odeme(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        donem TEXT NOT NULL, -- YYYY-MM
+        calisan_id INTEGER NOT NULL,
+        tutar REAL NOT NULL DEFAULT 0,
+        para TEXT DEFAULT 'TL',
+        odendi INTEGER NOT NULL DEFAULT 0,
+        odeme_tarihi TEXT DEFAULT '',
+        aciklama TEXT DEFAULT '',
+        banka_hareket_id INTEGER,
+        banka_match_score REAL,
+        banka_match_note TEXT DEFAULT '',
+        UNIQUE(calisan_id, donem),
+        FOREIGN KEY(calisan_id) REFERENCES maas_calisan(id) ON DELETE CASCADE
+    );""")
+
+
+    # Maaş - Hesap Hareketleri (eşleştirme geçmişi)
+    # Not: SQLite bazı sürümlerde DEFAULT ifadesinde fonksiyon çağrısına izin vermeyebilir.
+    # Bu yüzden en uyumlu seçenek olan CURRENT_TIMESTAMP kullanıyoruz.
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS maas_hesap_hareket(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        donem TEXT NOT NULL, -- YYYY-MM
+        calisan_id INTEGER NOT NULL,
+        odeme_id INTEGER,
+        banka_hareket_id INTEGER NOT NULL,
+        match_score REAL DEFAULT 0,
+        match_type TEXT DEFAULT 'auto_name',
+        note TEXT DEFAULT '',
+        UNIQUE(donem, calisan_id, banka_hareket_id),
+        FOREIGN KEY(calisan_id) REFERENCES maas_calisan(id) ON DELETE CASCADE,
+        FOREIGN KEY(odeme_id) REFERENCES maas_odeme(id) ON DELETE SET NULL,
+        FOREIGN KEY(banka_hareket_id) REFERENCES banka_hareket(id) ON DELETE CASCADE
+    );""")
+
+    conn.commit()
+
+
+def _table_columns(conn: sqlite3.Connection, table: str) -> set[str]:
+    try:
+        rows = list(conn.execute(f"PRAGMA table_info({table})"))
+        out = set()
+        for r in rows:
+            try:
+                out.add(str(r[1]))  # name
+            except Exception:
+                pass
+        return out
+    except Exception:
+        return set()
+
+
+def _ensure_column(
+    conn: sqlite3.Connection,
+    table: str,
+    col: str,
+    col_def_sql: str,
+    log_fn: Optional[Callable[[str, str], None]] = None,
+) -> None:
+    cols = _table_columns(conn, table)
+    if col in cols:
+        return
+    try:
+        conn.execute(f"ALTER TABLE {table} ADD COLUMN {col} {col_def_sql}")
+        conn.commit()
+        if log_fn:
+            log_fn("Schema Migration", f"{table}: added column {col}")
+    except Exception as e:
+        if log_fn:
+            try:
+                log_fn("Schema Migration Error", f"{table}.{col}: {e}")
+            except Exception:
+                pass
+
+
+def migrate_schema(conn: sqlite3.Connection, log_fn: Optional[Callable[[str, str], None]] = None) -> None:
+    # Banka tabloları (eski DB'ler için)
+    try:
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS banka_hareket(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                tarih TEXT NOT NULL,
+                banka TEXT DEFAULT '',
+                hesap TEXT DEFAULT '',
+                tip TEXT NOT NULL,
+                tutar REAL NOT NULL,
+                para TEXT DEFAULT 'TL',
+                aciklama TEXT DEFAULT '',
+                referans TEXT DEFAULT '',
+                belge TEXT DEFAULT '',
+                etiket TEXT DEFAULT '',
+                import_grup TEXT DEFAULT '',
+                bakiye REAL
+            );"""
+        )
+        conn.commit()
+    except Exception as e:
+        if log_fn:
+            try:
+                log_fn("Schema Migration Error", f"banka_hareket: {e}")
+            except Exception:
+                pass
+
+    # banka_hareket (eski tablolar için kolon garantisi)
+    _ensure_column(conn, "banka_hareket", "import_grup", "TEXT DEFAULT ''", log_fn)
+
+    # Yeni tabloları eski DB'lerde de oluştur (init_schema bazı eski DB'lerde çalışmış olsa bile güvenlik)
+    try:
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS maas_meslek(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                ad TEXT NOT NULL,
+                aktif INTEGER NOT NULL DEFAULT 1,
+                notlar TEXT DEFAULT '',
+                UNIQUE(ad)
+            );"""
+        )
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS maas_calisan(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                ad TEXT NOT NULL,
+                aylik_tutar REAL NOT NULL DEFAULT 0,
+                para TEXT DEFAULT 'TL',
+                meslek_id INTEGER,
+                aktif INTEGER NOT NULL DEFAULT 1,
+                notlar TEXT DEFAULT '',
+                UNIQUE(ad)
+            );"""
+        )
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS maas_odeme(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                donem TEXT NOT NULL,
+                calisan_id INTEGER NOT NULL,
+                tutar REAL NOT NULL DEFAULT 0,
+                para TEXT DEFAULT 'TL',
+                odendi INTEGER NOT NULL DEFAULT 0,
+                odeme_tarihi TEXT DEFAULT '',
+                aciklama TEXT DEFAULT '',
+                banka_hareket_id INTEGER,
+                banka_match_score REAL,
+                banka_match_note TEXT DEFAULT '',
+                UNIQUE(calisan_id, donem),
+                FOREIGN KEY(calisan_id) REFERENCES maas_calisan(id) ON DELETE CASCADE
+            );"""
+        )
+        conn.commit()
+    except Exception as e:
+        if log_fn:
+            try:
+                log_fn("Schema Migration Error", f"maas tables: {e}")
+            except Exception:
+                pass
+
+    
+
+    # Maaş - Hesap Hareketleri (eşleştirme geçmişi)
+    try:
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS maas_hesap_hareket(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                donem TEXT NOT NULL,
+                calisan_id INTEGER NOT NULL,
+                odeme_id INTEGER,
+                banka_hareket_id INTEGER NOT NULL,
+                match_score REAL DEFAULT 0,
+                match_type TEXT DEFAULT 'auto_name',
+                note TEXT DEFAULT '',
+                UNIQUE(donem, calisan_id, banka_hareket_id)
+            );"""
+        )
+        conn.commit()
+    except Exception as e:
+        if log_fn:
+            try:
+                log_fn("Schema Migration Error", f"maas_hesap_hareket: {e}")
+            except Exception:
+                pass
+
+    # Maaş ödeme tablosu yeni kolonlar (banka eşleştirme için)
+    _ensure_column(conn, "maas_odeme", "banka_hareket_id", "INTEGER", log_fn)
+    _ensure_column(conn, "maas_odeme", "banka_match_score", "REAL", log_fn)
+    _ensure_column(conn, "maas_odeme", "banka_match_note", "TEXT DEFAULT ''", log_fn)
+
+    # Maaş çalışan: meslek alanı
+    _ensure_column(conn, "maas_calisan", "meslek_id", "INTEGER", log_fn)
+
+    # users (eski DB'ler için kolon garantisi)
+    _ensure_column(conn, "users", "role", "TEXT NOT NULL DEFAULT 'user'", log_fn)
+    _ensure_column(conn, "users", "created_at", "TEXT DEFAULT ''", log_fn)
+    _ensure_column(conn, "users", "salt", "TEXT DEFAULT ''", log_fn)
+    _ensure_column(conn, "users", "pass_hash", "TEXT DEFAULT ''", log_fn)
+
+    # cariler
+    _ensure_column(conn, "cariler", "aktif", "INTEGER NOT NULL DEFAULT 1", log_fn)
+    _ensure_column(conn, "cariler", "tur", "TEXT DEFAULT ''", log_fn)
+    _ensure_column(conn, "cariler", "telefon", "TEXT DEFAULT ''", log_fn)
+    _ensure_column(conn, "cariler", "notlar", "TEXT DEFAULT ''", log_fn)
+    _ensure_column(conn, "cariler", "acilis_bakiye", "REAL DEFAULT 0", log_fn)
+
+    # cari_hareket
+    _ensure_column(conn, "cari_hareket", "para", "TEXT DEFAULT 'TL'", log_fn)
+    _ensure_column(conn, "cari_hareket", "aciklama", "TEXT DEFAULT ''", log_fn)
+    _ensure_column(conn, "cari_hareket", "odeme", "TEXT DEFAULT ''", log_fn)
+    _ensure_column(conn, "cari_hareket", "belge", "TEXT DEFAULT ''", log_fn)
+    _ensure_column(conn, "cari_hareket", "etiket", "TEXT DEFAULT ''", log_fn)
+
+    # banka_hareket
+    _ensure_column(conn, "banka_hareket", "import_grup", "TEXT DEFAULT ''", log_fn)
+
+    # kasa_hareket
+    _ensure_column(conn, "kasa_hareket", "para", "TEXT DEFAULT 'TL'", log_fn)
+    _ensure_column(conn, "kasa_hareket", "odeme", "TEXT DEFAULT ''", log_fn)
+    _ensure_column(conn, "kasa_hareket", "kategori", "TEXT DEFAULT ''", log_fn)
+    _ensure_column(conn, "kasa_hareket", "cari_id", "INTEGER", log_fn)
+    _ensure_column(conn, "kasa_hareket", "aciklama", "TEXT DEFAULT ''", log_fn)
+    _ensure_column(conn, "kasa_hareket", "belge", "TEXT DEFAULT ''", log_fn)
+    _ensure_column(conn, "kasa_hareket", "etiket", "TEXT DEFAULT ''", log_fn)
+
+
+def seed_defaults(conn: sqlite3.Connection, log_fn: Optional[Callable[[str, str], None]] = None) -> None:
+    """DB ilk kurulum: kullanıcı + settings seed."""
+    # default admin (company db içi)
+    try:
+        cur = conn.execute("SELECT COUNT(*) FROM users")
+        n = int(cur.fetchone()[0])
+    except Exception:
+        n = 0
+
+    if n == 0:
+        from ..utils import make_salt, hash_password, now_iso
+
+        salt = make_salt()
+        conn.execute(
+            "INSERT INTO users(username,salt,pass_hash,role,created_at) VALUES(?,?,?,?,?)",
+            ("admin", salt, hash_password("admin", salt), "admin", now_iso()),
+        )
+        conn.commit()
+        if log_fn:
+            log_fn("Init", "Default admin created (admin/admin)")
+
+    # default lists (settings)
+    try:
+        import json
+        from ..config import DEFAULT_CURRENCIES, DEFAULT_PAYMENTS, DEFAULT_CATEGORIES
+
+        def _get(k: str):
+            r = conn.execute("SELECT value FROM settings WHERE key=?", (k,)).fetchone()
+            return r[0] if r else None
+
+        def _set(k: str, v: str):
+            conn.execute(
+                "INSERT INTO settings(key,value) VALUES(?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value",
+                (k, v),
+            )
+            conn.commit()
+
+        if not _get("currencies"):
+            _set("currencies", json.dumps(DEFAULT_CURRENCIES, ensure_ascii=False))
+        if not _get("payments"):
+            _set("payments", json.dumps(DEFAULT_PAYMENTS, ensure_ascii=False))
+        if not _get("categories"):
+            _set("categories", json.dumps(DEFAULT_CATEGORIES, ensure_ascii=False))
+    except Exception:
+        pass

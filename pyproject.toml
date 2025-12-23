@@ -1,0 +1,9 @@
+[project]
+name = "kasapro"
+version = "3.0.0-pro"
+description = "KasaPro v3 - Tkinter + SQLite muhasebe/kasa uygulaması (modüler)."
+readme = "README.md"
+requires-python = ">=3.9"
+
+[project.scripts]
+kasapro = "kasapro.app:main"
