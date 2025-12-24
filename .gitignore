@@ -1,0 +1,21 @@
+# Byte-compiled / cache
+__pycache__/
+*.py[cod]
+*.pyc
+
+# SQLite databases
+*.db
+*.sqlite3
+
+# VS Code
+.vscode/
+
+# Virtual environments
+venv/
+env/
+
+# OS files
+.DS_Store
+
+# Ignore plugin caches
+kasapro/ui/plugins/__pycache__/
