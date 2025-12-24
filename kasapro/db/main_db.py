@@ -219,6 +219,7 @@ class DB:
         return self.kasa.aylik_ozet(limit=limit, has_cari=has_cari)
 
     # -----------------
+<<<<<<< ours
     # Stok
     # -----------------
     def stok_urun_list(self, q: str = "", only_active: bool = False) -> List[sqlite3.Row]:
@@ -356,6 +357,8 @@ class DB:
         return self.stok.hareket_delete(hid)
 
     # -----------------
+=======
+>>>>>>> theirs
     # Banka
     # -----------------
     def banka_add(self, tarih: Any, banka: str, hesap: str, tip: str, tutar: float, para: str,
