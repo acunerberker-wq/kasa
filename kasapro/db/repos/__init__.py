@@ -10,3 +10,4 @@ from .search_repo import SearchRepo
 from .maas_repo import MaasRepo
 from .banka_repo import BankaRepo
 from .fatura_repo import FaturaRepo
+from .nakliye_repo import NakliyeRepo

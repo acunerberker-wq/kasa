@@ -311,7 +311,7 @@ class NakliyeRepo:
         return list(self.conn.execute(sql, tuple(params)))
 
     def _make_is_no(self) -> str:
-        return "IS" + datetime.now().strftime("%Y%m%d%H%M%S")
+        return "IS" + datetime.now().strftime("%Y%m%d%H%M%S%f")
 
     def is_add(
         self,
