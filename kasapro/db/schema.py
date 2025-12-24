@@ -242,48 +242,6 @@ def init_schema(conn: sqlite3.Connection) -> None:
     );""")
 
     # -----------------
-    # Mesajlar
-    # -----------------
-    c.execute(
-        """
-    CREATE TABLE IF NOT EXISTS messages(
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        sender_id INTEGER NOT NULL,
-        sender_username TEXT NOT NULL,
-        subject TEXT DEFAULT '',
-        body TEXT DEFAULT '',
-        is_draft INTEGER NOT NULL DEFAULT 0,
-        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
-    );"""
-    )
-    c.execute(
-        """
-    CREATE TABLE IF NOT EXISTS message_recipients(
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        message_id INTEGER NOT NULL,
-        recipient_id INTEGER NOT NULL,
-        recipient_username TEXT NOT NULL,
-        is_read INTEGER NOT NULL DEFAULT 0,
-        read_at TEXT DEFAULT '',
-        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY(message_id) REFERENCES messages(id) ON DELETE CASCADE
-    );"""
-    )
-    c.execute(
-        """
-    CREATE TABLE IF NOT EXISTS message_attachments(
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        message_id INTEGER NOT NULL,
-        filename TEXT NOT NULL,
-        stored_name TEXT NOT NULL,
-        size_bytes INTEGER NOT NULL DEFAULT 0,
-        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY(message_id) REFERENCES messages(id) ON DELETE CASCADE
-    );"""
-    )
-
-    # -----------------
     # Stok Yönetimi
     # -----------------
     c.execute(
@@ -353,81 +311,6 @@ def init_schema(conn: sqlite3.Connection) -> None:
         FOREIGN KEY(kaynak_lokasyon_id) REFERENCES stok_lokasyon(id),
         FOREIGN KEY(hedef_lokasyon_id) REFERENCES stok_lokasyon(id),
         FOREIGN KEY(parti_id) REFERENCES stok_parti(id)
-    );"""
-    )
-
-    # -----------------
-    # Satın Alma Siparişleri
-    # -----------------
-    c.execute(
-        """
-    CREATE TABLE IF NOT EXISTS satin_alma_siparis(
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        siparis_no TEXT NOT NULL UNIQUE,
-        tedarikci_id INTEGER NOT NULL,
-        tarih TEXT NOT NULL,
-        teslim_tarihi TEXT DEFAULT '',
-        durum TEXT NOT NULL DEFAULT 'oluşturuldu',
-        para TEXT DEFAULT 'TL',
-        kur REAL DEFAULT 1,
-        iskonto_oran REAL DEFAULT 0,
-        depo_id INTEGER,
-        notlar TEXT DEFAULT '',
-        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY(tedarikci_id) REFERENCES cariler(id),
-        FOREIGN KEY(depo_id) REFERENCES stok_lokasyon(id)
-    );"""
-    )
-
-    c.execute(
-        """
-    CREATE TABLE IF NOT EXISTS satin_alma_siparis_kalem(
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        siparis_id INTEGER NOT NULL,
-        urun_id INTEGER,
-        urun_ad TEXT DEFAULT '',
-        miktar REAL NOT NULL DEFAULT 0,
-        birim TEXT DEFAULT 'Adet',
-        birim_fiyat REAL NOT NULL DEFAULT 0,
-        iskonto_oran REAL DEFAULT 0,
-        iskonto_tutar REAL DEFAULT 0,
-        toplam REAL DEFAULT 0,
-        FOREIGN KEY(siparis_id) REFERENCES satin_alma_siparis(id) ON DELETE CASCADE,
-        FOREIGN KEY(urun_id) REFERENCES stok_urun(id)
-    );"""
-    )
-
-    c.execute(
-        """
-    CREATE TABLE IF NOT EXISTS satin_alma_teslim(
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        siparis_id INTEGER NOT NULL,
-        tarih TEXT NOT NULL,
-        depo_id INTEGER,
-        fatura_id INTEGER,
-        durum TEXT DEFAULT 'kısmi teslim alındı',
-        notlar TEXT DEFAULT '',
-        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY(siparis_id) REFERENCES satin_alma_siparis(id) ON DELETE CASCADE,
-        FOREIGN KEY(depo_id) REFERENCES stok_lokasyon(id),
-        FOREIGN KEY(fatura_id) REFERENCES fatura(id)
-    );"""
-    )
-
-    c.execute(
-        """
-    CREATE TABLE IF NOT EXISTS satin_alma_teslim_kalem(
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        teslim_id INTEGER NOT NULL,
-        urun_id INTEGER,
-        urun_ad TEXT DEFAULT '',
-        miktar REAL NOT NULL DEFAULT 0,
-        birim TEXT DEFAULT 'Adet',
-        birim_fiyat REAL NOT NULL DEFAULT 0,
-        toplam REAL DEFAULT 0,
-        FOREIGN KEY(teslim_id) REFERENCES satin_alma_teslim(id) ON DELETE CASCADE,
-        FOREIGN KEY(urun_id) REFERENCES stok_urun(id)
     );"""
     )
 
@@ -868,199 +751,103 @@ def migrate_schema(conn: sqlite3.Connection, log_fn: Optional[Callable[[str, str
     _ensure_column(conn, "kasa_hareket", "belge", "TEXT DEFAULT ''", log_fn)
     _ensure_column(conn, "kasa_hareket", "etiket", "TEXT DEFAULT ''", log_fn)
 
-    # fatura (satış raporları için yeni kolonlar)
-    _ensure_column(conn, "fatura", "sube", "TEXT DEFAULT ''", log_fn)
-    _ensure_column(conn, "fatura", "depo", "TEXT DEFAULT ''", log_fn)
-    _ensure_column(conn, "fatura", "satis_temsilcisi", "TEXT DEFAULT ''", log_fn)
-
-    # fatura_kalem (kategori + maliyet)
-    _ensure_column(conn, "fatura_kalem", "kategori", "TEXT DEFAULT ''", log_fn)
-    _ensure_column(conn, "fatura_kalem", "maliyet", "REAL DEFAULT 0", log_fn)
-
     # -----------------
-    # Nakliye Sistemi (eski DB'ler için)
+    # Stok Yönetimi (eski DB'ler için)
     # -----------------
     try:
         conn.execute(
-            """CREATE TABLE IF NOT EXISTS nakliye_firma(
+            """CREATE TABLE IF NOT EXISTS stok_urun(
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
+                kod TEXT NOT NULL UNIQUE,
                 ad TEXT NOT NULL,
-                telefon TEXT DEFAULT '',
-                eposta TEXT DEFAULT '',
-                adres TEXT DEFAULT '',
+                kategori TEXT DEFAULT '',
+                birim TEXT DEFAULT 'Adet',
+                min_stok REAL DEFAULT 0,
+                max_stok REAL DEFAULT 0,
+                kritik_stok REAL DEFAULT 0,
+                raf TEXT DEFAULT '',
+                tedarikci_id INTEGER,
+                barkod TEXT DEFAULT '',
                 aktif INTEGER NOT NULL DEFAULT 1,
-                notlar TEXT DEFAULT '',
-                UNIQUE(ad)
-            );"""
-        )
-        conn.execute(
-            """CREATE TABLE IF NOT EXISTS nakliye_arac(
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                firma_id INTEGER,
-                plaka TEXT NOT NULL,
-                tip TEXT DEFAULT '',
-                marka TEXT DEFAULT '',
-                model TEXT DEFAULT '',
-                yil TEXT DEFAULT '',
-                kapasite TEXT DEFAULT '',
-                surucu TEXT DEFAULT '',
-                aktif INTEGER NOT NULL DEFAULT 1,
-                notlar TEXT DEFAULT '',
-                UNIQUE(plaka),
-                FOREIGN KEY(firma_id) REFERENCES nakliye_firma(id) ON DELETE SET NULL
-            );"""
-        )
-        conn.execute(
-            """CREATE TABLE IF NOT EXISTS nakliye_rota(
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                ad TEXT NOT NULL,
-                cikis TEXT DEFAULT '',
-                varis TEXT DEFAULT '',
-                mesafe_km REAL DEFAULT 0,
-                sure_saat REAL DEFAULT 0,
-                aktif INTEGER NOT NULL DEFAULT 1,
-                notlar TEXT DEFAULT ''
-            );"""
-        )
-        conn.execute(
-            """CREATE TABLE IF NOT EXISTS nakliye_is(
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                is_no TEXT NOT NULL UNIQUE,
-                tarih TEXT NOT NULL,
-                saat TEXT DEFAULT '',
-                firma_id INTEGER,
-                arac_id INTEGER,
-                rota_id INTEGER,
-                cikis TEXT DEFAULT '',
-                varis TEXT DEFAULT '',
-                yuk TEXT DEFAULT '',
-                durum TEXT DEFAULT 'Planlandı',
-                ucret REAL DEFAULT 0,
-                para TEXT DEFAULT 'TL',
-                notlar TEXT DEFAULT '',
-                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                FOREIGN KEY(firma_id) REFERENCES nakliye_firma(id) ON DELETE SET NULL,
-                FOREIGN KEY(arac_id) REFERENCES nakliye_arac(id) ON DELETE SET NULL,
-                FOREIGN KEY(rota_id) REFERENCES nakliye_rota(id) ON DELETE SET NULL
-            );"""
-        )
-        conn.execute(
-            """CREATE TABLE IF NOT EXISTS nakliye_islem(
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                is_id INTEGER NOT NULL,
-                tarih TEXT NOT NULL,
-                saat TEXT DEFAULT '',
-                tip TEXT NOT NULL,
                 aciklama TEXT DEFAULT '',
-                FOREIGN KEY(is_id) REFERENCES nakliye_is(id) ON DELETE CASCADE
-            );"""
-        )
-        conn.commit()
-    except Exception as e:
-        if log_fn:
-            try:
-                log_fn("Schema Migration Error", f"nakliye tables: {e}")
-            except Exception:
-                pass
-
-    # Sık kullanılan sorgular için indeksler
-    _ensure_index(conn, "idx_cari_hareket_cari_tarih", "cari_hareket", "cari_id, tarih", log_fn)
-    _ensure_index(conn, "idx_cari_hareket_tarih", "cari_hareket", "tarih", log_fn)
-    _ensure_index(conn, "idx_kasa_hareket_tarih", "kasa_hareket", "tarih", log_fn)
-    _ensure_index(conn, "idx_banka_hareket_tarih", "banka_hareket", "tarih", log_fn)
-    _ensure_index(conn, "idx_banka_hareket_import_grup", "banka_hareket", "import_grup", log_fn)
-    _ensure_index(conn, "idx_fatura_cari_tarih", "fatura", "cari_id, tarih", log_fn)
-    _ensure_index(conn, "idx_fatura_kalem_fatura_id", "fatura_kalem", "fatura_id", log_fn)
-    _ensure_index(conn, "idx_fatura_odeme_fatura_id", "fatura_odeme", "fatura_id", log_fn)
-    _ensure_index(conn, "idx_stok_hareket_urun_id", "stok_hareket", "urun_id", log_fn)
-
-    # -----------------
-    # Satış Siparişleri (eski DB'ler için)
-    # -----------------
-    try:
-        conn.execute(
-            """CREATE TABLE IF NOT EXISTS satis_siparis(
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                tarih TEXT NOT NULL,
-                teslim_tarih TEXT DEFAULT '',
-                siparis_no TEXT NOT NULL UNIQUE,
-                cari_id INTEGER,
-                cari_ad TEXT DEFAULT '',
-                temsilci TEXT DEFAULT '',
-                depo_id INTEGER,
-                durum TEXT NOT NULL DEFAULT 'Açık',
-                para TEXT DEFAULT 'TL',
-                toplam REAL DEFAULT 0,
-                aciklama TEXT DEFAULT '',
-                sevk_tarih TEXT DEFAULT '',
-                sevk_no TEXT DEFAULT '',
-                fatura_id INTEGER,
                 created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
                 updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
             );"""
         )
         conn.execute(
-            """CREATE TABLE IF NOT EXISTS satis_siparis_kalem(
+            """CREATE TABLE IF NOT EXISTS stok_lokasyon(
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                siparis_id INTEGER NOT NULL,
-                urun_id INTEGER,
-                urun_kod TEXT DEFAULT '',
-                urun_ad TEXT DEFAULT '',
-                birim TEXT DEFAULT 'Adet',
-                miktar REAL DEFAULT 0,
-                birim_fiyat REAL DEFAULT 0,
-                toplam REAL DEFAULT 0,
-                sevk_miktar REAL DEFAULT 0,
+                ad TEXT NOT NULL UNIQUE,
                 aciklama TEXT DEFAULT '',
-                FOREIGN KEY(siparis_id) REFERENCES satis_siparis(id) ON DELETE CASCADE
+                aktif INTEGER NOT NULL DEFAULT 1
+            );"""
+        )
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS stok_parti(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                urun_id INTEGER NOT NULL,
+                parti_no TEXT NOT NULL,
+                skt TEXT DEFAULT '',
+                uretim_tarih TEXT DEFAULT '',
+                aciklama TEXT DEFAULT '',
+                UNIQUE(urun_id, parti_no)
+            );"""
+        )
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS stok_hareket(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                tarih TEXT NOT NULL,
+                urun_id INTEGER NOT NULL,
+                tip TEXT NOT NULL,
+                miktar REAL NOT NULL DEFAULT 0,
+                birim TEXT DEFAULT 'Adet',
+                kaynak_lokasyon_id INTEGER,
+                hedef_lokasyon_id INTEGER,
+                parti_id INTEGER,
+                referans_tipi TEXT DEFAULT '',
+                referans_id INTEGER,
+                maliyet REAL DEFAULT 0,
+                aciklama TEXT DEFAULT '',
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
             );"""
         )
         conn.commit()
     except Exception as e:
         if log_fn:
             try:
-                log_fn("Schema Migration Error", f"satis_siparis tables: {e}")
+                log_fn("Schema Migration Error", f"stok tables: {e}")
             except Exception:
                 pass
 
-    _ensure_column(conn, "satis_siparis", "teslim_tarih", "TEXT DEFAULT ''", log_fn)
-    _ensure_column(conn, "satis_siparis", "cari_ad", "TEXT DEFAULT ''", log_fn)
-    _ensure_column(conn, "satis_siparis", "temsilci", "TEXT DEFAULT ''", log_fn)
-    _ensure_column(conn, "satis_siparis", "depo_id", "INTEGER", log_fn)
-    _ensure_column(conn, "satis_siparis", "durum", "TEXT NOT NULL DEFAULT 'Açık'", log_fn)
-    _ensure_column(conn, "satis_siparis", "para", "TEXT DEFAULT 'TL'", log_fn)
-    _ensure_column(conn, "satis_siparis", "toplam", "REAL DEFAULT 0", log_fn)
-    _ensure_column(conn, "satis_siparis", "aciklama", "TEXT DEFAULT ''", log_fn)
-    _ensure_column(conn, "satis_siparis", "sevk_tarih", "TEXT DEFAULT ''", log_fn)
-    _ensure_column(conn, "satis_siparis", "sevk_no", "TEXT DEFAULT ''", log_fn)
-    _ensure_column(conn, "satis_siparis", "fatura_id", "INTEGER", log_fn)
+    _ensure_column(conn, "stok_urun", "kategori", "TEXT DEFAULT ''", log_fn)
+    _ensure_column(conn, "stok_urun", "birim", "TEXT DEFAULT 'Adet'", log_fn)
+    _ensure_column(conn, "stok_urun", "min_stok", "REAL DEFAULT 0", log_fn)
+    _ensure_column(conn, "stok_urun", "max_stok", "REAL DEFAULT 0", log_fn)
+    _ensure_column(conn, "stok_urun", "kritik_stok", "REAL DEFAULT 0", log_fn)
+    _ensure_column(conn, "stok_urun", "raf", "TEXT DEFAULT ''", log_fn)
+    _ensure_column(conn, "stok_urun", "tedarikci_id", "INTEGER", log_fn)
+    _ensure_column(conn, "stok_urun", "barkod", "TEXT DEFAULT ''", log_fn)
+    _ensure_column(conn, "stok_urun", "aktif", "INTEGER NOT NULL DEFAULT 1", log_fn)
+    _ensure_column(conn, "stok_urun", "aciklama", "TEXT DEFAULT ''", log_fn)
+    _ensure_column(conn, "stok_urun", "created_at", "TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP", log_fn)
+    _ensure_column(conn, "stok_urun", "updated_at", "TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP", log_fn)
 
-    _ensure_column(conn, "satis_siparis_kalem", "urun_id", "INTEGER", log_fn)
-    _ensure_column(conn, "satis_siparis_kalem", "urun_kod", "TEXT DEFAULT ''", log_fn)
-    _ensure_column(conn, "satis_siparis_kalem", "urun_ad", "TEXT DEFAULT ''", log_fn)
-    _ensure_column(conn, "satis_siparis_kalem", "birim", "TEXT DEFAULT 'Adet'", log_fn)
-    _ensure_column(conn, "satis_siparis_kalem", "miktar", "REAL DEFAULT 0", log_fn)
-    _ensure_column(conn, "satis_siparis_kalem", "birim_fiyat", "REAL DEFAULT 0", log_fn)
-    _ensure_column(conn, "satis_siparis_kalem", "toplam", "REAL DEFAULT 0", log_fn)
-    _ensure_column(conn, "satis_siparis_kalem", "sevk_miktar", "REAL DEFAULT 0", log_fn)
-    _ensure_column(conn, "satis_siparis_kalem", "aciklama", "TEXT DEFAULT ''", log_fn)
+    _ensure_column(conn, "stok_lokasyon", "aciklama", "TEXT DEFAULT ''", log_fn)
+    _ensure_column(conn, "stok_lokasyon", "aktif", "INTEGER NOT NULL DEFAULT 1", log_fn)
 
-    # Sık kullanılan sorgular için indeksler
-    _ensure_index(conn, "idx_cari_hareket_cari_tarih", "cari_hareket", "cari_id, tarih", log_fn)
-    _ensure_index(conn, "idx_cari_hareket_tarih", "cari_hareket", "tarih", log_fn)
-    _ensure_index(conn, "idx_kasa_hareket_tarih", "kasa_hareket", "tarih", log_fn)
-    _ensure_index(conn, "idx_banka_hareket_tarih", "banka_hareket", "tarih", log_fn)
-    _ensure_index(conn, "idx_banka_hareket_import_grup", "banka_hareket", "import_grup", log_fn)
-    _ensure_index(conn, "idx_fatura_cari_tarih", "fatura", "cari_id, tarih", log_fn)
-    _ensure_index(conn, "idx_fatura_tur_tarih", "fatura", "tur, tarih", log_fn)
-    _ensure_index(conn, "idx_fatura_kalem_fatura_id", "fatura_kalem", "fatura_id", log_fn)
-    _ensure_index(conn, "idx_fatura_kalem_urun", "fatura_kalem", "urun", log_fn)
-    _ensure_index(conn, "idx_fatura_odeme_fatura_id", "fatura_odeme", "fatura_id", log_fn)
-    _ensure_index(conn, "idx_fatura_odeme_tarih", "fatura_odeme", "tarih", log_fn)
-    _ensure_index(conn, "idx_stok_hareket_urun_id", "stok_hareket", "urun_id", log_fn)
-    _ensure_index(conn, "idx_stok_hareket_tarih", "stok_hareket", "tarih", log_fn)
-    _ensure_index(conn, "idx_kasa_hareket_tip_tarih", "kasa_hareket", "tip, tarih", log_fn)
+    _ensure_column(conn, "stok_parti", "skt", "TEXT DEFAULT ''", log_fn)
+    _ensure_column(conn, "stok_parti", "uretim_tarih", "TEXT DEFAULT ''", log_fn)
+    _ensure_column(conn, "stok_parti", "aciklama", "TEXT DEFAULT ''", log_fn)
+
+    _ensure_column(conn, "stok_hareket", "birim", "TEXT DEFAULT 'Adet'", log_fn)
+    _ensure_column(conn, "stok_hareket", "kaynak_lokasyon_id", "INTEGER", log_fn)
+    _ensure_column(conn, "stok_hareket", "hedef_lokasyon_id", "INTEGER", log_fn)
+    _ensure_column(conn, "stok_hareket", "parti_id", "INTEGER", log_fn)
+    _ensure_column(conn, "stok_hareket", "referans_tipi", "TEXT DEFAULT ''", log_fn)
+    _ensure_column(conn, "stok_hareket", "referans_id", "INTEGER", log_fn)
+    _ensure_column(conn, "stok_hareket", "maliyet", "REAL DEFAULT 0", log_fn)
+    _ensure_column(conn, "stok_hareket", "aciklama", "TEXT DEFAULT ''", log_fn)
+    _ensure_column(conn, "stok_hareket", "created_at", "TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP", log_fn)
 
 
 def seed_defaults(conn: sqlite3.Connection, log_fn: Optional[Callable[[str, str], None]] = None) -> None:

@@ -69,14 +69,14 @@ class StokRepo:
                 float(max_stok or 0),
                 float(kritik_stok or 0),
                 str(raf or ""),
-                int(tedarikci_id) if tedarikci_id is not None else None,
+                int(tedarikci_id) if tedarikci_id else None,
                 str(barkod or ""),
                 int(aktif),
                 str(aciklama or ""),
             ),
         )
         self.conn.commit()
-        return int(cur.lastrowid or 0)
+        return int(cur.lastrowid)
 
     def urun_update(
         self,
@@ -257,17 +257,17 @@ class StokRepo:
                 str(tip),
                 float(miktar),
                 str(birim or "Adet"),
-                int(kaynak_lokasyon_id) if kaynak_lokasyon_id is not None else None,
-                int(hedef_lokasyon_id) if hedef_lokasyon_id is not None else None,
-                int(parti_id) if parti_id is not None else None,
+                int(kaynak_lokasyon_id) if kaynak_lokasyon_id else None,
+                int(hedef_lokasyon_id) if hedef_lokasyon_id else None,
+                int(parti_id) if parti_id else None,
                 str(referans_tipi or ""),
-                int(referans_id) if referans_id is not None else None,
+                int(referans_id) if referans_id else None,
                 float(maliyet or 0),
                 str(aciklama or ""),
             ),
         )
         self.conn.commit()
-        return int(cur.lastrowid or 0)
+        return int(cur.lastrowid)
 
     def hareket_list(self, q: str = "", urun_id: Optional[int] = None, limit: int = 500) -> List[sqlite3.Row]:
         clauses = []

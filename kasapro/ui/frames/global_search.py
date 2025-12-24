@@ -55,3 +55,7 @@ class GlobalSearchFrame(ttk.Frame):
         self.txt.insert(tk.END, f"\nSTOK HAREKET ({len(res['stok_hareket'])})\n" + "-"*80 + "\n")
         for r in res["stok_hareket"]:
             self.txt.insert(tk.END, f"{r['id']} | {fmt_tr_date(r['tarih'])} | {r['urun_kod']} | {r['urun_ad']} | {r['tip']} | {r['miktar']}\n")
+
+        self.txt.insert(tk.END, f"\nSTOK HAREKET ({len(res['stok_hareket'])})\n" + "-"*80 + "\n")
+        for r in res["stok_hareket"]:
+            self.txt.insert(tk.END, f"{r['id']} | {fmt_tr_date(r['tarih'])} | {r['urun_kod']} | {r['urun_ad']} | {r['tip']} | {r['miktar']}\n")
