@@ -66,121 +66,137 @@ class FaturaFrame(ttk.Frame):
     # UI
     # -----------------
     def _build(self):
-        top = ttk.Frame(self)
-        top.pack(fill=tk.X, padx=10, pady=(10, 6))
+        try:
+            top = ttk.Frame(self)
+            top.pack(fill=tk.X, padx=10, pady=(10, 6))
 
-        ttk.Button(top, text="➕ Yeni Fatura", command=self.new_invoice).pack(side=tk.LEFT)
-        ttk.Button(top, text="💾 Kaydet", command=self.save_invoice).pack(side=tk.LEFT, padx=6)
-        self.btn_pdf = ttk.Button(top, text="🧾 PDF", command=self.export_pdf)
-        self.btn_pdf.pack(side=tk.LEFT, padx=6)
-        ttk.Button(top, text="🗑️ Sil", command=self.delete_invoice).pack(side=tk.LEFT, padx=6)
-        ttk.Button(top, text="Yenile", command=self.refresh).pack(side=tk.LEFT, padx=10)
+            ttk.Button(top, text="➕ Yeni Fatura", command=self.new_invoice).pack(side=tk.LEFT)
+            ttk.Button(top, text="💾 Kaydet", command=self.save_invoice).pack(side=tk.LEFT, padx=6)
+            self.btn_pdf = ttk.Button(top, text="🧾 PDF", command=self.export_pdf)
+            self.btn_pdf.pack(side=tk.LEFT, padx=6)
+            ttk.Button(top, text="🗑️ Sil", command=self.delete_invoice).pack(side=tk.LEFT, padx=6)
+            ttk.Button(top, text="Yenile", command=self.refresh).pack(side=tk.LEFT, padx=10)
 
-        if not HAS_REPORTLAB:
-            try:
-                self.btn_pdf.config(state="disabled")
-            except Exception:
-                pass
+            if not HAS_REPORTLAB:
+                try:
+                    self.btn_pdf.config(state="disabled")
+                except Exception:
+                    pass
 
-        self.lbl_top_info = ttk.Label(top, text="")
-        self.lbl_top_info.pack(side=tk.LEFT, padx=(14, 0))
+            self.lbl_top_info = ttk.Label(top, text="")
+            self.lbl_top_info.pack(side=tk.LEFT, padx=(14, 0))
 
-        mid = ttk.LabelFrame(self, text="Fatura")
-        mid.pack(fill=tk.BOTH, expand=True, padx=10, pady=(0, 10))
+            mid = ttk.LabelFrame(self, text="Fatura")
+            mid.pack(fill=tk.BOTH, expand=True, padx=10, pady=(0, 10))
 
-        self.nb = ttk.Notebook(mid)
-        self.nb.pack(fill=tk.BOTH, expand=True, padx=6, pady=6)
+            self.nb = ttk.Notebook(mid)
+            self.nb.pack(fill=tk.BOTH, expand=True, padx=6, pady=6)
 
-        # 1) Liste
-        self.tab_list = ttk.Frame(self.nb)
-        self.nb.add(self.tab_list, text="Faturalar")
-        self._build_list_tab()
+            # 1) Liste
+            self.tab_list = ttk.Frame(self.nb)
+            self.nb.add(self.tab_list, text="Faturalar")
+            self._build_list_tab()
 
-        # 2) Editor
-        self.tab_edit = ttk.Frame(self.nb)
-        self.nb.add(self.tab_edit, text="Fatura Oluştur / Düzenle")
-        self._build_edit_tab()
+            # 2) Editor
+            self.tab_edit = ttk.Frame(self.nb)
+            self.nb.add(self.tab_edit, text="Fatura Oluştur / Düzenle")
+            self._build_edit_tab()
 
-        # 3) Tahsilat
-        self.tab_pay = ttk.Frame(self.nb)
-        self.nb.add(self.tab_pay, text="Tahsilat / Ödeme")
-        self._build_pay_tab()
+            # 3) Tahsilat
+            self.tab_pay = ttk.Frame(self.nb)
+            self.nb.add(self.tab_pay, text="Tahsilat / Ödeme")
+            self._build_pay_tab()
 
-        # 4) Ayarlar
-        self.tab_settings = ttk.Frame(self.nb)
-        self.nb.add(self.tab_settings, text="Ayarlar")
-        self._build_settings_tab()
+            # 4) Ayarlar
+            self.tab_settings = ttk.Frame(self.nb)
+            self.nb.add(self.tab_settings, text="Ayarlar")
+            self._build_settings_tab()
 
-        # 5) Rapor
-        self.tab_report = ttk.Frame(self.nb)
-        self.nb.add(self.tab_report, text="Raporlar")
-        self._build_report_tab()
+            # 5) Rapor
+            self.tab_report = ttk.Frame(self.nb)
+            self.nb.add(self.tab_report, text="Raporlar")
+            self._build_report_tab()
 
-        self.new_invoice()
-        self.refresh()
+            self.new_invoice()
+            self.refresh()
+        except Exception as e:
+            messagebox.showerror(APP_TITLE, f"Fatura arayüzü oluşturulamadı:\n{str(e)}")
+            # En azından basit bir hata mesajı göster
+            err_lbl = ttk.Label(self, text=f"HATA: {str(e)}", foreground="red")
+            err_lbl.pack(padx=20, pady=20)
 
     # -----------------
     # Tab: Liste
     # -----------------
     def _build_list_tab(self):
-        box = ttk.LabelFrame(self.tab_list, text="Filtre")
-        box.pack(fill=tk.X, padx=8, pady=8)
-
-        row = ttk.Frame(box)
-        row.pack(fill=tk.X, pady=6)
-
-        self.f_q = LabeledEntry(row, "Ara:", 24)
-        self.f_q.pack(side=tk.LEFT, padx=6)
-
-        self.f_tur = LabeledCombo(row, "Tür:", ["(Tümü)"] + FATURA_TURLERI, 12)
-        self.f_tur.pack(side=tk.LEFT, padx=6)
-        self.f_tur.set("(Tümü)")
-
-        self.f_durum = LabeledCombo(row, "Durum:", ["(Tümü)"] + FATURA_DURUMLARI, 12)
-        self.f_durum.pack(side=tk.LEFT, padx=6)
-        self.f_durum.set("(Tümü)")
-
-        self.f_from = LabeledEntry(row, "Başlangıç:", 12)
-        self.f_from.pack(side=tk.LEFT, padx=6)
-        self.f_to = LabeledEntry(row, "Bitiş:", 12)
-        self.f_to.pack(side=tk.LEFT, padx=6)
-
-        ttk.Button(row, text="Yenile", command=self.refresh).pack(side=tk.LEFT, padx=6)
-        ttk.Button(row, text="Seçiliyi Aç", command=self.open_selected_invoice).pack(side=tk.LEFT, padx=6)
-
-        cols = ("id", "tarih", "no", "tur", "durum", "cari", "para", "toplam", "odendi", "kalan")
-        self.tree = ttk.Treeview(self.tab_list, columns=cols, show="headings", height=16, selectmode="browse")
-        for c in cols:
-            self.tree.heading(c, text=c.upper())
-
-        self.tree.column("id", width=55, anchor="center")
-        self.tree.column("tarih", width=95)
-        self.tree.column("no", width=130)
-        self.tree.column("tur", width=80, anchor="center")
-        self.tree.column("durum", width=80, anchor="center")
-        self.tree.column("cari", width=240)
-        self.tree.column("para", width=55, anchor="center")
-        self.tree.column("toplam", width=110, anchor="e")
-        self.tree.column("odendi", width=110, anchor="e")
-        self.tree.column("kalan", width=110, anchor="e")
-
-        self.tree.pack(fill=tk.BOTH, expand=True, padx=8, pady=(0, 8))
-
-        scr = ttk.Scrollbar(self.tab_list, orient="vertical", command=self.tree.yview)
-        scr.place(in_=self.tree, relx=1.0, rely=0, relheight=1.0, x=0)
-        self.tree.configure(yscrollcommand=scr.set)
-
         try:
-            self.tree.bind("<Double-1>", lambda _e: self.open_selected_invoice())
-        except Exception:
-            pass
+            box = ttk.LabelFrame(self.tab_list, text="Filtre")
+            box.pack(fill=tk.X, padx=8, pady=8)
+
+            row = ttk.Frame(box)
+            row.pack(fill=tk.X, pady=6)
+
+            self.f_q = LabeledEntry(row, "Ara:", 24)
+            self.f_q.pack(side=tk.LEFT, padx=6)
+
+            self.f_tur = LabeledCombo(row, "Tür:", ["(Tümü)"] + FATURA_TURLERI, 12)
+            self.f_tur.pack(side=tk.LEFT, padx=6)
+            self.f_tur.set("(Tümü)")
+
+            self.f_durum = LabeledCombo(row, "Durum:", ["(Tümü)"] + FATURA_DURUMLARI, 12)
+            self.f_durum.pack(side=tk.LEFT, padx=6)
+            self.f_durum.set("(Tümü)")
+
+            self.f_from = LabeledEntry(row, "Başlangıç:", 12)
+            self.f_from.pack(side=tk.LEFT, padx=6)
+            self.f_to = LabeledEntry(row, "Bitiş:", 12)
+            self.f_to.pack(side=tk.LEFT, padx=6)
+
+            ttk.Button(row, text="Yenile", command=self.refresh).pack(side=tk.LEFT, padx=6)
+            ttk.Button(row, text="Seçiliyi Aç", command=self.open_selected_invoice).pack(side=tk.LEFT, padx=6)
+
+            cols = ("id", "tarih", "no", "tur", "durum", "cari", "para", "toplam", "odendi", "kalan")
+            self.tree = ttk.Treeview(self.tab_list, columns=cols, show="headings", height=16, selectmode="browse")
+            for c in cols:
+                self.tree.heading(c, text=c.upper())
+
+            self.tree.column("id", width=55, anchor="center")
+            self.tree.column("tarih", width=95)
+            self.tree.column("no", width=130)
+            self.tree.column("tur", width=80, anchor="center")
+            self.tree.column("durum", width=80, anchor="center")
+            self.tree.column("cari", width=240)
+            self.tree.column("para", width=55, anchor="center")
+            self.tree.column("toplam", width=110, anchor="e")
+            self.tree.column("odendi", width=110, anchor="e")
+            self.tree.column("kalan", width=110, anchor="e")
+
+            self.tree.pack(fill=tk.BOTH, expand=True, padx=8, pady=(0, 4))
+
+            scr = ttk.Scrollbar(self.tab_list, orient="vertical", command=self.tree.yview)
+            scr.place(in_=self.tree, relx=1.0, rely=0, relheight=1.0, x=0)
+            self.tree.configure(yscrollcommand=scr.set)
+
+            # Bilgi etiketi
+            self.lbl_list_info = ttk.Label(self.tab_list, text="Fatura listesi yüklenecek...")
+            self.lbl_list_info.pack(fill=tk.X, padx=8, pady=(0, 8))
+
+            try:
+                self.tree.bind("<Double-1>", lambda _e: self.open_selected_invoice())
+            except Exception:
+                pass
+        except Exception as e:
+            err = ttk.Label(self.tab_list, text=f"Liste sekme hatası: {str(e)}", foreground="red")
+            err.pack(padx=10, pady=10)
+            messagebox.showerror(APP_TITLE, f"Liste sekmesi oluşturulamadı:\n{str(e)}")
 
     # -----------------
     # Tab: Editor
     # -----------------
     def _build_edit_tab(self):
-        header = ttk.LabelFrame(self.tab_edit, text="Fatura Bilgileri")
-        header.pack(fill=tk.X, padx=8, pady=8)
+        try:
+            header = ttk.LabelFrame(self.tab_edit, text="Fatura Bilgileri")
+            header.pack(fill=tk.X, padx=8, pady=8)
 
         row1 = ttk.Frame(header)
         row1.pack(fill=tk.X, pady=(6, 2))
@@ -347,6 +363,7 @@ class FaturaFrame(ttk.Frame):
                 uniq = ["A"]
         except Exception:
             uniq = ["A"]
+            
         try:
             self.e_seri.cmb["values"] = uniq
         except Exception:
@@ -356,8 +373,9 @@ class FaturaFrame(ttk.Frame):
     # Tab: Tahsilat
     # -----------------
     def _build_pay_tab(self):
-        top = ttk.Frame(self.tab_pay)
-        top.pack(fill=tk.X, padx=8, pady=8)
+        try:
+            top = ttk.Frame(self.tab_pay)
+            top.pack(fill=tk.X, padx=8, pady=8)
 
         ttk.Button(top, text="➕ Tahsilat/Ödeme Ekle", command=self.add_payment).pack(side=tk.LEFT)
         ttk.Button(top, text="🗑️ Sil", command=self.delete_payment).pack(side=tk.LEFT, padx=6)
@@ -374,25 +392,30 @@ class FaturaFrame(ttk.Frame):
         self.pay_tree.column("id", width=55, anchor="center")
         self.pay_tree.column("tarih", width=95)
         self.pay_tree.column("tutar", width=110, anchor="e")
-        self.pay_tree.column("para", width=55, anchor="center")
-        self.pay_tree.column("odeme", width=140)
-        self.pay_tree.column("aciklama", width=360)
-        self.pay_tree.column("ref", width=140)
+            self.pay_tree.column("para", width=55, anchor="center")
+            self.pay_tree.column("odeme", width=140)
+            self.pay_tree.column("aciklama", width=360)
+            self.pay_tree.column("ref", width=140)
 
-        self.pay_tree.pack(fill=tk.BOTH, expand=True, padx=8, pady=(0, 8))
+            self.pay_tree.pack(fill=tk.BOTH, expand=True, padx=8, pady=(0, 8))
+        except Exception as e:
+            err = ttk.Label(self.tab_pay, text=f"Tahsilat sekme hatası: {str(e)}", foreground="red")
+            err.pack(padx=10, pady=10)
+            messagebox.showerror(APP_TITLE, f"Tahsilat sekmesi oluşturulamadı:\n{str(e)}")
 
     # -----------------
     # Tab: Ayarlar
     # -----------------
     def _build_settings_tab(self):
-        hint = ttk.Label(
-            self.tab_settings,
-            text=(
-                "Seri/Numara formatı: {yil} {seri} {no_pad} {no} {prefix} alanlarını kullanabilirsiniz.\n"
-                "Örn: {yil}{seri}{no_pad}  =>  2025A000001"
-            ),
-        )
-        hint.pack(anchor="w", padx=10, pady=(10, 4))
+        try:
+            hint = ttk.Label(
+                self.tab_settings,
+                text=(
+                    "Seri/Numara formatı: {yil} {seri} {no_pad} {no} {prefix} alanlarını kullanabilirsiniz.\n"
+                    "Örn: {yil}{seri}{no_pad}  =>  2025A000001"
+                ),
+            )
+            hint.pack(anchor="w", padx=10, pady=(10, 4))
 
         top = ttk.Frame(self.tab_settings)
         top.pack(fill=tk.X, padx=10, pady=6)
@@ -456,42 +479,51 @@ class FaturaFrame(ttk.Frame):
         except Exception:
             pass
 
-        self.refresh_series()
+            self.refresh_series()
+        except Exception as e:
+            err = ttk.Label(self.tab_settings, text=f"Ayarlar sekme hatası: {str(e)}", foreground="red")
+            err.pack(padx=10, pady=10)
+            messagebox.showerror(APP_TITLE, f"Ayarlar sekmesi oluşturulamadı:\n{str(e)}")
 
     # -----------------
     # Tab: Rapor
     # -----------------
     def _build_report_tab(self):
-        top = ttk.Frame(self.tab_report)
-        top.pack(fill=tk.X, padx=8, pady=8)
+        try:
+            top = ttk.Frame(self.tab_report)
+            top.pack(fill=tk.X, padx=8, pady=8)
 
-        ttk.Button(top, text="Açık Faturalar", command=self.report_open_invoices).pack(side=tk.LEFT)
-        ttk.Button(top, text="Satın Alma Siparişleri", command=self.report_purchase_orders).pack(side=tk.LEFT, padx=6)
-        ttk.Button(top, text="Bu Ay", command=lambda: self.report_month(date.today().year, date.today().month)).pack(side=tk.LEFT, padx=6)
-        ttk.Button(top, text="Satın Alma (Bu Ay)", command=lambda: self.report_purchase_month(date.today().year, date.today().month)).pack(
-            side=tk.LEFT, padx=6
-        )
-        ttk.Button(top, text="Satın Alma (Tümü)", command=self.report_purchase_all).pack(side=tk.LEFT, padx=6)
+            ttk.Button(top, text="Açık Faturalar", command=self.report_open_invoices).pack(side=tk.LEFT)
+            ttk.Button(top, text="Satın Alma Siparişleri", command=self.report_purchase_orders).pack(side=tk.LEFT, padx=6)
+            ttk.Button(top, text="Bu Ay", command=lambda: self.report_month(date.today().year, date.today().month)).pack(side=tk.LEFT, padx=6)
+            ttk.Button(top, text="Satın Alma (Bu Ay)", command=lambda: self.report_purchase_month(date.today().year, date.today().month)).pack(
+                side=tk.LEFT, padx=6
+            )
+            ttk.Button(top, text="Satın Alma (Tümü)", command=self.report_purchase_all).pack(side=tk.LEFT, padx=6)
 
-        self.lbl_report = ttk.Label(top, text="")
-        self.lbl_report.pack(side=tk.LEFT, padx=(10, 0))
+            self.lbl_report = ttk.Label(top, text="")
+            self.lbl_report.pack(side=tk.LEFT, padx=(10, 0))
 
-        cols = ("id", "tarih", "no", "cari", "tur", "durum", "para", "toplam", "kalan")
-        self.report_tree = ttk.Treeview(self.tab_report, columns=cols, show="headings", height=16, selectmode="browse")
-        for c in cols:
-            self.report_tree.heading(c, text=c.upper())
+            cols = ("id", "tarih", "no", "cari", "tur", "durum", "para", "toplam", "kalan")
+            self.report_tree = ttk.Treeview(self.tab_report, columns=cols, show="headings", height=16, selectmode="browse")
+            for c in cols:
+                self.report_tree.heading(c, text=c.upper())
 
-        self.report_tree.column("id", width=55, anchor="center")
-        self.report_tree.column("tarih", width=95)
-        self.report_tree.column("no", width=130)
-        self.report_tree.column("cari", width=260)
-        self.report_tree.column("tur", width=80, anchor="center")
-        self.report_tree.column("durum", width=80, anchor="center")
-        self.report_tree.column("para", width=55, anchor="center")
-        self.report_tree.column("toplam", width=110, anchor="e")
-        self.report_tree.column("kalan", width=110, anchor="e")
+            self.report_tree.column("id", width=55, anchor="center")
+            self.report_tree.column("tarih", width=95)
+            self.report_tree.column("no", width=130)
+            self.report_tree.column("cari", width=260)
+            self.report_tree.column("tur", width=80, anchor="center")
+            self.report_tree.column("durum", width=80, anchor="center")
+            self.report_tree.column("para", width=55, anchor="center")
+            self.report_tree.column("toplam", width=110, anchor="e")
+            self.report_tree.column("kalan", width=110, anchor="e")
 
-        self.report_tree.pack(fill=tk.BOTH, expand=True, padx=8, pady=(0, 8))
+            self.report_tree.pack(fill=tk.BOTH, expand=True, padx=8, pady=(0, 8))
+        except Exception as e:
+            err = ttk.Label(self.tab_report, text=f"Rapor sekme hatası: {str(e)}", foreground="red")
+            err.pack(padx=10, pady=10)
+            messagebox.showerror(APP_TITLE, f"Rapor sekmesi oluşturulamadı:\n{str(e)}")
 
     def _clear_report_tree(self) -> None:
         try:
@@ -521,13 +553,23 @@ class FaturaFrame(ttk.Frame):
         if durum == "(Tümü)":
             durum = ""
 
-        rows = self.app.db.fatura_list(
-            q=self.f_q.get(),
-            date_from=self.f_from.get(),
-            date_to=self.f_to.get(),
-            tur=tur,
-            durum=durum,
-        )
+        try:
+            self.lbl_list_info.config(text="Faturalar yükleniyor...")
+            self.update_idletasks()
+            
+            rows = self.app.db.fatura_list(
+                q=self.f_q.get(),
+                date_from=self.f_from.get(),
+                date_to=self.f_to.get(),
+                tur=tur,
+                durum=durum,
+            )
+        except Exception as e:
+            error_msg = f"Fatura listesi yüklenemedi: {str(e)}"
+            self.lbl_top_info.config(text=f"HATA: {str(e)[:60]}")
+            self.lbl_list_info.config(text=error_msg)
+            messagebox.showerror(APP_TITLE, error_msg)
+            return
 
         total = 0.0
         for r in rows:
@@ -561,6 +603,7 @@ class FaturaFrame(ttk.Frame):
             ))
 
         self.lbl_top_info.config(text=f"Fatura Sayısı: {len(rows)}  •  Toplam: {fmt_amount(total)}")
+        self.lbl_list_info.config(text=f"{len(rows)} fatura listelendi. Toplam tutar: {fmt_amount(total)}")
 
     def refresh_payments(self):
         for i in self.pay_tree.get_children():

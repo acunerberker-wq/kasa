@@ -12,7 +12,10 @@ from .banka_repo import BankaRepo
 from .fatura_repo import FaturaRepo
 from .stok_repo import StokRepo
 from .nakliye_repo import NakliyeRepo
-from .purchase_report_repo import PurchaseReportRepo
+from .satin_alma_repo import SatinAlmaRepo
+from .messages_repo import MessagesRepo
+from .satis_rapor_repo import SatisRaporRepo
+from .satis_siparis_repo import SatisSiparisRepo
 
 __all__ = [
     "LogsRepo",
@@ -27,5 +30,8 @@ __all__ = [
     "FaturaRepo",
     "StokRepo",
     "NakliyeRepo",
-    "PurchaseReportRepo",
+    "SatinAlmaRepo",
+    "MessagesRepo",
+    "SatisRaporRepo",
+    "SatisSiparisRepo",
 ]

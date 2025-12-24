@@ -280,6 +280,16 @@ class SatisSiparisRaporFrame(ttk.Frame):
         def worker():
             try:
                 db = DB(db_path)
+                # Tabloları kontrol et
+                cursor = db.conn.execute(
+                    "SELECT name FROM sqlite_master WHERE type='table' AND name IN ('satis_siparis', 'satis_siparis_kalem')"
+                )
+                tables = [row[0] for row in cursor.fetchall()]
+                if 'satis_siparis' not in tables or 'satis_siparis_kalem' not in tables:
+                    db.close()
+                    q.put(("warn", "Satış sipariş tabloları henüz oluşturulmamış. Lütfen önce satış siparişi oluşturun."))
+                    return
+                
                 if key == "open":
                     data = db.satis_siparis_rapor_acik(filters, OPEN_STATUSES)
                 elif key == "ready":
@@ -290,6 +300,11 @@ class SatisSiparisRaporFrame(ttk.Frame):
                     data = db.satis_siparis_rapor_donusum(filters)
                 db.close()
                 q.put(("ok", data))
+            except AttributeError as exc:
+                if "satis_siparis" in str(exc).lower():
+                    q.put(("warn", "Satış sipariş fonksiyonları henüz etkin değil. Lütfen önce satış siparişi oluşturun."))
+                else:
+                    q.put(("err", exc))
             except Exception as exc:
                 q.put(("err", exc))
 
@@ -309,8 +324,10 @@ class SatisSiparisRaporFrame(ttk.Frame):
             if status == "err":
                 messagebox.showerror(APP_TITLE, f"Rapor oluşturulamadı: {payload}")
                 self._set_status("Rapor hatası.")
-                return
-            self._render_report(key, payload)
+                return            elif status == "warn":
+                messagebox.showwarning(APP_TITLE, str(payload))
+                self._set_status("Rapor yok.")
+                return            self._render_report(key, payload)
 
         self.after(60, poll)
 

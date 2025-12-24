@@ -185,9 +185,23 @@ class DiagnosticsFrame(ttk.Frame):
         base_dir = APP_BASE_DIR
         data_dir = os.path.join(base_dir, DATA_DIRNAME)
         shared_dir = os.path.join(base_dir, SHARED_STORAGE_DIRNAME)
+        
+        # Eksik dizinleri oluşturmayı dene
+        created = []
+        for p in (data_dir, shared_dir):
+            if not os.path.isdir(p):
+                try:
+                    os.makedirs(p, exist_ok=True)
+                    created.append(os.path.basename(p))
+                except Exception:
+                    pass
+        
         missing = [p for p in (base_dir, data_dir, shared_dir) if not os.path.isdir(p)]
         if missing:
             return False, f"Eksik dizinler: {', '.join(missing)}"
+        
+        if created:
+            return True, f"Base: {base_dir} (Oluşturuldu: {', '.join(created)})"
         return True, f"Base: {base_dir}"
 
     def _check_disk_space(self) -> Tuple[bool, str]:

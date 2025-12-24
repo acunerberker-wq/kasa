@@ -23,17 +23,11 @@ from .repos import (
     BankaRepo,
     FaturaRepo,
     StokRepo,
-    StokRepo,
     NakliyeRepo,
-    PurchaseReportRepo,
-    PurchaseReportRepo,
-    StokRepo,
-    NakliyeRepo,
-    PurchaseReportRepo,
     SatinAlmaRepo,
     SatisSiparisRepo,
     MessagesRepo,
-    PurchaseReportRepo,
+    SatisRaporRepo,
 )
 
 
@@ -57,17 +51,11 @@ class DB:
         self.banka = BankaRepo(self.conn)
         self.fatura = FaturaRepo(self.conn)
         self.stok = StokRepo(self.conn)
-        self.stok = StokRepo(self.conn)
         self.nakliye = NakliyeRepo(self.conn)
-        self.purchase_reports = PurchaseReportRepo(self.conn)
-        self.purchase_reports = PurchaseReportRepo(self.conn)
-        self.stok = StokRepo(self.conn)
-        self.nakliye = NakliyeRepo(self.conn)
-        self.purchase_reports = PurchaseReportRepo(self.conn)
         self.satin_alma = SatinAlmaRepo(self.conn)
         self.satis_siparis = SatisSiparisRepo(self.conn)
         self.messages = MessagesRepo(self.conn)
-        self.purchase_reports = PurchaseReportRepo(self.conn)
+        self.satis_rapor = SatisRaporRepo(self.conn)
 
         migrate_schema(self.conn, log_fn=self._safe_log)
         seed_defaults(self.conn, log_fn=self._safe_log)
@@ -176,12 +164,6 @@ class DB:
 
     def list_categories(self) -> List[str]:
         return self.settings.list_categories()
-
-    def list_stock_units(self) -> List[str]:
-        return self.settings.list_stock_units()
-
-    def list_stock_categories(self) -> List[str]:
-        return self.settings.list_stock_categories()
 
     def list_stock_units(self) -> List[str]:
         return self.settings.list_stock_units()
@@ -435,43 +417,22 @@ class DB:
     # Satın Alma Raporları
     # -----------------
     def purchase_report_suppliers(self):
-        return self.purchase_reports.list_suppliers()
+        return self.satin_alma.list_suppliers()
 
     def purchase_report_products(self) -> List[str]:
-        return self.purchase_reports.list_products()
+        return self.satin_alma.list_products()
 
     def purchase_report_categories(self) -> List[str]:
-        return self.purchase_reports.list_categories()
+        return self.satin_alma.list_categories()
 
     def purchase_report_locations(self):
-        return self.purchase_reports.list_locations()
+        return self.satin_alma.list_locations()
 
     def purchase_report_users(self):
-        return self.purchase_reports.list_users()
+        return self.satin_alma.list_users()
 
     def purchase_report_fetch(self, **kwargs):
-        return self.purchase_reports.fetch_report(**kwargs)
-
-    # -----------------
-    # Satın Alma Raporları
-    # -----------------
-    def purchase_report_suppliers(self):
-        return self.purchase_reports.list_suppliers()
-
-    def purchase_report_products(self) -> List[str]:
-        return self.purchase_reports.list_products()
-
-    def purchase_report_categories(self) -> List[str]:
-        return self.purchase_reports.list_categories()
-
-    def purchase_report_locations(self):
-        return self.purchase_reports.list_locations()
-
-    def purchase_report_users(self):
-        return self.purchase_reports.list_users()
-
-    def purchase_report_fetch(self, **kwargs):
-        return self.purchase_reports.fetch_report(**kwargs)
+        return self.satin_alma.fetch_report(**kwargs)
 
     # -----------------
     # Stok
@@ -611,27 +572,6 @@ class DB:
         return self.stok.hareket_delete(hid)
 
     # -----------------
-    # Satın Alma Raporları
-    # -----------------
-    def purchase_report_suppliers(self):
-        return self.purchase_reports.list_suppliers()
-
-    def purchase_report_products(self) -> List[str]:
-        return self.purchase_reports.list_products()
-
-    def purchase_report_categories(self) -> List[str]:
-        return self.purchase_reports.list_categories()
-
-    def purchase_report_locations(self):
-        return self.purchase_reports.list_locations()
-
-    def purchase_report_users(self):
-        return self.purchase_reports.list_users()
-
-    def purchase_report_fetch(self, **kwargs):
-        return self.purchase_reports.fetch_report(**kwargs)
-
-    # -----------------
     # Satın Alma Siparişleri
     # -----------------
     def satin_alma_siparis_list(
@@ -675,27 +615,6 @@ class DB:
             depo_id=depo_id,
             limit=limit,
         )
-
-    # -----------------
-    # Satın Alma Raporları
-    # -----------------
-    def purchase_report_suppliers(self):
-        return self.purchase_reports.list_suppliers()
-
-    def purchase_report_products(self) -> List[str]:
-        return self.purchase_reports.list_products()
-
-    def purchase_report_categories(self) -> List[str]:
-        return self.purchase_reports.list_categories()
-
-    def purchase_report_locations(self):
-        return self.purchase_reports.list_locations()
-
-    def purchase_report_users(self):
-        return self.purchase_reports.list_users()
-
-    def purchase_report_fetch(self, **kwargs):
-        return self.purchase_reports.fetch_report(**kwargs)
 
     # -----------------
     # Banka
@@ -1206,6 +1125,27 @@ class DB:
     def satis_rapor_warnings(self) -> List[str]:
         return self.satis_rapor.data_warnings()
 
+    # -----------------
+    # Satış Sipariş Raporları
+    # -----------------
+    def satis_siparis_rapor_acik(self, filters: Dict[str, Any], open_statuses: List[str]) -> Dict[str, Any]:
+        return self.satis_siparis.rapor_acik_siparisler(filters, open_statuses)
+
+    def satis_siparis_rapor_sevkiyata_hazir(self, filters: Dict[str, Any], status_pool: List[str]) -> Dict[str, Any]:
+        return self.satis_siparis.rapor_sevkiyata_hazir(filters, status_pool)
+
+    def satis_siparis_rapor_kismi_sevk(self, filters: Dict[str, Any]) -> Dict[str, Any]:
+        return self.satis_siparis.rapor_kismi_sevk(filters)
+
+    def satis_siparis_rapor_donusum(self, filters: Dict[str, Any]) -> Dict[str, Any]:
+        return self.satis_siparis.rapor_donusum(filters)
+
+    def satis_siparis_acik_ozet(self, open_statuses: List[str]) -> Dict[str, Any]:
+        return self.satis_siparis.acik_siparis_ozet(open_statuses)
+
+    # -----------------
+    # Fatura Kalem ve Ödeme
+    # -----------------
     def fatura_kalem_list(self, fid: int):
         return self.fatura.kalem_list(fid)
 

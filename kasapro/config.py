@@ -81,3 +81,8 @@ LOG_LEVEL = _cfg.get("logging", "level", fallback=DEFAULT_LOG_LEVEL)
 
 SHARED_STORAGE_DIR = os.path.join(APP_BASE_DIR, SHARED_STORAGE_DIRNAME)
 MESSAGE_ATTACHMENT_MAX_BYTES = MESSAGE_ATTACHMENT_MAX_MB * 1024 * 1024
+# Shared storage dizinini otomatik oluştur
+try:
+    os.makedirs(SHARED_STORAGE_DIR, exist_ok=True)
+except Exception:
+    pass
