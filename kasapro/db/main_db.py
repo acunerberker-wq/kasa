@@ -24,14 +24,8 @@ from .repos import (
     FaturaRepo,
     StokRepo,
     NakliyeRepo,
-<<<<<<< ours
-<<<<<<< ours
+
     PurchaseReportRepo,
-=======
-    MessagesRepo,
->>>>>>> theirs
-=======
->>>>>>> theirs
 )
 
 
@@ -56,14 +50,8 @@ class DB:
         self.fatura = FaturaRepo(self.conn)
         self.stok = StokRepo(self.conn)
         self.nakliye = NakliyeRepo(self.conn)
-<<<<<<< ours
-<<<<<<< ours
-        self.purchase_reports = PurchaseReportRepo(self.conn)
-=======
-        self.messages = MessagesRepo(self.conn)
->>>>>>> theirs
-=======
->>>>>>> theirs
+
+            self.purchase_reports = PurchaseReportRepo(self.conn)
 
         migrate_schema(self.conn, log_fn=self._safe_log)
         seed_defaults(self.conn, log_fn=self._safe_log)
