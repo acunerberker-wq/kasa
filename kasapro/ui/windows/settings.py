@@ -20,8 +20,8 @@ import json
 import tkinter as tk
 from tkinter import ttk, messagebox, simpledialog
 
-from ...config import APP_TITLE, APP_BASE_DIR
-from ...utils import center_window, fmt_amount
+from ...config import APP_TITLE, APP_BASE_DIR, SHARED_STORAGE_DIRNAME
+from ...utils import center_window, fmt_amount, _safe_slug
 from ..dialogs import simple_input, simple_choice
 
 
@@ -60,6 +60,9 @@ class SettingsWindow(tk.Toplevel):
         tab_db_restore = ttk.Frame(nb)
         nb.add(tab_db_restore, text="DB Geri Yükle")
 
+        tab_shared_storage = ttk.Frame(nb)
+        nb.add(tab_shared_storage, text="Ortak Depolama")
+
         # ---- Listeler ----
         self._list_editor(tab_lists, "Para Birimleri", "currencies", self.db.list_currencies(), y=0)
         self._list_editor(tab_lists, "Ödeme Tipleri", "payments", self.db.list_payments(), y=170)
@@ -80,6 +83,7 @@ class SettingsWindow(tk.Toplevel):
         # ---- DB Yedek / Geri Yükle ----
         self._build_db_backup_tab(tab_db_backup)
         self._build_db_restore_tab(tab_db_restore)
+        self._build_shared_storage_tab(tab_shared_storage)
 
         # Varsayılan olarak ilk sekmede kalsın.
 
@@ -813,6 +817,63 @@ class SettingsWindow(tk.Toplevel):
 
     def _get_base_dir(self) -> str:
         return getattr(self.app, "base_dir", None) or APP_BASE_DIR
+
+    def _get_shared_storage_root(self) -> str:
+        base = self._get_base_dir()
+        return os.path.join(base, SHARED_STORAGE_DIRNAME)
+
+    def _get_shared_storage_path(self) -> str:
+        root = self._get_shared_storage_root()
+        company_name = getattr(self.app, "active_company_name", "") or "sirket"
+        company_id = getattr(self.app, "active_company_id", None)
+        slug = _safe_slug(company_name)
+        if company_id:
+            folder = f"{company_id}_{slug}"
+        else:
+            folder = slug or "sirket"
+        return os.path.join(root, folder)
+
+    def _refresh_shared_storage_info(self) -> None:
+        if not hasattr(self, "lbl_shared_storage"):
+            return
+        path = self._get_shared_storage_path()
+        root = self._get_shared_storage_root()
+        text = (
+            "Şirket içi ortak dosya alanı.\n"
+            f"Kök klasör: {root}\n"
+            f"Aktif şirket klasörü: {path}"
+        )
+        self.lbl_shared_storage.config(text=text)
+
+    def _build_shared_storage_tab(self, master: ttk.Frame):
+        self.lbl_shared_storage = ttk.Label(master, text="", justify="left")
+        self.lbl_shared_storage.pack(anchor="w", padx=10, pady=(10, 8))
+        self._refresh_shared_storage_info()
+
+        btns = ttk.Frame(master)
+        btns.pack(fill=tk.X, padx=10, pady=(0, 8))
+
+        def ensure_and_open():
+            path = self._get_shared_storage_path()
+            try:
+                os.makedirs(path, exist_ok=True)
+            except Exception as e:
+                messagebox.showerror(APP_TITLE, f"Klasör oluşturulamadı:\n{e}", parent=self)
+                return
+            self._open_in_file_manager(path)
+
+        def copy_path():
+            path = self._get_shared_storage_path()
+            try:
+                self.clipboard_clear()
+                self.clipboard_append(path)
+                messagebox.showinfo(APP_TITLE, "Klasör yolu kopyalandı.", parent=self)
+            except Exception as e:
+                messagebox.showerror(APP_TITLE, f"Kopyalanamadı:\n{e}", parent=self)
+
+        ttk.Button(btns, text="📂 Klasörü Aç", command=ensure_and_open).pack(side=tk.LEFT)
+        ttk.Button(btns, text="📋 Yolu Kopyala", command=copy_path).pack(side=tk.LEFT, padx=6)
+        ttk.Button(btns, text="🔄 Yenile", command=self._refresh_shared_storage_info).pack(side=tk.RIGHT)
 
     def _list_backup_files(self) -> List[str]:
         base = self._get_base_dir()
