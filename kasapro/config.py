@@ -29,6 +29,7 @@ DEFAULT_LOG_DIRNAME = "logs"
 DEFAULT_LOG_LEVEL = "INFO"
 DEFAULT_SHARED_STORAGE_DIRNAME = "shared_storage"
 DEFAULT_MESSAGE_ATTACHMENTS_DIRNAME = "attachments"
+DEFAULT_HR_ATTACHMENTS_DIRNAME = "attachments/hr"
 DEFAULT_MESSAGE_ATTACHMENT_MAX_MB = 10
 
 DEFAULT_CURRENCIES = ["TL", "USD", "EUR"]
@@ -75,14 +76,21 @@ USERS_DB_FILENAME = _cfg.get("db", "users_db_filename", fallback=DEFAULT_USERS_D
 DATA_DIRNAME = _cfg.get("paths", "data_dir", fallback=DEFAULT_DATA_DIRNAME)
 SHARED_STORAGE_DIRNAME = _cfg.get("paths", "shared_storage_dir", fallback=DEFAULT_SHARED_STORAGE_DIRNAME)
 MESSAGE_ATTACHMENTS_DIRNAME = _cfg.get("paths", "message_attachments_dir", fallback=DEFAULT_MESSAGE_ATTACHMENTS_DIRNAME)
+HR_ATTACHMENTS_DIRNAME = _cfg.get("paths", "hr_attachments_dir", fallback=DEFAULT_HR_ATTACHMENTS_DIRNAME)
 MESSAGE_ATTACHMENT_MAX_MB = _cfg.getint("messages", "attachment_max_mb", fallback=DEFAULT_MESSAGE_ATTACHMENT_MAX_MB)
 LOG_DIRNAME = _cfg.get("logging", "log_dir", fallback=DEFAULT_LOG_DIRNAME)
 LOG_LEVEL = _cfg.get("logging", "level", fallback=DEFAULT_LOG_LEVEL)
 
 SHARED_STORAGE_DIR = os.path.join(APP_BASE_DIR, SHARED_STORAGE_DIRNAME)
+HR_ATTACHMENTS_DIR = os.path.join(APP_BASE_DIR, HR_ATTACHMENTS_DIRNAME)
 MESSAGE_ATTACHMENT_MAX_BYTES = MESSAGE_ATTACHMENT_MAX_MB * 1024 * 1024
 # Shared storage dizinini otomatik oluştur
 try:
     os.makedirs(SHARED_STORAGE_DIR, exist_ok=True)
+except Exception:
+    pass
+
+try:
+    os.makedirs(HR_ATTACHMENTS_DIR, exist_ok=True)
 except Exception:
     pass

@@ -7,6 +7,7 @@ App açılırken tek bir yerde oluşturulur ve UI'ye `app.services` olarak veril
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import Callable
 
 from ..db.main_db import DB
 from ..db.users_db import UsersDB
@@ -16,7 +17,7 @@ from .settings_service import SettingsService
 from .company_users_service import CompanyUsersService
 from .cari_service import CariService
 from .messages_service import MessagesService
-from ..modules.hakedis.service import HakedisService
+from modules.hr.service import HRService, HRContext
 
 
 @dataclass
@@ -29,10 +30,10 @@ class Services:
     company_users: CompanyUsersService
     cari: CariService
     messages: MessagesService
-    hakedis: HakedisService
+    hr: HRService
 
     @classmethod
-    def build(cls, db: DB, usersdb: UsersDB) -> "Services":
+    def build(cls, db: DB, usersdb: UsersDB, context_provider: Callable[[], HRContext]) -> "Services":
         exporter = ExportService()
         return cls(
             db=db,
@@ -42,5 +43,5 @@ class Services:
             company_users=CompanyUsersService(db),
             cari=CariService(db, exporter),
             messages=MessagesService(db, usersdb),
-            hakedis=HakedisService(db),
+            hr=HRService(db, context_provider),
         )

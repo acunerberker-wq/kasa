@@ -33,6 +33,7 @@ from .ui.frames import (
     MessagesFrame,
 )
 from .ui.plugins.loader import discover_ui_plugins
+from modules.hr.service import HRContext
 
 class App:
     def __init__(self, base_dir: Optional[str] = None, test_mode: bool = False):
@@ -109,7 +110,7 @@ class App:
 
         self.db = DB(db_path)
         # Servis katmanı (UI -> services -> DB)
-        self.services = Services.build(self.db, self.usersdb)
+        self.services = Services.build(self.db, self.usersdb, context_provider=self._hr_context)
         try:
             cname = getattr(self, "active_company_name", "")
             if cname:
@@ -171,6 +172,14 @@ class App:
                 return
 
         threading.Thread(target=worker, daemon=True).start()
+
+    def _hr_context(self) -> HRContext:
+        company_id = int(getattr(self, "active_company_id", None) or 1)
+        return HRContext(
+            company_id=company_id,
+            actor_username=str(self.user["username"]),
+            actor_role=str(self.user["role"]),
+        )
 
     def _install_exception_handlers(self) -> None:
         logger = logging.getLogger(__name__)
