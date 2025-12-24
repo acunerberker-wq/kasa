@@ -801,232 +801,95 @@ def init_schema(conn: sqlite3.Connection) -> None:
     );""")
 
     # -----------------
-    # Hakediş Modülü
+    # Notlar & Hatırlatmalar
     # -----------------
     c.execute("""
-    CREATE TABLE IF NOT EXISTS projects(
+    CREATE TABLE IF NOT EXISTS notes(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        company_id INTEGER NOT NULL,
-        name TEXT NOT NULL,
-        code TEXT DEFAULT '',
+        company_id INTEGER NOT NULL DEFAULT 1,
+        owner_user_id INTEGER NOT NULL,
+        title TEXT NOT NULL,
+        body TEXT DEFAULT '',
+        category TEXT DEFAULT '',
+        priority TEXT DEFAULT 'normal',
+        pinned INTEGER NOT NULL DEFAULT 0,
+        scope TEXT NOT NULL DEFAULT 'personal',
         status TEXT NOT NULL DEFAULT 'active',
-        notes TEXT DEFAULT '',
-        created_at TEXT NOT NULL,
-        updated_at TEXT NOT NULL
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
     );""")
 
     c.execute("""
-    CREATE TABLE IF NOT EXISTS sites(
+    CREATE TABLE IF NOT EXISTS note_tags(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        company_id INTEGER NOT NULL,
-        project_id INTEGER NOT NULL,
-        name TEXT NOT NULL,
-        location TEXT DEFAULT '',
-        status TEXT NOT NULL DEFAULT 'active',
-        created_at TEXT NOT NULL,
-        updated_at TEXT NOT NULL,
-        FOREIGN KEY(project_id) REFERENCES projects(id)
+        note_id INTEGER NOT NULL,
+        tag TEXT NOT NULL,
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY(note_id) REFERENCES notes(id) ON DELETE CASCADE
     );""")
 
     c.execute("""
-    CREATE TABLE IF NOT EXISTS contracts(
+    CREATE TABLE IF NOT EXISTS note_attachments(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        company_id INTEGER NOT NULL,
-        project_id INTEGER NOT NULL,
-        site_id INTEGER,
-        contract_no TEXT NOT NULL,
-        contract_type TEXT NOT NULL DEFAULT 'birim_fiyat',
-        currency TEXT DEFAULT 'TL',
-        advance_rate REAL DEFAULT 0,
-        retention_rate REAL DEFAULT 0,
-        advance_deduction_rate REAL DEFAULT 0,
-        penalty_rate REAL DEFAULT 0,
-        price_diff_enabled INTEGER NOT NULL DEFAULT 0,
-        formula_template TEXT DEFAULT '',
-        formula_params TEXT DEFAULT '',
-        status TEXT NOT NULL DEFAULT 'active',
-        created_at TEXT NOT NULL,
-        updated_at TEXT NOT NULL,
-        FOREIGN KEY(project_id) REFERENCES projects(id),
-        FOREIGN KEY(site_id) REFERENCES sites(id)
-    );""")
-
-    c.execute("""
-    CREATE TABLE IF NOT EXISTS boq_items(
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        company_id INTEGER NOT NULL,
-        project_id INTEGER NOT NULL,
-        contract_id INTEGER NOT NULL,
-        poz_code TEXT NOT NULL,
-        name TEXT NOT NULL,
-        unit TEXT DEFAULT '',
-        qty_contract REAL DEFAULT 0,
-        unit_price REAL DEFAULT 0,
-        group_name TEXT DEFAULT '',
-        mahal TEXT DEFAULT '',
-        budget REAL DEFAULT 0,
-        status TEXT NOT NULL DEFAULT 'active',
-        created_at TEXT NOT NULL,
-        updated_at TEXT NOT NULL,
-        FOREIGN KEY(project_id) REFERENCES projects(id),
-        FOREIGN KEY(contract_id) REFERENCES contracts(id)
-    );""")
-
-    c.execute("""
-    CREATE TABLE IF NOT EXISTS boq_revisions(
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        company_id INTEGER NOT NULL,
-        boq_item_id INTEGER NOT NULL,
-        rev_no INTEGER NOT NULL,
-        note TEXT DEFAULT '',
-        snapshot_json TEXT NOT NULL,
-        created_at TEXT NOT NULL,
-        FOREIGN KEY(boq_item_id) REFERENCES boq_items(id)
-    );""")
-
-    c.execute("""
-    CREATE TABLE IF NOT EXISTS attachments(
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        company_id INTEGER NOT NULL,
-        module TEXT NOT NULL,
+        note_id INTEGER NOT NULL,
         filename TEXT NOT NULL,
         stored_name TEXT NOT NULL,
-        stored_path TEXT NOT NULL,
-        size_bytes INTEGER NOT NULL,
-        created_at TEXT NOT NULL
+        size_bytes INTEGER NOT NULL DEFAULT 0,
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY(note_id) REFERENCES notes(id) ON DELETE CASCADE
     );""")
 
     c.execute("""
-    CREATE TABLE IF NOT EXISTS pay_estimates(
+    CREATE TABLE IF NOT EXISTS reminders(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        company_id INTEGER NOT NULL,
-        project_id INTEGER NOT NULL,
-        contract_id INTEGER NOT NULL,
-        period_no INTEGER NOT NULL,
-        start_date TEXT NOT NULL,
-        end_date TEXT NOT NULL,
-        status TEXT NOT NULL DEFAULT 'Taslak',
-        created_at TEXT NOT NULL,
-        updated_at TEXT NOT NULL,
-        FOREIGN KEY(project_id) REFERENCES projects(id),
-        FOREIGN KEY(contract_id) REFERENCES contracts(id)
+        company_id INTEGER NOT NULL DEFAULT 1,
+        owner_user_id INTEGER NOT NULL,
+        assignee_user_id INTEGER,
+        title TEXT NOT NULL,
+        body TEXT DEFAULT '',
+        due_at TEXT NOT NULL,
+        priority TEXT DEFAULT 'normal',
+        status TEXT NOT NULL DEFAULT 'scheduled',
+        series_id INTEGER,
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
     );""")
 
     c.execute("""
-    CREATE TABLE IF NOT EXISTS measurements(
+    CREATE TABLE IF NOT EXISTS reminder_recurrence(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        company_id INTEGER NOT NULL,
-        project_id INTEGER NOT NULL,
-        contract_id INTEGER NOT NULL,
-        period_id INTEGER NOT NULL,
-        boq_item_id INTEGER NOT NULL,
-        qty REAL NOT NULL,
-        tarih TEXT NOT NULL,
-        mahal TEXT DEFAULT '',
-        note TEXT DEFAULT '',
-        attachment_id INTEGER,
-        status TEXT NOT NULL DEFAULT 'active',
-        created_at TEXT NOT NULL,
-        FOREIGN KEY(period_id) REFERENCES pay_estimates(id),
-        FOREIGN KEY(boq_item_id) REFERENCES boq_items(id),
-        FOREIGN KEY(attachment_id) REFERENCES attachments(id)
+        reminder_id INTEGER NOT NULL UNIQUE,
+        frequency TEXT NOT NULL,
+        interval INTEGER NOT NULL DEFAULT 1,
+        until TEXT DEFAULT '',
+        byweekday TEXT DEFAULT '',
+        bymonthday TEXT DEFAULT '',
+        active INTEGER NOT NULL DEFAULT 1,
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY(reminder_id) REFERENCES reminders(id) ON DELETE CASCADE
     );""")
 
     c.execute("""
-    CREATE TABLE IF NOT EXISTS pay_estimate_lines(
+    CREATE TABLE IF NOT EXISTS reminder_links(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        company_id INTEGER NOT NULL,
-        pay_estimate_id INTEGER NOT NULL,
-        boq_item_id INTEGER NOT NULL,
-        prev_qty REAL DEFAULT 0,
-        current_qty REAL DEFAULT 0,
-        cum_qty REAL DEFAULT 0,
-        unit_price REAL DEFAULT 0,
-        prev_amount REAL DEFAULT 0,
-        current_amount REAL DEFAULT 0,
-        cum_amount REAL DEFAULT 0,
-        status TEXT NOT NULL DEFAULT 'active',
-        created_at TEXT NOT NULL,
-        FOREIGN KEY(pay_estimate_id) REFERENCES pay_estimates(id),
-        FOREIGN KEY(boq_item_id) REFERENCES boq_items(id)
-    );""")
-
-    c.execute("""
-    CREATE TABLE IF NOT EXISTS deductions(
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        company_id INTEGER NOT NULL,
-        pay_estimate_id INTEGER NOT NULL,
-        type TEXT NOT NULL,
-        rate REAL DEFAULT 0,
-        amount REAL DEFAULT 0,
-        note TEXT DEFAULT '',
-        status TEXT NOT NULL DEFAULT 'active',
-        created_at TEXT NOT NULL,
-        FOREIGN KEY(pay_estimate_id) REFERENCES pay_estimates(id)
-    );""")
-
-    c.execute("""
-    CREATE TABLE IF NOT EXISTS indices_cache(
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        company_id INTEGER NOT NULL,
-        provider TEXT NOT NULL,
-        index_code TEXT NOT NULL,
-        index_value REAL NOT NULL,
-        period TEXT NOT NULL,
-        fetched_at TEXT NOT NULL,
-        raw_json TEXT DEFAULT ''
-    );""")
-
-    c.execute("""
-    CREATE TABLE IF NOT EXISTS price_diff_rules(
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        company_id INTEGER NOT NULL,
-        contract_id INTEGER NOT NULL,
-        formula_name TEXT NOT NULL,
-        formula_params TEXT NOT NULL,
-        base_period TEXT NOT NULL,
-        created_at TEXT NOT NULL,
-        FOREIGN KEY(contract_id) REFERENCES contracts(id)
-    );""")
-
-    c.execute("""
-    CREATE TABLE IF NOT EXISTS approvals(
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        company_id INTEGER NOT NULL,
-        module TEXT NOT NULL,
-        ref_id INTEGER NOT NULL,
-        status TEXT NOT NULL,
-        user_id INTEGER,
-        username TEXT DEFAULT '',
-        comment TEXT DEFAULT '',
-        created_at TEXT NOT NULL
+        reminder_id INTEGER NOT NULL,
+        linked_type TEXT NOT NULL,
+        linked_id TEXT NOT NULL,
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY(reminder_id) REFERENCES reminders(id) ON DELETE CASCADE
     );""")
 
     c.execute("""
     CREATE TABLE IF NOT EXISTS audit_log(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        company_id INTEGER NOT NULL,
-        module TEXT NOT NULL,
-        ref_id INTEGER,
+        company_id INTEGER NOT NULL DEFAULT 1,
+        user_id INTEGER NOT NULL,
         action TEXT NOT NULL,
-        user_id INTEGER,
-        username TEXT DEFAULT '',
+        entity TEXT NOT NULL,
+        entity_id INTEGER NOT NULL,
         detail TEXT DEFAULT '',
-        created_at TEXT NOT NULL
-    );""")
-
-    c.execute("""
-    CREATE TABLE IF NOT EXISTS subcontracts(
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        company_id INTEGER NOT NULL,
-        project_id INTEGER NOT NULL,
-        contract_id INTEGER NOT NULL,
-        vendor_name TEXT NOT NULL,
-        contract_amount REAL DEFAULT 0,
-        status TEXT NOT NULL DEFAULT 'active',
-        created_at TEXT NOT NULL,
-        FOREIGN KEY(project_id) REFERENCES projects(id),
-        FOREIGN KEY(contract_id) REFERENCES contracts(id)
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
     );""")
 
     conn.commit()
@@ -1281,6 +1144,101 @@ def migrate_schema(conn: sqlite3.Connection, log_fn: Optional[Callable[[str, str
         if log_fn:
             try:
                 log_fn("Schema Migration Error", f"maas_hesap_hareket: {e}")
+            except Exception:
+                pass
+
+    # Notlar & Hatırlatmalar tabloları
+    try:
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS notes(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                company_id INTEGER NOT NULL DEFAULT 1,
+                owner_user_id INTEGER NOT NULL,
+                title TEXT NOT NULL,
+                body TEXT DEFAULT '',
+                category TEXT DEFAULT '',
+                priority TEXT DEFAULT 'normal',
+                pinned INTEGER NOT NULL DEFAULT 0,
+                scope TEXT NOT NULL DEFAULT 'personal',
+                status TEXT NOT NULL DEFAULT 'active',
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+            );"""
+        )
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS note_tags(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                note_id INTEGER NOT NULL,
+                tag TEXT NOT NULL,
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+            );"""
+        )
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS note_attachments(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                note_id INTEGER NOT NULL,
+                filename TEXT NOT NULL,
+                stored_name TEXT NOT NULL,
+                size_bytes INTEGER NOT NULL DEFAULT 0,
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+            );"""
+        )
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS reminders(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                company_id INTEGER NOT NULL DEFAULT 1,
+                owner_user_id INTEGER NOT NULL,
+                assignee_user_id INTEGER,
+                title TEXT NOT NULL,
+                body TEXT DEFAULT '',
+                due_at TEXT NOT NULL,
+                priority TEXT DEFAULT 'normal',
+                status TEXT NOT NULL DEFAULT 'scheduled',
+                series_id INTEGER,
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+            );"""
+        )
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS reminder_recurrence(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                reminder_id INTEGER NOT NULL UNIQUE,
+                frequency TEXT NOT NULL,
+                interval INTEGER NOT NULL DEFAULT 1,
+                until TEXT DEFAULT '',
+                byweekday TEXT DEFAULT '',
+                bymonthday TEXT DEFAULT '',
+                active INTEGER NOT NULL DEFAULT 1,
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+            );"""
+        )
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS reminder_links(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                reminder_id INTEGER NOT NULL,
+                linked_type TEXT NOT NULL,
+                linked_id TEXT NOT NULL,
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+            );"""
+        )
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS audit_log(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                company_id INTEGER NOT NULL DEFAULT 1,
+                user_id INTEGER NOT NULL,
+                action TEXT NOT NULL,
+                entity TEXT NOT NULL,
+                entity_id INTEGER NOT NULL,
+                detail TEXT DEFAULT '',
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+            );"""
+        )
+        conn.commit()
+    except Exception as e:
+        if log_fn:
+            try:
+                log_fn("Schema Migration Error", f"notes/reminders: {e}")
             except Exception:
                 pass
 
@@ -1772,37 +1730,12 @@ def migrate_schema(conn: sqlite3.Connection, log_fn: Optional[Callable[[str, str
     _ensure_index(conn, "idx_stok_hareket_urun_id", "stok_hareket", "urun_id", log_fn)
     _ensure_index(conn, "idx_stok_hareket_tarih", "stok_hareket", "tarih", log_fn)
     _ensure_index(conn, "idx_kasa_hareket_tip_tarih", "kasa_hareket", "tip, tarih", log_fn)
-    _ensure_index(conn, "idx_hr_departments_company", "hr_departments", "company_id", log_fn)
-    _ensure_index(conn, "idx_hr_positions_company", "hr_positions", "company_id", log_fn)
-    _ensure_index(conn, "idx_hr_employees_company", "hr_employees", "company_id", log_fn)
-    _ensure_index(conn, "idx_hr_employees_department", "hr_employees", "department_id", log_fn)
-    _ensure_index(conn, "idx_hr_salary_history_employee", "hr_salary_history", "employee_id", log_fn)
-    _ensure_index(conn, "idx_hr_documents_employee", "hr_documents", "employee_id", log_fn)
-    _ensure_index(conn, "idx_hr_leave_types_company", "hr_leave_types", "company_id", log_fn)
-    _ensure_index(conn, "idx_hr_leave_requests_employee", "hr_leave_requests", "employee_id", log_fn)
-    _ensure_index(conn, "idx_hr_leave_requests_dates", "hr_leave_requests", "start_date, end_date", log_fn)
-    _ensure_index(conn, "idx_hr_leave_balances_employee_year", "hr_leave_balances", "employee_id, year", log_fn)
-    _ensure_index(conn, "idx_hr_shifts_company", "hr_shifts", "company_id", log_fn)
-    _ensure_index(conn, "idx_hr_timesheets_company_date", "hr_timesheets", "company_id, work_date", log_fn)
-    _ensure_index(conn, "idx_hr_overtime_company_date", "hr_overtime_requests", "company_id, work_date", log_fn)
-    _ensure_index(conn, "idx_hr_payroll_periods_company", "hr_payroll_periods", "company_id", log_fn)
-    _ensure_index(conn, "idx_hr_payroll_items_period", "hr_payroll_items", "period_id", log_fn)
-    _ensure_index(conn, "idx_hr_payroll_items_employee", "hr_payroll_items", "employee_id", log_fn)
-    _ensure_index(conn, "idx_hr_user_roles_company", "hr_user_roles", "company_id", log_fn)
-    _ensure_index(conn, "idx_hr_audit_company", "hr_audit_log", "company_id, created_at", log_fn)
-
-    # Hakediş indeksleri
-    _ensure_index(conn, "idx_projects_company", "projects", "company_id, status", log_fn)
-    _ensure_index(conn, "idx_sites_project", "sites", "project_id, status", log_fn)
-    _ensure_index(conn, "idx_contracts_project", "contracts", "project_id, status", log_fn)
-    _ensure_index(conn, "idx_boq_contract", "boq_items", "contract_id, poz_code", log_fn)
-    _ensure_index(conn, "idx_measurements_period", "measurements", "period_id, tarih", log_fn)
-    _ensure_index(conn, "idx_pay_estimates_contract", "pay_estimates", "contract_id, period_no", log_fn)
-    _ensure_index(conn, "idx_pay_estimate_lines_period", "pay_estimate_lines", "pay_estimate_id", log_fn)
-    _ensure_index(conn, "idx_deductions_period", "deductions", "pay_estimate_id, type", log_fn)
-    _ensure_index(conn, "idx_indices_cache_key", "indices_cache", "provider, index_code, period", log_fn)
-    _ensure_index(conn, "idx_approvals_ref", "approvals", "module, ref_id, status", log_fn)
-    _ensure_index(conn, "idx_audit_log_ref", "audit_log", "module, ref_id, action", log_fn)
+    _ensure_index(conn, "idx_notes_company_owner", "notes", "company_id, owner_user_id", log_fn)
+    _ensure_index(conn, "idx_notes_status", "notes", "status", log_fn)
+    _ensure_index(conn, "idx_reminders_due_at", "reminders", "due_at", log_fn)
+    _ensure_index(conn, "idx_reminders_status", "reminders", "status", log_fn)
+    _ensure_index(conn, "idx_reminders_owner", "reminders", "owner_user_id", log_fn)
+    _ensure_index(conn, "idx_audit_log_company", "audit_log", "company_id, user_id", log_fn)
 
 
 def seed_defaults(conn: sqlite3.Connection, log_fn: Optional[Callable[[str, str], None]] = None) -> None:

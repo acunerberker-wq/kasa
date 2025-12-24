@@ -47,6 +47,8 @@ class KasaFrame(ttk.Frame):
         self.lbl_month.pack(side=tk.LEFT, padx=(0, 12))
         self.lbl_all = ttk.Label(self.summary_bar, text="")
         self.lbl_all.pack(side=tk.LEFT)
+        self.lbl_overdue = ttk.Label(self.summary_bar, text="Geciken Hatırlatmalar: 0")
+        self.lbl_overdue.pack(side=tk.RIGHT, padx=(12, 0))
 
         # Sekmeler
         self.nb = ttk.Notebook(self)
@@ -560,6 +562,12 @@ class KasaFrame(ttk.Frame):
         self._refresh_history()
         self._refresh_reports()
         self._refresh_summary_bar()
+
+    def update_overdue_reminders(self, count: int) -> None:
+        try:
+            self.lbl_overdue.config(text=f"Geciken Hatırlatmalar: {int(count)}")
+        except Exception:
+            pass
 
     def _refresh_history(self):
         for i in self.tree.get_children():

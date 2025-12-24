@@ -33,7 +33,7 @@ from .ui.frames import (
     MessagesFrame,
 )
 from .ui.plugins.loader import discover_ui_plugins
-from modules.hr.service import HRContext
+from .modules.notes_reminders.scheduler import ReminderScheduler
 
 class App:
     def __init__(self, base_dir: Optional[str] = None, test_mode: bool = False):
@@ -123,6 +123,7 @@ class App:
         self.frames: Dict[str, ttk.Frame] = {}
         self._build_ui()
         self._schedule_sales_order_summary()
+        self._start_reminder_scheduler()
 
         # Login başarılı -> ana pencereyi göster
         if not self._test_mode:
@@ -262,6 +263,22 @@ class App:
         except Exception:
             pass
 
+    def update_notes_reminders_badge(self, count: int):
+        try:
+            frame = (getattr(self, "frames", {}) or {}).get("rapor_araclar")
+            if frame and hasattr(frame, "refresh_notes_reminders_badge"):
+                frame.refresh_notes_reminders_badge(count)
+        except Exception:
+            pass
+
+    def update_overdue_dashboard(self, count: int):
+        try:
+            frame = (getattr(self, "frames", {}) or {}).get("kasa")
+            if frame and hasattr(frame, "update_overdue_reminders"):
+                frame.update_overdue_reminders(count)
+        except Exception:
+            pass
+
     def show_toast(self, text: str, duration_ms: int = 3500):
         try:
             toast = tk.Toplevel(self.root)
@@ -282,6 +299,15 @@ class App:
         self._message_polling_active = True
         try:
             self._poll_messages()
+        except Exception:
+            pass
+
+    def _start_reminder_scheduler(self):
+        if getattr(self, "_test_mode", False):
+            return
+        try:
+            self._reminder_scheduler = ReminderScheduler(self, self.services.notes_reminders)
+            self._reminder_scheduler.start()
         except Exception:
             pass
 
@@ -349,6 +375,12 @@ class App:
             pass
         self.db = DB(new_path)
         self.services = Services.build(self.db, self.usersdb)
+        try:
+            if hasattr(self, "_reminder_scheduler") and self._reminder_scheduler:
+                self._reminder_scheduler.service = self.services.notes_reminders
+                self._reminder_scheduler.reset_context()
+        except Exception:
+            pass
 
         self.active_company = c
         try:
@@ -693,6 +725,7 @@ class App:
         self._nav_routes["satis_raporlari"] = {"target": "rapor_araclar", "after": "hub_tab", "tab": "satis_raporlari"}
         self._nav_routes["search"] = {"target": "rapor_araclar", "after": "hub_tab", "tab": "search"}
         self._nav_routes["loglar"] = {"target": "rapor_araclar", "after": "hub_tab", "tab": "loglar"}
+        self._nav_routes["notlar_hatirlatmalar"] = {"target": "rapor_araclar", "after": "hub_tab", "tab": "notlar_hatirlatmalar"}
 
         # Eski kısayol uyumluluğu: Maaş Eklentileri -> Maaş Takibi / Bankada Maaş Bul
         self._nav_routes["maas_eklentileri"] = {"target": "maas_takibi", "after": "plugin_tab", "tab": "scan"}
@@ -1138,6 +1171,11 @@ class App:
     def on_close(self):
         try:
             self.db.log("Uygulama", "Kapandı")
+        except Exception:
+            pass
+        try:
+            if hasattr(self, "_reminder_scheduler") and self._reminder_scheduler:
+                self._reminder_scheduler.stop()
         except Exception:
             pass
         try:

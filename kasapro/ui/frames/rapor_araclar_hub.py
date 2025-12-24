@@ -20,6 +20,7 @@ from .raporlar import RaporlarFrame
 from .global_search import GlobalSearchFrame
 from .logs import LogsFrame
 from .satin_alma_raporlar import SatinAlmaRaporlarFrame
+from ...modules.notes_reminders.ui import NotesRemindersFrame
 
 if TYPE_CHECKING:
     from ...app import App
@@ -43,11 +44,14 @@ class RaporAraclarHubFrame(ttk.Frame):
         self.tab_search = ttk.Frame(self.nb)
         self.tab_loglar = ttk.Frame(self.nb)
         self.tab_satin_alma = ttk.Frame(self.nb)
+        self.tab_notes_reminders = ttk.Frame(self.nb)
 
         self.nb.add(self.tab_raporlar, text="📊 Raporlar")
         self.nb.add(self.tab_search, text="🔎 Global Arama")
         self.nb.add(self.tab_loglar, text="🧾 Log")
         self.nb.add(self.tab_satin_alma, text="📦 Satın Alma Sipariş Raporları")
+        self._notes_tab_base_text = "🗒️ Notlar & Hatırlatmalar"
+        self.nb.add(self.tab_notes_reminders, text=self._notes_tab_base_text)
 
         # İçerikler
         self.raporlar_frame = RaporlarFrame(self.tab_raporlar, self.app)
@@ -61,6 +65,9 @@ class RaporAraclarHubFrame(ttk.Frame):
 
         self.satin_alma_frame = SatinAlmaRaporlarFrame(self.tab_satin_alma, self.app)
         self.satin_alma_frame.pack(fill=tk.BOTH, expand=True)
+
+        self.notes_reminders_frame = NotesRemindersFrame(self.tab_notes_reminders, self.app)
+        self.notes_reminders_frame.pack(fill=tk.BOTH, expand=True)
 
         try:
             self.nb.bind("<<NotebookTabChanged>>", lambda _e: self._on_tab_change())
@@ -82,6 +89,9 @@ class RaporAraclarHubFrame(ttk.Frame):
             "log": self.tab_loglar,
             "satin_alma": self.tab_satin_alma,
             "satin_alma_rapor": self.tab_satin_alma,
+            "notlar_hatirlatmalar": self.tab_notes_reminders,
+            "notlar": self.tab_notes_reminders,
+            "hatirlatmalar": self.tab_notes_reminders,
         }
         target = m.get(k, self.tab_raporlar)
         try:
@@ -106,6 +116,20 @@ class RaporAraclarHubFrame(ttk.Frame):
         try:
             if hasattr(self, "satin_alma_frame") and hasattr(self.satin_alma_frame, "refresh"):
                 self.satin_alma_frame.refresh()  # type: ignore
+        except Exception:
+            pass
+        try:
+            if hasattr(self, "notes_reminders_frame") and hasattr(self.notes_reminders_frame, "refresh"):
+                self.notes_reminders_frame.refresh()  # type: ignore
+        except Exception:
+            pass
+
+    def refresh_notes_reminders_badge(self, count: int) -> None:
+        try:
+            text = self._notes_tab_base_text
+            if count and count > 0:
+                text = f\"{text} ({count})\"
+            self.nb.tab(self.tab_notes_reminders, text=text)
         except Exception:
             pass
 
@@ -147,5 +171,13 @@ class RaporAraclarHubFrame(ttk.Frame):
             if sel == str(self.tab_satin_alma) and hasattr(self, "satin_alma_frame"):
                 if hasattr(self.satin_alma_frame, "refresh"):
                     self.satin_alma_frame.refresh()  # type: ignore
+        except Exception:
+            pass
+
+        # Notlar & Hatırlatmalar sekmesi aktifse tazele
+        try:
+            if sel == str(self.tab_notes_reminders) and hasattr(self, "notes_reminders_frame"):
+                if hasattr(self.notes_reminders_frame, "refresh"):
+                    self.notes_reminders_frame.refresh()  # type: ignore
         except Exception:
             pass
