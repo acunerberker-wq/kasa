@@ -4,6 +4,7 @@
 from .kasa import KasaFrame as KasaFrame
 from .cariler import CarilerFrame as CarilerFrame
 from .raporlar import RaporlarFrame as RaporlarFrame
+from .satis_raporlari import SatisRaporlariFrame as SatisRaporlariFrame
 from .global_search import GlobalSearchFrame as GlobalSearchFrame
 from .logs import LogsFrame as LogsFrame
 from .sirketler import SirketlerFrame as SirketlerFrame
@@ -16,6 +17,7 @@ __all__ = [
     "KasaFrame",
     "CarilerFrame",
     "RaporlarFrame",
+    "SatisRaporlariFrame",
     "GlobalSearchFrame",
     "LogsFrame",
     "SirketlerFrame",

@@ -952,6 +952,42 @@ class DB:
     def fatura_delete(self, fid: int):
         return self.fatura.delete(fid)
 
+    # -----------------
+    # Satış Raporları
+    # -----------------
+    def satis_rapor_kpi(self, filters: Dict[str, Any]) -> Dict[str, Any]:
+        return self.satis_rapor.kpis(filters)
+
+    def satis_rapor_gunluk(self, filters: Dict[str, Any], limit: int, offset: int) -> Dict[str, Any]:
+        return self.satis_rapor.daily_summary(filters, limit, offset)
+
+    def satis_rapor_musteri(self, filters: Dict[str, Any], limit: int, offset: int) -> Dict[str, Any]:
+        return self.satis_rapor.customer_summary(filters, limit, offset)
+
+    def satis_rapor_urun(self, filters: Dict[str, Any], limit: int, offset: int) -> Dict[str, Any]:
+        return self.satis_rapor.product_summary(filters, limit, offset)
+
+    def satis_rapor_temsilci(self, filters: Dict[str, Any], limit: int, offset: int) -> Dict[str, Any]:
+        return self.satis_rapor.temsilci_summary(filters, limit, offset)
+
+    def satis_rapor_list_products(self) -> List[str]:
+        return self.satis_rapor.list_products()
+
+    def satis_rapor_list_categories(self) -> List[str]:
+        return self.satis_rapor.list_categories()
+
+    def satis_rapor_list_sube(self) -> List[str]:
+        return self.satis_rapor.list_sube()
+
+    def satis_rapor_list_depo(self) -> List[str]:
+        return self.satis_rapor.list_depo()
+
+    def satis_rapor_list_temsilci(self) -> List[str]:
+        return self.satis_rapor.list_temsilci()
+
+    def satis_rapor_warnings(self) -> List[str]:
+        return self.satis_rapor.data_warnings()
+
     def fatura_kalem_list(self, fid: int):
         return self.fatura.kalem_list(fid)
 

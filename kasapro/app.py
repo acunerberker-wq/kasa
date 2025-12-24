@@ -647,6 +647,7 @@ class App:
 
         # Rapor & Araçlar hub iç sekme yönlendirmeleri (eski kısayollar uyumlu kalsın)
         self._nav_routes["raporlar"] = {"target": "rapor_araclar", "after": "hub_tab", "tab": "raporlar"}
+        self._nav_routes["satis_raporlari"] = {"target": "rapor_araclar", "after": "hub_tab", "tab": "satis_raporlari"}
         self._nav_routes["search"] = {"target": "rapor_araclar", "after": "hub_tab", "tab": "search"}
         self._nav_routes["loglar"] = {"target": "rapor_araclar", "after": "hub_tab", "tab": "loglar"}
 
@@ -676,6 +677,7 @@ class App:
 
         nav_section("📈 RAPOR & ARAÇLAR")
         nav_btn("📈 Rapor & Araçlar", "rapor_araclar")
+        nav_btn("💹 Satış Raporları", "satis_raporlari")
 
         # Kullanıcı yönetimi Ayarlar (⚙️) içine taşındı.
         # Sol menüde ayrı bir "Kullanıcılar" sayfası göstermiyoruz.
@@ -765,6 +767,7 @@ class App:
             "cariler": "Tanımlar",
             "rapor_araclar": "Rapor & Araçlar",
             "raporlar": "Raporlar",
+            "satis_raporlari": "Satış Raporları",
             "search": "Global Arama",
             "loglar": "Log",
             "kullanicilar": "Kullanıcılar",
@@ -864,7 +867,7 @@ class App:
         except Exception:
             pass
 
-        if key in ("tanimlar", "cariler", "cari_hareket_ekle", "cari_hareketler", "rapor_araclar", "raporlar", "search", "loglar", "kasa", "mesajlar"):
+        if key in ("tanimlar", "cariler", "cari_hareket_ekle", "cari_hareketler", "rapor_araclar", "raporlar", "satis_raporlari", "search", "loglar", "kasa"):
             try:
                 for k2 in ("cari_hareket_ekle", "cari_hareketler"):
                     if k2 in self.frames and hasattr(self.frames[k2], "reload_cari"):
@@ -875,7 +878,7 @@ class App:
                 self.frames["kasa"].reload_cari_combo()  # type: ignore
             except Exception:
                 pass
-            if key in ("rapor_araclar", "raporlar", "search", "loglar"):
+            if key in ("rapor_araclar", "raporlar", "satis_raporlari", "search", "loglar"):
                 try:
                     if "rapor_araclar" in self.frames and hasattr(self.frames["rapor_araclar"], "refresh"):
                         self.frames["rapor_araclar"].refresh()  # type: ignore

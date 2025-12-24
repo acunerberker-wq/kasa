@@ -227,6 +227,16 @@ class FaturaFrame(ttk.Frame):
         self.e_adres = LabeledEntry(row3, "Adres:", 85)
         self.e_adres.pack(side=tk.LEFT, padx=6)
 
+        row4 = ttk.Frame(header)
+        row4.pack(fill=tk.X, pady=(0, 8))
+
+        self.e_sube = LabeledEntry(row4, "Şube:", 18)
+        self.e_sube.pack(side=tk.LEFT, padx=6)
+        self.e_depo = LabeledEntry(row4, "Depo:", 18)
+        self.e_depo.pack(side=tk.LEFT, padx=6)
+        self.e_temsilci = LabeledEntry(row4, "Temsilci:", 22)
+        self.e_temsilci.pack(side=tk.LEFT, padx=6)
+
         # Kalemler
         items = ttk.LabelFrame(self.tab_edit, text="Kalemler")
         items.pack(fill=tk.BOTH, expand=True, padx=8, pady=(0, 8))
@@ -238,14 +248,16 @@ class FaturaFrame(ttk.Frame):
         ttk.Button(btns, text="✏️ Düzenle", command=self.edit_item).pack(side=tk.LEFT, padx=6)
         ttk.Button(btns, text="🗑️ Sil", command=self.delete_item).pack(side=tk.LEFT, padx=6)
 
-        cols = ("sira", "urun", "miktar", "birim", "fiyat", "isk", "kdv", "ara", "kdv_t", "top")
+        cols = ("sira", "urun", "kategori", "miktar", "birim", "fiyat", "maliyet", "isk", "kdv", "ara", "kdv_t", "top")
         self.items_tree = ttk.Treeview(items, columns=cols, show="headings", height=10, selectmode="browse")
         heads = {
             "sira": "Sıra",
             "urun": "Ürün/Hizmet",
+            "kategori": "Kategori",
             "miktar": "Miktar",
             "birim": "Birim",
             "fiyat": "B.Fiyat",
+            "maliyet": "Maliyet",
             "isk": "İsk%",
             "kdv": "KDV%",
             "ara": "Ara",
@@ -256,10 +268,12 @@ class FaturaFrame(ttk.Frame):
             self.items_tree.heading(c, text=heads.get(c, c))
 
         self.items_tree.column("sira", width=55, anchor="center")
-        self.items_tree.column("urun", width=360)
+        self.items_tree.column("urun", width=260)
+        self.items_tree.column("kategori", width=140)
         self.items_tree.column("miktar", width=80, anchor="e")
         self.items_tree.column("birim", width=70, anchor="center")
         self.items_tree.column("fiyat", width=100, anchor="e")
+        self.items_tree.column("maliyet", width=100, anchor="e")
         self.items_tree.column("isk", width=65, anchor="e")
         self.items_tree.column("kdv", width=65, anchor="e")
         self.items_tree.column("ara", width=110, anchor="e")
@@ -629,6 +643,18 @@ class FaturaFrame(ttk.Frame):
                 w.set("")
             except Exception:
                 pass
+        for w in (self.e_sube, self.e_depo):
+            try:
+                w.set("")
+            except Exception:
+                pass
+        try:
+            self.e_temsilci.set(self.app.get_active_username())
+        except Exception:
+            try:
+                self.e_temsilci.set("")
+            except Exception:
+                pass
 
         try:
             self.e_notlar.delete("1.0", tk.END)
@@ -660,6 +686,9 @@ class FaturaFrame(ttk.Frame):
             self.e_vd.set(_s(inv["cari_vergi_dairesi"]))
             self.e_eposta.set(_s(inv["cari_eposta"]))
             self.e_adres.set(_s(inv["cari_adres"]))
+            self.e_sube.set(_s(inv["sube"]))
+            self.e_depo.set(_s(inv["depo"]))
+            self.e_temsilci.set(_s(inv["satis_temsilcisi"]))
         except Exception:
             pass
 
@@ -674,10 +703,12 @@ class FaturaFrame(ttk.Frame):
             self._items.append({
                 "sira": int(r["sira"] or 1),
                 "urun": _s(r["urun"]),
+                "kategori": _s(r["kategori"]),
                 "aciklama": _s(r["aciklama"]),
                 "miktar": float(safe_float(r["miktar"])),
                 "birim": _s(r["birim"]),
                 "birim_fiyat": float(safe_float(r["birim_fiyat"])),
+                "maliyet": float(safe_float(r["maliyet"])),
                 "iskonto_oran": float(safe_float(r["iskonto_oran"])),
                 "kdv_oran": float(safe_float(r["kdv_oran"])),
                 "ara_tutar": float(safe_float(r["ara_tutar"])),
@@ -702,9 +733,11 @@ class FaturaFrame(ttk.Frame):
             self.items_tree.insert("", tk.END, values=(
                 int(k.get("sira") or 0),
                 _s(k.get("urun")),
+                _s(k.get("kategori")),
                 fmt_amount(k.get("miktar")),
                 _s(k.get("birim")),
                 fmt_amount(k.get("birim_fiyat")),
+                fmt_amount(k.get("maliyet")),
                 fmt_amount(k.get("iskonto_oran")),
                 fmt_amount(k.get("kdv_oran")),
                 fmt_amount(k.get("ara_tutar")),
@@ -795,7 +828,20 @@ class FaturaFrame(ttk.Frame):
 
         r3 = ttk.Frame(frm)
         r3.pack(fill=tk.X, pady=6)
-        e_ack = LabeledEntry(r3, "Açıklama:", 70)
+
+        try:
+            kategori_vals = self.app.db.list_stock_categories()
+        except Exception:
+            kategori_vals = []
+
+        e_kategori = LabeledCombo(r3, "Kategori:", [""] + kategori_vals, 18, state="normal")
+        e_kategori.pack(side=tk.LEFT, padx=6)
+        e_maliyet = LabeledEntry(r3, "Birim Maliyet:", 12)
+        e_maliyet.pack(side=tk.LEFT, padx=6)
+
+        r4 = ttk.Frame(frm)
+        r4.pack(fill=tk.X, pady=6)
+        e_ack = LabeledEntry(r4, "Açıklama:", 70)
         e_ack.pack(side=tk.LEFT, padx=6)
 
         sum_lbl = ttk.Label(frm, text="")
@@ -808,8 +854,10 @@ class FaturaFrame(ttk.Frame):
             e_miktar.set(_s(init.get("miktar")) or "1")
             e_birim.set(_s(init.get("birim")) or "Adet")
             e_fiyat.set(_s(init.get("birim_fiyat")) or "0")
+            e_maliyet.set(_s(init.get("maliyet")) or "0")
             e_isk.set(_s(init.get("iskonto_oran")) or "0")
             e_kdv.set(_s(init.get("kdv_oran")) or "20")
+            e_kategori.set(_s(init.get("kategori")))
             e_ack.set(_s(init.get("aciklama")))
         except Exception:
             pass
@@ -844,10 +892,12 @@ class FaturaFrame(ttk.Frame):
                 out["sira"] = None
 
             out["urun"] = _s(e_urun.get())
+            out["kategori"] = _s(e_kategori.get())
             out["aciklama"] = _s(e_ack.get())
             out["miktar"] = float(safe_float(e_miktar.get()))
             out["birim"] = _s(e_birim.get()) or "Adet"
             out["birim_fiyat"] = float(safe_float(e_fiyat.get()))
+            out["maliyet"] = float(safe_float(e_maliyet.get()))
             out["iskonto_oran"] = float(safe_float(e_isk.get()))
             out["kdv_oran"] = float(safe_float(e_kdv.get()))
 
@@ -929,6 +979,9 @@ class FaturaFrame(ttk.Frame):
             "cari_vergi_dairesi": self.e_vd.get(),
             "cari_adres": self.e_adres.get(),
             "cari_eposta": self.e_eposta.get(),
+            "sube": self.e_sube.get(),
+            "depo": self.e_depo.get(),
+            "satis_temsilcisi": self.e_temsilci.get(),
             "para": self.e_para.get(),
             "ara_toplam": sum(float(safe_float(x.get("ara_tutar"))) for x in self._items),
             "iskonto_toplam": sum(float(safe_float(x.get("iskonto_tutar"))) for x in self._items),

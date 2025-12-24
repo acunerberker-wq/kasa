@@ -103,6 +103,9 @@ def init_schema(conn: sqlite3.Connection) -> None:
         durum TEXT NOT NULL DEFAULT 'Taslak',
         fatura_no TEXT NOT NULL UNIQUE,
         seri TEXT DEFAULT '',
+        sube TEXT DEFAULT '',
+        depo TEXT DEFAULT '',
+        satis_temsilcisi TEXT DEFAULT '',
 
         cari_id INTEGER,
         cari_ad TEXT DEFAULT '',
@@ -132,10 +135,12 @@ def init_schema(conn: sqlite3.Connection) -> None:
         fatura_id INTEGER NOT NULL,
         sira INTEGER NOT NULL DEFAULT 1,
         urun TEXT DEFAULT '',
+        kategori TEXT DEFAULT '',
         aciklama TEXT DEFAULT '',
         miktar REAL DEFAULT 0,
         birim TEXT DEFAULT 'Adet',
         birim_fiyat REAL DEFAULT 0,
+        maliyet REAL DEFAULT 0,
         iskonto_oran REAL DEFAULT 0,
         kdv_oran REAL DEFAULT 20,
         ara_tutar REAL DEFAULT 0,
@@ -845,6 +850,15 @@ def migrate_schema(conn: sqlite3.Connection, log_fn: Optional[Callable[[str, str
     _ensure_column(conn, "kasa_hareket", "belge", "TEXT DEFAULT ''", log_fn)
     _ensure_column(conn, "kasa_hareket", "etiket", "TEXT DEFAULT ''", log_fn)
 
+    # fatura (satış raporları için yeni kolonlar)
+    _ensure_column(conn, "fatura", "sube", "TEXT DEFAULT ''", log_fn)
+    _ensure_column(conn, "fatura", "depo", "TEXT DEFAULT ''", log_fn)
+    _ensure_column(conn, "fatura", "satis_temsilcisi", "TEXT DEFAULT ''", log_fn)
+
+    # fatura_kalem (kategori + maliyet)
+    _ensure_column(conn, "fatura_kalem", "kategori", "TEXT DEFAULT ''", log_fn)
+    _ensure_column(conn, "fatura_kalem", "maliyet", "REAL DEFAULT 0", log_fn)
+
     # -----------------
     # Nakliye Sistemi (eski DB'ler için)
     # -----------------
@@ -1010,13 +1024,17 @@ def migrate_schema(conn: sqlite3.Connection, log_fn: Optional[Callable[[str, str
     _ensure_index(conn, "idx_banka_hareket_tarih", "banka_hareket", "tarih", log_fn)
     _ensure_index(conn, "idx_banka_hareket_import_grup", "banka_hareket", "import_grup", log_fn)
     _ensure_index(conn, "idx_fatura_cari_tarih", "fatura", "cari_id, tarih", log_fn)
-    _ensure_index(conn, "idx_fatura_tur_tarih", "fatura", "tur, tarih", log_fn)
+    _ensure_index(conn, "idx_fatura_tarih", "fatura", "tarih", log_fn)
+    _ensure_index(conn, "idx_fatura_temsilci", "fatura", "satis_temsilcisi", log_fn)
+    _ensure_index(conn, "idx_fatura_sube", "fatura", "sube", log_fn)
+    _ensure_index(conn, "idx_fatura_depo", "fatura", "depo", log_fn)
+    _ensure_index(conn, "idx_fatura_tur_durum", "fatura", "tur, durum", log_fn)
     _ensure_index(conn, "idx_fatura_kalem_fatura_id", "fatura_kalem", "fatura_id", log_fn)
     _ensure_index(conn, "idx_fatura_kalem_urun", "fatura_kalem", "urun", log_fn)
+    _ensure_index(conn, "idx_fatura_kalem_kategori", "fatura_kalem", "kategori", log_fn)
     _ensure_index(conn, "idx_fatura_odeme_fatura_id", "fatura_odeme", "fatura_id", log_fn)
-    _ensure_index(conn, "idx_satis_siparis_tarih", "satis_siparis", "tarih", log_fn)
-    _ensure_index(conn, "idx_satis_siparis_cari", "satis_siparis", "cari_id, tarih", log_fn)
-    _ensure_index(conn, "idx_satis_siparis_kalem_siparis", "satis_siparis_kalem", "siparis_id", log_fn)
+    _ensure_index(conn, "idx_fatura_odeme_tarih", "fatura_odeme", "tarih", log_fn)
+    _ensure_index(conn, "idx_fatura_odeme_odeme", "fatura_odeme", "odeme", log_fn)
     _ensure_index(conn, "idx_stok_hareket_urun_id", "stok_hareket", "urun_id", log_fn)
     _ensure_index(conn, "idx_satin_alma_siparis_tarih", "satin_alma_siparis", "tarih", log_fn)
     _ensure_index(conn, "idx_satin_alma_siparis_tedarikci", "satin_alma_siparis", "tedarikci_id", log_fn)

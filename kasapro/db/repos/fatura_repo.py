@@ -168,11 +168,11 @@ class FaturaRepo:
         cur = self.conn.cursor()
         cur.execute(
             """INSERT INTO fatura(
-                tarih,vade,tur,durum,fatura_no,seri,
+                tarih,vade,tur,durum,fatura_no,seri,sube,depo,satis_temsilcisi,
                 cari_id,cari_ad,cari_vkn,cari_vergi_dairesi,cari_adres,cari_eposta,
                 para,ara_toplam,iskonto_toplam,kdv_toplam,genel_toplam,
                 notlar,etiket
-            ) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
+            ) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
             (
                 parse_date_smart(header.get('tarih') or ''),
                 parse_date_smart(header.get('vade') or '') if _norm(header.get('vade')) else '',
@@ -180,6 +180,9 @@ class FaturaRepo:
                 _norm(header.get('durum') or 'Taslak'),
                 _norm(header.get('fatura_no')),
                 _norm(header.get('seri')),
+                _norm(header.get('sube')),
+                _norm(header.get('depo')),
+                _norm(header.get('satis_temsilcisi')),
                 int(header.get('cari_id') or 0) if header.get('cari_id') is not None else None,
                 _norm(header.get('cari_ad')),
                 _norm(header.get('cari_vkn')),
@@ -206,7 +209,7 @@ class FaturaRepo:
         cur = self.conn.cursor()
         cur.execute(
             """UPDATE fatura SET
-                tarih=?, vade=?, tur=?, durum=?, fatura_no=?, seri=?,
+                tarih=?, vade=?, tur=?, durum=?, fatura_no=?, seri=?, sube=?, depo=?, satis_temsilcisi=?,
                 cari_id=?, cari_ad=?, cari_vkn=?, cari_vergi_dairesi=?, cari_adres=?, cari_eposta=?,
                 para=?, ara_toplam=?, iskonto_toplam=?, kdv_toplam=?, genel_toplam=?,
                 notlar=?, etiket=?, updated_at=CURRENT_TIMESTAMP
@@ -218,6 +221,9 @@ class FaturaRepo:
                 _norm(header.get('durum') or 'Taslak'),
                 _norm(header.get('fatura_no')),
                 _norm(header.get('seri')),
+                _norm(header.get('sube')),
+                _norm(header.get('depo')),
+                _norm(header.get('satis_temsilcisi')),
                 int(header.get('cari_id') or 0) if header.get('cari_id') is not None else None,
                 _norm(header.get('cari_ad')),
                 _norm(header.get('cari_vkn')),
@@ -250,17 +256,19 @@ class FaturaRepo:
         for idx, k in enumerate(kalemler, start=1):
             cur.execute(
                 """INSERT INTO fatura_kalem(
-                    fatura_id,sira,urun,aciklama,miktar,birim,birim_fiyat,iskonto_oran,kdv_oran,
+                    fatura_id,sira,urun,kategori,aciklama,miktar,birim,birim_fiyat,maliyet,iskonto_oran,kdv_oran,
                     ara_tutar,iskonto_tutar,kdv_tutar,toplam
-                ) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)""",
+                ) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
                 (
                     int(fid),
                     int(k.get('sira') or idx),
                     _norm(k.get('urun')),
+                    _norm(k.get('kategori')),
                     _norm(k.get('aciklama')),
                     float(safe_float(k.get('miktar') or 0)),
                     _norm(k.get('birim') or 'Adet'),
                     float(safe_float(k.get('birim_fiyat') or 0)),
+                    float(safe_float(k.get('maliyet') or 0)),
                     float(safe_float(k.get('iskonto_oran') or 0)),
                     float(safe_float(k.get('kdv_oran') or 0)),
                     float(safe_float(k.get('ara_tutar') or 0)),

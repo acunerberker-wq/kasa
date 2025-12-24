@@ -17,7 +17,7 @@ import tkinter as tk
 from tkinter import ttk
 
 from .raporlar import RaporlarFrame
-from .purchase_report import PurchaseReportFrame
+from .satis_raporlari import SatisRaporlariFrame
 from .global_search import GlobalSearchFrame
 from .logs import LogsFrame
 from .satin_alma_raporlar import SatinAlmaRaporlarFrame
@@ -38,13 +38,13 @@ class RaporAraclarHubFrame(ttk.Frame):
 
         # Tab konteynerleri
         self.tab_raporlar = ttk.Frame(self.nb)
-        self.tab_purchase = ttk.Frame(self.nb)
+        self.tab_satis = ttk.Frame(self.nb)
         self.tab_search = ttk.Frame(self.nb)
         self.tab_loglar = ttk.Frame(self.nb)
         self.tab_satin_alma = ttk.Frame(self.nb)
 
         self.nb.add(self.tab_raporlar, text="📊 Raporlar")
-        self.nb.add(self.tab_purchase, text="🧾 Satın Alma Raporu")
+        self.nb.add(self.tab_satis, text="💹 Satış Raporları")
         self.nb.add(self.tab_search, text="🔎 Global Arama")
         self.nb.add(self.tab_loglar, text="🧾 Log")
         self.nb.add(self.tab_satin_alma, text="📦 Satın Alma Sipariş Raporları")
@@ -53,8 +53,8 @@ class RaporAraclarHubFrame(ttk.Frame):
         self.raporlar_frame = RaporlarFrame(self.tab_raporlar, self.app)
         self.raporlar_frame.pack(fill=tk.BOTH, expand=True)
 
-        self.purchase_frame = PurchaseReportFrame(self.tab_purchase, self.app)
-        self.purchase_frame.pack(fill=tk.BOTH, expand=True)
+        self.satis_raporlar_frame = SatisRaporlariFrame(self.tab_satis, self.app)
+        self.satis_raporlar_frame.pack(fill=tk.BOTH, expand=True)
 
         self.search_frame = GlobalSearchFrame(self.tab_search, self.app)
         self.search_frame.pack(fill=tk.BOTH, expand=True)
@@ -79,8 +79,8 @@ class RaporAraclarHubFrame(ttk.Frame):
         m = {
             "raporlar": self.tab_raporlar,
             "rapor": self.tab_raporlar,
-            "purchase": self.tab_purchase,
-            "satinalma": self.tab_purchase,
+            "satis_raporlari": self.tab_satis,
+            "satis": self.tab_satis,
             "search": self.tab_search,
             "arama": self.tab_search,
             "loglar": self.tab_loglar,
@@ -104,8 +104,8 @@ class RaporAraclarHubFrame(ttk.Frame):
         except Exception:
             pass
         try:
-            if hasattr(self, "purchase_frame") and hasattr(self.purchase_frame, "reload_filters"):
-                self.purchase_frame.reload_filters()  # type: ignore
+            if hasattr(self, "satis_raporlar_frame") and hasattr(self.satis_raporlar_frame, "refresh"):
+                self.satis_raporlar_frame.refresh()  # type: ignore
         except Exception:
             pass
         try:
@@ -143,11 +143,10 @@ class RaporAraclarHubFrame(ttk.Frame):
                     self.raporlar_frame.refresh()  # type: ignore
         except Exception:
             pass
-
         try:
-            if sel == str(self.tab_purchase) and hasattr(self, "purchase_frame"):
-                if hasattr(self.purchase_frame, "reload_filters"):
-                    self.purchase_frame.reload_filters()  # type: ignore
+            if sel == str(self.tab_satis) and hasattr(self, "satis_raporlar_frame"):
+                if hasattr(self.satis_raporlar_frame, "refresh"):
+                    self.satis_raporlar_frame.refresh()  # type: ignore
         except Exception:
             pass
 
