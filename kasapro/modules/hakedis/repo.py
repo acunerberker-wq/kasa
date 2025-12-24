@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 import sqlite3
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Dict, Iterable, List, Optional, Tuple
 
 
@@ -22,7 +22,8 @@ class HakedisRepo:
         self.log_fn = log_fn
 
     def _now(self) -> str:
-        return datetime.utcnow().isoformat(timespec="seconds")
+        # Use timezone-aware UTC to avoid deprecation warnings
+        return datetime.now(timezone.utc).isoformat(timespec="seconds")
 
     def _audit(
         self,

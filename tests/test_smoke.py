@@ -89,7 +89,11 @@ class SmokeTests(unittest.TestCase):
 
     @unittest.skipUnless(_can_start_tk(), "Tkinter ekranı başlatılamıyor (headless ortam).")
     def test_ui_smoke(self) -> None:
-        app = App(base_dir=self.base_dir, test_mode=True)
+        try:
+            app = App(base_dir=self.base_dir, test_mode=True)
+        except tk.TclError:
+            self.skipTest("Tk kurulumu eksik (init.tcl bulunamadı)")
+            return
         try:
             for key in ("kasa", "tanimlar", "rapor_araclar"):
                 self.assertIn(key, app.frames)
