@@ -13,7 +13,7 @@ Not: e-Fatura/e-Arşiv entegrasyonu bu modülde sadece alan ve hazırlık olarak
 
 from __future__ import annotations
 
-from datetime import date
+from datetime import date, timedelta
 from typing import Any, Dict, List, Optional
 
 import tkinter as tk
@@ -450,7 +450,12 @@ class FaturaFrame(ttk.Frame):
         top.pack(fill=tk.X, padx=8, pady=8)
 
         ttk.Button(top, text="Açık Faturalar", command=self.report_open_invoices).pack(side=tk.LEFT)
+        ttk.Button(top, text="Satın Alma Siparişleri", command=self.report_purchase_orders).pack(side=tk.LEFT, padx=6)
         ttk.Button(top, text="Bu Ay", command=lambda: self.report_month(date.today().year, date.today().month)).pack(side=tk.LEFT, padx=6)
+        ttk.Button(top, text="Satın Alma (Bu Ay)", command=lambda: self.report_purchase_month(date.today().year, date.today().month)).pack(
+            side=tk.LEFT, padx=6
+        )
+        ttk.Button(top, text="Satın Alma (Tümü)", command=self.report_purchase_all).pack(side=tk.LEFT, padx=6)
 
         self.lbl_report = ttk.Label(top, text="")
         self.lbl_report.pack(side=tk.LEFT, padx=(10, 0))
@@ -1156,8 +1161,7 @@ class FaturaFrame(ttk.Frame):
     # Raporlar
     # -----------------
     def report_open_invoices(self, silent: bool = False):
-        for i in self.report_tree.get_children():
-            self.report_tree.delete(i)
+        self._clear_report_tree()
 
         try:
             rows = self.app.db.fatura_list()
@@ -1182,20 +1186,58 @@ class FaturaFrame(ttk.Frame):
         self.lbl_report.config(text=f"Açık fatura: {len(out)}  •  Kalan toplam: {fmt_amount(total_kalan)}")
         if not silent:
             try:
+            self.nb.select(self.tab_report)
+        except Exception:
+            pass
+
+    def report_purchase_orders(self, silent: bool = False):
+        self._clear_report_tree()
+
+        try:
+            rows = self.app.db.fatura_list(tur="Alış")
+        except Exception:
+            rows = []
+
+        out = [r for r in rows if _s(r["durum"]) != "İptal"]
+        total = 0.0
+        total_kalan = 0.0
+        for r in out:
+            fid = int(r["id"])
+            tarih = fmt_tr_date(r["tarih"])
+            no = _s(r["fatura_no"])
+            cari = _s(r["cari_ad"])
+            para = _s(r["para"] or "TL")
+            toplam = float(safe_float(r["genel_toplam"]))
+            kalan = float(safe_float(r["kalan"]))
+            total += toplam
+            total_kalan += kalan
+            self.report_tree.insert("", tk.END, values=(
+                fid, tarih, no, cari, _s(r["tur"]), _s(r["durum"]), para, fmt_amount(toplam), fmt_amount(kalan)
+            ))
+
+        self.lbl_report.config(
+            text=f"Satın alma siparişi: {len(out)}  •  Toplam: {fmt_amount(total)}  •  Kalan: {fmt_amount(total_kalan)}"
+        )
+        if not silent:
+            try:
                 self.nb.select(self.tab_report)
             except Exception:
                 pass
 
-    def report_month(self, year: int, month: int):
-        # basit rapor: belirtilen ayın faturaları
+<<<<<<< ours
+    def _report_rows(self, rows, *, label: str):
         for i in self.report_tree.get_children():
             self.report_tree.delete(i)
+=======
+    def report_month(self, year: int, month: int):
+        # basit rapor: belirtilen ayın faturaları
+        self._clear_report_tree()
         try:
             df = date(year, month, 1).strftime("%d.%m.%Y")
             if month == 12:
                 dt = date(year, 12, 31).strftime("%d.%m.%Y")
             else:
-                dt = (date(year, month + 1, 1) - tk.timedelta(days=1)).strftime("%d.%m.%Y")  # type: ignore
+                dt = (date(year, month + 1, 1) - timedelta(days=1)).strftime("%d.%m.%Y")
         except Exception:
             # fallback: kullanma
             df, dt = "", ""
@@ -1204,6 +1246,7 @@ class FaturaFrame(ttk.Frame):
             rows = self.app.db.fatura_list(date_from=df, date_to=dt)
         except Exception:
             rows = []
+>>>>>>> theirs
 
         total = 0.0
         for r in rows:
@@ -1219,11 +1262,50 @@ class FaturaFrame(ttk.Frame):
                 fid, tarih, no, cari, _s(r["tur"]), _s(r["durum"]), para, fmt_amount(toplam), fmt_amount(kalan)
             ))
 
-        self.lbl_report.config(text=f"{year}-{month:02d} fatura sayısı: {len(rows)}  •  Toplam: {fmt_amount(total)}")
+        self.lbl_report.config(text=f"{label}: {len(rows)}  •  Toplam: {fmt_amount(total)}")
         try:
             self.nb.select(self.tab_report)
         except Exception:
             pass
+
+<<<<<<< ours
+    def report_month(self, year: int, month: int):
+        # basit rapor: belirtilen ayın faturaları
+        self.report_month_filtered(year, month)
+
+    def report_month_filtered(self, year: int, month: int, *, tur: str = "", label: str = ""):
+        try:
+            df = date(year, month, 1).strftime("%d.%m.%Y")
+            if month == 12:
+                dt = date(year, 12, 31).strftime("%d.%m.%Y")
+            else:
+                dt = (date(year, month + 1, 1) - timedelta(days=1)).strftime("%d.%m.%Y")
+        except Exception:
+            # fallback: kullanma
+            df, dt = "", ""
+
+        try:
+            rows = self.app.db.fatura_list(date_from=df, date_to=dt, tur=tur)
+        except Exception:
+            rows = []
+
+        title = label or f"{year}-{month:02d} fatura"
+        self._report_rows(rows, label=title)
+
+    def report_purchase_month(self, year: int, month: int):
+        self.report_month_filtered(year, month, tur="Alış", label=f"{year}-{month:02d} satın alma")
+
+    def report_purchase_all(self):
+        try:
+            rows = self.app.db.fatura_list(tur="Alış")
+        except Exception:
+            rows = []
+        self._report_rows(rows, label="Satın alma faturaları")
+=======
+    def _clear_report_tree(self) -> None:
+        for i in self.report_tree.get_children():
+            self.report_tree.delete(i)
+>>>>>>> theirs
 
     # -----------------
     # PDF

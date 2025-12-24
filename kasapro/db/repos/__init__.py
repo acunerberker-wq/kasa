@@ -10,4 +10,8 @@ from .search_repo import SearchRepo
 from .maas_repo import MaasRepo
 from .banka_repo import BankaRepo
 from .fatura_repo import FaturaRepo
+<<<<<<< ours
 from .stok_repo import StokRepo
+=======
+from .nakliye_repo import NakliyeRepo
+>>>>>>> theirs
