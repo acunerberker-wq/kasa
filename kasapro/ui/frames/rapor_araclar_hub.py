@@ -128,7 +128,7 @@ class RaporAraclarHubFrame(ttk.Frame):
         try:
             text = self._notes_tab_base_text
             if count and count > 0:
-                text = f\"{text} ({count})\"
+                text = f"{text} ({count})"
             self.nb.tab(self.tab_notes_reminders, text=text)
         except Exception:
             pass
