@@ -180,6 +180,54 @@ def init_schema(conn: sqlite3.Connection) -> None:
     );"""
     )
 
+    # -----------------
+    # Satış Siparişleri
+    # -----------------
+    c.execute(
+        """
+    CREATE TABLE IF NOT EXISTS satis_siparis(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        tarih TEXT NOT NULL,
+        teslim_tarih TEXT DEFAULT '',
+        siparis_no TEXT NOT NULL UNIQUE,
+        cari_id INTEGER,
+        cari_ad TEXT DEFAULT '',
+        temsilci TEXT DEFAULT '',
+        depo_id INTEGER,
+        durum TEXT NOT NULL DEFAULT 'Açık',
+        para TEXT DEFAULT 'TL',
+        toplam REAL DEFAULT 0,
+        aciklama TEXT DEFAULT '',
+        sevk_tarih TEXT DEFAULT '',
+        sevk_no TEXT DEFAULT '',
+        fatura_id INTEGER,
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY(cari_id) REFERENCES cariler(id),
+        FOREIGN KEY(depo_id) REFERENCES stok_lokasyon(id),
+        FOREIGN KEY(fatura_id) REFERENCES fatura(id)
+    );"""
+    )
+
+    c.execute(
+        """
+    CREATE TABLE IF NOT EXISTS satis_siparis_kalem(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        siparis_id INTEGER NOT NULL,
+        urun_id INTEGER,
+        urun_kod TEXT DEFAULT '',
+        urun_ad TEXT DEFAULT '',
+        birim TEXT DEFAULT 'Adet',
+        miktar REAL DEFAULT 0,
+        birim_fiyat REAL DEFAULT 0,
+        toplam REAL DEFAULT 0,
+        sevk_miktar REAL DEFAULT 0,
+        aciklama TEXT DEFAULT '',
+        FOREIGN KEY(siparis_id) REFERENCES satis_siparis(id) ON DELETE CASCADE,
+        FOREIGN KEY(urun_id) REFERENCES stok_urun(id)
+    );"""
+    )
+
     c.execute("""
     CREATE TABLE IF NOT EXISTS logs(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -736,54 +784,75 @@ def migrate_schema(conn: sqlite3.Connection, log_fn: Optional[Callable[[str, str
                 pass
 
     # -----------------
-    # Mesajlaşma (eski DB'ler için)
+    # Satış Siparişleri (eski DB'ler için)
     # -----------------
     try:
         conn.execute(
-            """
-            CREATE TABLE IF NOT EXISTS messages(
+            """CREATE TABLE IF NOT EXISTS satis_siparis(
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                sender_id INTEGER NOT NULL,
-                sender_username TEXT NOT NULL,
-                subject TEXT DEFAULT '',
-                body TEXT DEFAULT '',
-                is_draft INTEGER NOT NULL DEFAULT 0,
+                tarih TEXT NOT NULL,
+                teslim_tarih TEXT DEFAULT '',
+                siparis_no TEXT NOT NULL UNIQUE,
+                cari_id INTEGER,
+                cari_ad TEXT DEFAULT '',
+                temsilci TEXT DEFAULT '',
+                depo_id INTEGER,
+                durum TEXT NOT NULL DEFAULT 'Açık',
+                para TEXT DEFAULT 'TL',
+                toplam REAL DEFAULT 0,
+                aciklama TEXT DEFAULT '',
+                sevk_tarih TEXT DEFAULT '',
+                sevk_no TEXT DEFAULT '',
+                fatura_id INTEGER,
                 created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
                 updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
             );"""
         )
         conn.execute(
-            """
-            CREATE TABLE IF NOT EXISTS message_recipients(
+            """CREATE TABLE IF NOT EXISTS satis_siparis_kalem(
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                message_id INTEGER NOT NULL,
-                recipient_id INTEGER NOT NULL,
-                recipient_username TEXT NOT NULL,
-                is_read INTEGER NOT NULL DEFAULT 0,
-                read_at TEXT DEFAULT '',
-                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                FOREIGN KEY(message_id) REFERENCES messages(id) ON DELETE CASCADE
-            );"""
-        )
-        conn.execute(
-            """
-            CREATE TABLE IF NOT EXISTS message_attachments(
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                message_id INTEGER NOT NULL,
-                filename TEXT NOT NULL,
-                stored_name TEXT NOT NULL,
-                size_bytes INTEGER NOT NULL DEFAULT 0,
-                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                FOREIGN KEY(message_id) REFERENCES messages(id) ON DELETE CASCADE
+                siparis_id INTEGER NOT NULL,
+                urun_id INTEGER,
+                urun_kod TEXT DEFAULT '',
+                urun_ad TEXT DEFAULT '',
+                birim TEXT DEFAULT 'Adet',
+                miktar REAL DEFAULT 0,
+                birim_fiyat REAL DEFAULT 0,
+                toplam REAL DEFAULT 0,
+                sevk_miktar REAL DEFAULT 0,
+                aciklama TEXT DEFAULT '',
+                FOREIGN KEY(siparis_id) REFERENCES satis_siparis(id) ON DELETE CASCADE
             );"""
         )
         conn.commit()
     except Exception as e:
         if log_fn:
             try:
-                log_fn("Schema Migration Error", f"messages tables: {e}")
+                log_fn("Schema Migration Error", f"satis_siparis tables: {e}")
             except Exception:
                 pass
+
+    _ensure_column(conn, "satis_siparis", "teslim_tarih", "TEXT DEFAULT ''", log_fn)
+    _ensure_column(conn, "satis_siparis", "cari_ad", "TEXT DEFAULT ''", log_fn)
+    _ensure_column(conn, "satis_siparis", "temsilci", "TEXT DEFAULT ''", log_fn)
+    _ensure_column(conn, "satis_siparis", "depo_id", "INTEGER", log_fn)
+    _ensure_column(conn, "satis_siparis", "durum", "TEXT NOT NULL DEFAULT 'Açık'", log_fn)
+    _ensure_column(conn, "satis_siparis", "para", "TEXT DEFAULT 'TL'", log_fn)
+    _ensure_column(conn, "satis_siparis", "toplam", "REAL DEFAULT 0", log_fn)
+    _ensure_column(conn, "satis_siparis", "aciklama", "TEXT DEFAULT ''", log_fn)
+    _ensure_column(conn, "satis_siparis", "sevk_tarih", "TEXT DEFAULT ''", log_fn)
+    _ensure_column(conn, "satis_siparis", "sevk_no", "TEXT DEFAULT ''", log_fn)
+    _ensure_column(conn, "satis_siparis", "fatura_id", "INTEGER", log_fn)
+
+    _ensure_column(conn, "satis_siparis_kalem", "urun_id", "INTEGER", log_fn)
+    _ensure_column(conn, "satis_siparis_kalem", "urun_kod", "TEXT DEFAULT ''", log_fn)
+    _ensure_column(conn, "satis_siparis_kalem", "urun_ad", "TEXT DEFAULT ''", log_fn)
+    _ensure_column(conn, "satis_siparis_kalem", "birim", "TEXT DEFAULT 'Adet'", log_fn)
+    _ensure_column(conn, "satis_siparis_kalem", "miktar", "REAL DEFAULT 0", log_fn)
+    _ensure_column(conn, "satis_siparis_kalem", "birim_fiyat", "REAL DEFAULT 0", log_fn)
+    _ensure_column(conn, "satis_siparis_kalem", "toplam", "REAL DEFAULT 0", log_fn)
+    _ensure_column(conn, "satis_siparis_kalem", "sevk_miktar", "REAL DEFAULT 0", log_fn)
+    _ensure_column(conn, "satis_siparis_kalem", "aciklama", "TEXT DEFAULT ''", log_fn)
 
     # Sık kullanılan sorgular için indeksler
     _ensure_index(conn, "idx_cari_hareket_cari_tarih", "cari_hareket", "cari_id, tarih", log_fn)
@@ -796,7 +865,9 @@ def migrate_schema(conn: sqlite3.Connection, log_fn: Optional[Callable[[str, str
     _ensure_index(conn, "idx_fatura_kalem_fatura_id", "fatura_kalem", "fatura_id", log_fn)
     _ensure_index(conn, "idx_fatura_kalem_urun", "fatura_kalem", "urun", log_fn)
     _ensure_index(conn, "idx_fatura_odeme_fatura_id", "fatura_odeme", "fatura_id", log_fn)
-    _ensure_index(conn, "idx_fatura_odeme_tarih", "fatura_odeme", "tarih", log_fn)
+    _ensure_index(conn, "idx_satis_siparis_tarih", "satis_siparis", "tarih", log_fn)
+    _ensure_index(conn, "idx_satis_siparis_cari", "satis_siparis", "cari_id, tarih", log_fn)
+    _ensure_index(conn, "idx_satis_siparis_kalem_siparis", "satis_siparis_kalem", "siparis_id", log_fn)
     _ensure_index(conn, "idx_stok_hareket_urun_id", "stok_hareket", "urun_id", log_fn)
     _ensure_index(conn, "idx_messages_created_at", "messages", "created_at", log_fn)
     _ensure_index(conn, "idx_message_recipients_recipient_created", "message_recipients", "recipient_id, created_at", log_fn)

@@ -24,7 +24,7 @@ from .repos import (
     FaturaRepo,
     StokRepo,
     NakliyeRepo,
-    MessagesRepo,
+    SatisSiparisRepo,
 )
 
 
@@ -49,7 +49,7 @@ class DB:
         self.fatura = FaturaRepo(self.conn)
         self.stok = StokRepo(self.conn)
         self.nakliye = NakliyeRepo(self.conn)
-        self.messages = MessagesRepo(self.conn)
+        self.satis_siparis = SatisSiparisRepo(self.conn)
 
         migrate_schema(self.conn, log_fn=self._safe_log)
         seed_defaults(self.conn, log_fn=self._safe_log)
@@ -408,25 +408,22 @@ class DB:
         return self.stok.hareket_delete(hid)
 
     # -----------------
-    # Satın Alma Raporları
+    # Satış Sipariş Raporları
     # -----------------
-    def purchase_report_suppliers(self):
-        return self.purchase_reports.list_suppliers()
+    def satis_siparis_rapor_acik(self, filters: Dict[str, Any], open_statuses: List[str]) -> Dict[str, Any]:
+        return self.satis_siparis.rapor_acik_siparisler(filters, open_statuses)
 
-    def purchase_report_products(self) -> List[str]:
-        return self.purchase_reports.list_products()
+    def satis_siparis_rapor_sevkiyata_hazir(self, filters: Dict[str, Any], status_pool: List[str]) -> Dict[str, Any]:
+        return self.satis_siparis.rapor_sevkiyata_hazir(filters, status_pool)
 
-    def purchase_report_categories(self) -> List[str]:
-        return self.purchase_reports.list_categories()
+    def satis_siparis_rapor_kismi_sevk(self, filters: Dict[str, Any]) -> Dict[str, Any]:
+        return self.satis_siparis.rapor_kismi_sevk(filters)
 
-    def purchase_report_locations(self):
-        return self.purchase_reports.list_locations()
+    def satis_siparis_rapor_donusum(self, filters: Dict[str, Any]) -> Dict[str, Any]:
+        return self.satis_siparis.rapor_donusum(filters)
 
-    def purchase_report_users(self):
-        return self.purchase_reports.list_users()
-
-    def purchase_report_fetch(self, **kwargs):
-        return self.purchase_reports.fetch_report(**kwargs)
+    def satis_siparis_acik_ozet(self, open_statuses: List[str]) -> Dict[str, Any]:
+        return self.satis_siparis.acik_siparis_ozet(open_statuses)
 
     # -----------------
     # Banka

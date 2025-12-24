@@ -9,14 +9,15 @@ from __future__ import annotations
 import os
 import shutil
 import sqlite3
-from datetime import datetime
+import threading
+from datetime import datetime, date, time, timedelta
 from typing import Any, Optional, List, Dict, Tuple
 
 import tkinter as tk
 from tkinter import ttk, messagebox, filedialog
 
 from .config import APP_TITLE, HAS_OPENPYXL, APP_BASE_DIR, DB_FILENAME
-from .utils import _safe_slug
+from .utils import _safe_slug, fmt_amount
 from .db.main_db import DB
 from .db.users_db import UsersDB
 from .services import Services
@@ -113,7 +114,7 @@ class App:
 
         self.frames: Dict[str, ttk.Frame] = {}
         self._build_ui()
-        self._start_message_polling()
+        self._schedule_sales_order_summary()
 
         # Login başarılı -> ana pencereyi göster
         try:
@@ -122,6 +123,46 @@ class App:
             self.root.after(80, self.root.lift)
         except Exception:
             pass
+
+    def _schedule_sales_order_summary(self) -> None:
+        try:
+            now = datetime.now()
+            next_run = datetime.combine(now.date(), time(23, 59))
+            if now >= next_run:
+                self._run_sales_order_summary_if_needed()
+                next_run = next_run + timedelta(days=1)
+            delay_ms = int((next_run - now).total_seconds() * 1000)
+            self.root.after(delay_ms, self._schedule_sales_order_summary)
+        except Exception:
+            pass
+
+    def _run_sales_order_summary_if_needed(self) -> None:
+        today = date.today().isoformat()
+        try:
+            last = self.db.get_setting("satis_siparis_gun_sonu")
+            if last == today:
+                return
+        except Exception:
+            pass
+
+        db_path = self.db.path
+        company_name = getattr(self, "active_company_name", "") or ""
+
+        def worker():
+            try:
+                db = DB(db_path)
+                summary = db.satis_siparis_acik_ozet(["Açık", "Hazırlanıyor", "Kısmi Sevk"])
+                db.set_setting("satis_siparis_gun_sonu", today)
+                msg = (
+                    f"Gün Sonu Açık Sipariş ({company_name or 'Şirket'}): "
+                    f"Adet={summary['adet']} • Toplam={fmt_amount(summary['toplam'])}"
+                )
+                db.log("Gün Sonu", msg)
+                db.close()
+            except Exception:
+                return
+
+        threading.Thread(target=worker, daemon=True).start()
 
     def _login(self) -> Optional[sqlite3.Row]:
         # LoginWindow kullanıcı seçimi + şifre doğrulama yapar

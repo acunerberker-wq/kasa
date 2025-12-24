@@ -6,12 +6,35 @@ UI tarafındaki openpyxl/reportlab bağımlılıklarını tek noktada toplamak i
 
 from __future__ import annotations
 
-from typing import Any, Dict
+from typing import Any, Dict, Iterable, List
 
 from ..utils import fmt_amount, ensure_pdf_fonts
 
 
 class ExportService:
+    def export_table_csv(self, headers: List[str], rows: Iterable[Iterable[Any]], filepath: str) -> None:
+        import csv
+
+        with open(filepath, "w", newline="", encoding="utf-8") as handle:
+            writer = csv.writer(handle)
+            writer.writerow(headers)
+            for row in rows:
+                writer.writerow(list(row))
+
+    def export_table_excel(self, headers: List[str], rows: Iterable[Iterable[Any]], filepath: str) -> None:
+        from openpyxl import Workbook
+        from openpyxl.utils import get_column_letter
+
+        wb = Workbook()
+        ws = wb.active
+        ws.append(headers)
+        for row in rows:
+            ws.append(list(row))
+        for i, h in enumerate(headers, start=1):
+            ws.column_dimensions[get_column_letter(i)].width = min(42, max(12, len(str(h)) + 2))
+        ws.freeze_panes = "A2"
+        wb.save(filepath)
+
     def export_cari_ekstre_excel(self, data: Dict[str, Any], filepath: str):
         """Cari ekstreyi Excel'e yazar.
 
