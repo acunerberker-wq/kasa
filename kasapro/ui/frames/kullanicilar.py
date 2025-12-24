@@ -3,28 +3,16 @@
 
 from __future__ import annotations
 
-import os
-import re
-from datetime import datetime, timedelta
-from typing import Any, Optional, List, Dict, Tuple
+from typing import Optional, TYPE_CHECKING
 
 import tkinter as tk
-from tkinter import ttk, messagebox, filedialog, simpledialog
+from tkinter import ttk, messagebox
 
-from ...config import APP_TITLE, HAS_OPENPYXL, HAS_REPORTLAB
-from ...utils import (
-    center_window,
-    today_iso,
-    now_iso,
-    fmt_tr_date,
-    parse_date_smart,
-    parse_number_smart,
-    safe_float,
-    fmt_amount,
-)
-from ..widgets import SimpleField, LabeledEntry, LabeledCombo, MoneyEntry
-from ..windows import ImportWizard, CariEkstreWindow
+from ...config import APP_TITLE
 from ..dialogs import simple_input, simple_choice
+
+if TYPE_CHECKING:
+    from ...app import App
 
 class KullanicilarFrame(ttk.Frame):
     def __init__(self, master, app: "App"):
@@ -33,10 +21,12 @@ class KullanicilarFrame(ttk.Frame):
         self._build()
 
     def _build(self):
-        top = ttk.Frame(self); top.pack(fill=tk.X, padx=12, pady=12)
+        top = ttk.Frame(self)
+        top.pack(fill=tk.X, padx=12, pady=12)
         ttk.Label(top, text="Kullanıcılar", font=("Calibri", 16, "bold")).pack(side=tk.LEFT)
 
-        btns = ttk.Frame(top); btns.pack(side=tk.RIGHT)
+        btns = ttk.Frame(top)
+        btns.pack(side=tk.RIGHT)
         ttk.Button(btns, text="➕ Yeni", command=self.add_user).pack(side=tk.LEFT, padx=4)
         ttk.Button(btns, text="🔑 Şifre", command=self.reset_password).pack(side=tk.LEFT, padx=4)
         ttk.Button(btns, text="🗑 Sil", command=self.delete_user).pack(side=tk.LEFT, padx=4)

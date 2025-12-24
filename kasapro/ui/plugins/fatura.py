@@ -14,15 +14,17 @@ Not: e-Fatura/e-Arşiv entegrasyonu bu modülde sadece alan ve hazırlık olarak
 from __future__ import annotations
 
 from datetime import date, timedelta
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, TYPE_CHECKING
 
 import tkinter as tk
 from tkinter import ttk, messagebox, filedialog
 
 from ...config import APP_TITLE, HAS_REPORTLAB
-from ...utils import fmt_amount, fmt_tr_date, safe_float, parse_date_smart, ensure_pdf_fonts
+from ...utils import fmt_amount, fmt_tr_date, safe_float, ensure_pdf_fonts
 from ..widgets import LabeledEntry, LabeledCombo
 
+if TYPE_CHECKING:
+    from ...app import App
 
 PLUGIN_META = {
     "key": "fatura",
@@ -476,6 +478,13 @@ class FaturaFrame(ttk.Frame):
         self.report_tree.column("kalan", width=110, anchor="e")
 
         self.report_tree.pack(fill=tk.BOTH, expand=True, padx=8, pady=(0, 8))
+
+    def _clear_report_tree(self) -> None:
+        try:
+            for item_id in self.report_tree.get_children():
+                self.report_tree.delete(item_id)
+        except Exception:
+            pass
 
     # -----------------
     # Genel: Refresh
@@ -1186,9 +1195,9 @@ class FaturaFrame(ttk.Frame):
         self.lbl_report.config(text=f"Açık fatura: {len(out)}  •  Kalan toplam: {fmt_amount(total_kalan)}")
         if not silent:
             try:
-            self.nb.select(self.tab_report)
-        except Exception:
-            pass
+                self.nb.select(self.tab_report)
+            except Exception:
+                pass
 
     def report_purchase_orders(self, silent: bool = False):
         self._clear_report_tree()
@@ -1220,9 +1229,9 @@ class FaturaFrame(ttk.Frame):
         )
         if not silent:
             try:
-            self.nb.select(self.tab_report)
-        except Exception:
-            pass
+                self.nb.select(self.tab_report)
+            except Exception:
+                pass
 
     def report_month(self, year: int, month: int):
         # basit rapor: belirtilen ayın faturaları
@@ -1242,8 +1251,8 @@ class FaturaFrame(ttk.Frame):
             rows = self.app.db.fatura_list(date_from=df, date_to=dt)
         except Exception:
             rows = []
->>>>>>> theirs
 
+        label = f"{year}-{month:02d}"
         total = 0.0
         for r in rows:
             fid = int(r["id"])

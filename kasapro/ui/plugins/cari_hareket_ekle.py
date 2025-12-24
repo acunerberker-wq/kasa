@@ -7,7 +7,7 @@ Listeleme/filtreleme ayrı bir eklentiye taşınmıştır.
 
 from __future__ import annotations
 
-from typing import Optional
+from typing import Optional, TYPE_CHECKING
 
 import tkinter as tk
 from tkinter import ttk, messagebox
@@ -16,6 +16,8 @@ from ...config import APP_TITLE
 from ...utils import center_window, today_iso, fmt_tr_date, fmt_amount
 from ..widgets import SimpleField, LabeledEntry, LabeledCombo, MoneyEntry
 
+if TYPE_CHECKING:
+    from ...app import App
 
 PLUGIN_META = {
     "key": "cari_hareket_ekle",
@@ -39,22 +41,32 @@ class CariHareketEkleFrame(ttk.Frame):
         top = ttk.LabelFrame(self, text="Cari Hareket Ekle")
         top.pack(fill=tk.X, padx=10, pady=10)
 
-        r1 = ttk.Frame(top); r1.pack(fill=tk.X, pady=4)
-        self.in_tarih = LabeledEntry(r1, "Tarih:", 14); self.in_tarih.pack(side=tk.LEFT, padx=6)
+        r1 = ttk.Frame(top)
+        r1.pack(fill=tk.X, pady=4)
+        self.in_tarih = LabeledEntry(r1, "Tarih:", 14)
+        self.in_tarih.pack(side=tk.LEFT, padx=6)
         ttk.Button(r1, text="Bugün", command=lambda: self.in_tarih.set(fmt_tr_date(today_iso()))).pack(side=tk.LEFT, padx=6)
 
-        self.in_cari = LabeledCombo(r1, "Cari:", ["Seç"], 26); self.in_cari.pack(side=tk.LEFT, padx=6)
-        self.in_tip = LabeledCombo(r1, "Tip:", ["Borç", "Alacak"], 10); self.in_tip.pack(side=tk.LEFT, padx=6)
+        self.in_cari = LabeledCombo(r1, "Cari:", ["Seç"], 26)
+        self.in_cari.pack(side=tk.LEFT, padx=6)
+        self.in_tip = LabeledCombo(r1, "Tip:", ["Borç", "Alacak"], 10)
+        self.in_tip.pack(side=tk.LEFT, padx=6)
         self.in_tip.set("Borç")
 
-        self.in_tutar = MoneyEntry(r1, "Tutar:"); self.in_tutar.pack(side=tk.LEFT, padx=6)
-        self.in_para = LabeledCombo(r1, "Para:", self.app.db.list_currencies(), 8); self.in_para.pack(side=tk.LEFT, padx=6)
+        self.in_tutar = MoneyEntry(r1, "Tutar:")
+        self.in_tutar.pack(side=tk.LEFT, padx=6)
+        self.in_para = LabeledCombo(r1, "Para:", self.app.db.list_currencies(), 8)
+        self.in_para.pack(side=tk.LEFT, padx=6)
         self.in_para.set("TL")
 
-        r2 = ttk.Frame(top); r2.pack(fill=tk.X, pady=4)
-        self.in_odeme = LabeledCombo(r2, "Ödeme:", self.app.db.list_payments(), 14); self.in_odeme.pack(side=tk.LEFT, padx=6)
-        self.in_belge = LabeledEntry(r2, "Belge:", 14); self.in_belge.pack(side=tk.LEFT, padx=6)
-        self.in_etiket = LabeledEntry(r2, "Etiket:", 14); self.in_etiket.pack(side=tk.LEFT, padx=6)
+        r2 = ttk.Frame(top)
+        r2.pack(fill=tk.X, pady=4)
+        self.in_odeme = LabeledCombo(r2, "Ödeme:", self.app.db.list_payments(), 14)
+        self.in_odeme.pack(side=tk.LEFT, padx=6)
+        self.in_belge = LabeledEntry(r2, "Belge:", 14)
+        self.in_belge.pack(side=tk.LEFT, padx=6)
+        self.in_etiket = LabeledEntry(r2, "Etiket:", 14)
+        self.in_etiket.pack(side=tk.LEFT, padx=6)
 
         # Açıklama: buton + sekmeli editör
         desc_box = ttk.Frame(r2)
@@ -148,7 +160,9 @@ class CariHareketEkleFrame(ttk.Frame):
         win = getattr(self, "_aciklama_win", None)
         try:
             if win is not None and win.winfo_exists():
-                win.deiconify(); win.lift(); win.focus_force()
+                win.deiconify()
+                win.lift()
+                win.focus_force()
                 return
         except Exception:
             pass

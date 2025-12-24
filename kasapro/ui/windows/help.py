@@ -3,12 +3,15 @@
 
 from __future__ import annotations
 
-from typing import List, Tuple
+from typing import List, Tuple, TYPE_CHECKING
 
 import tkinter as tk
 from tkinter import ttk
 
 from ...utils import center_window
+
+if TYPE_CHECKING:
+    from ...app import App
 
 def _tr_norm(s: str) -> str:
     """Arama için TR-dostu normalizasyon (I/İ davranışı dahil)."""
@@ -197,7 +200,8 @@ class HelpWindow(tk.Toplevel):
         center_window(self, app.root)
 
     def _build(self):
-        top = ttk.Frame(self); top.pack(fill=tk.X, padx=12, pady=10)
+        top = ttk.Frame(self)
+        top.pack(fill=tk.X, padx=12, pady=10)
 
         ttk.Label(top, text="Yardım", font=("Calibri", 14, "bold")).pack(side=tk.LEFT)
         ttk.Label(top, text=f"  (Kullanıcı: {self.app.user['username']} / {self.app.user['role']})", foreground="#666").pack(side=tk.LEFT)
@@ -215,7 +219,8 @@ class HelpWindow(tk.Toplevel):
         pw = ttk.PanedWindow(self, orient=tk.HORIZONTAL)
         pw.pack(fill=tk.BOTH, expand=True, padx=12, pady=(0, 12))
 
-        left = ttk.Frame(pw); right = ttk.Frame(pw)
+        left = ttk.Frame(pw)
+        right = ttk.Frame(pw)
         pw.add(left, weight=1)
         pw.add(right, weight=3)
 
@@ -230,7 +235,8 @@ class HelpWindow(tk.Toplevel):
         self.lb.bind("<<ListboxSelect>>", self._on_select_topic)
 
         # Sağ: içerik + arama içinde gezinme
-        nav = ttk.Frame(right); nav.pack(fill=tk.X, padx=6, pady=(6, 0))
+        nav = ttk.Frame(right)
+        nav.pack(fill=tk.X, padx=6, pady=(6, 0))
         ttk.Button(nav, text="Önceki", command=lambda: self.find_next(backwards=True)).pack(side=tk.LEFT)
         ttk.Button(nav, text="Sonraki", command=lambda: self.find_next(backwards=False)).pack(side=tk.LEFT, padx=6)
         ttk.Button(nav, text="Kopyala", command=self.copy_current).pack(side=tk.RIGHT)

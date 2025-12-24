@@ -3,7 +3,7 @@
 
 from __future__ import annotations
 
-from typing import Any, Optional, List, Dict, Tuple
+from typing import Any, List
 
 import re
 import tkinter as tk

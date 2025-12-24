@@ -15,7 +15,7 @@ Notlar:
 from __future__ import annotations
 
 from datetime import date, timedelta
-from typing import Optional, List
+from typing import Optional, List, TYPE_CHECKING
 
 import tkinter as tk
 from tkinter import ttk, messagebox, filedialog
@@ -25,6 +25,8 @@ from ...utils import fmt_tr_date, fmt_amount
 from ..widgets import LabeledEntry, LabeledCombo
 from ..windows import ImportWizard, BankaWorkspaceWindow
 
+if TYPE_CHECKING:
+    from ...app import App
 
 PLUGIN_META = {
     "key": "banka_hareketleri",

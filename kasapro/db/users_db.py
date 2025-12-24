@@ -7,11 +7,10 @@ Multi-company/multi-user routing burada yönetilir.
 from __future__ import annotations
 
 import os
-import re
 import shutil
 import sqlite3
 import secrets
-from typing import Any, Optional, List, Dict, Tuple
+from typing import Optional, List
 
 from ..config import USERS_DB_FILENAME, DATA_DIRNAME, DB_FILENAME
 from ..utils import make_salt, hash_password, _safe_slug, now_iso
@@ -345,7 +344,7 @@ class UsersDB:
 
                 comps = list(self.conn.execute("SELECT id, name, db_file FROM companies WHERE user_id=? ORDER BY id", (uid,)))
                 if not comps:
-                    cid = self._create_default_company_for_user(uid, uname, db_file)
+                    self._create_default_company_for_user(uid, uname, db_file)
                     comps = list(self.conn.execute("SELECT id, name, db_file FROM companies WHERE user_id=? ORDER BY id", (uid,)))
                     if not comps:
                         continue

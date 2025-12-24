@@ -3,32 +3,21 @@
 
 from __future__ import annotations
 
-import os
-import re
-from datetime import datetime, timedelta
-from typing import Any, Optional, List, Dict, Tuple
+from typing import Optional, TYPE_CHECKING
 
 import tkinter as tk
-from tkinter import ttk, messagebox, filedialog, simpledialog
+from tkinter import ttk, messagebox, simpledialog
 
-from ...config import APP_TITLE, HAS_OPENPYXL, HAS_REPORTLAB
-from ...utils import (
-    center_window,
-    today_iso,
-    now_iso,
-    fmt_tr_date,
-    parse_date_smart,
-    parse_number_smart,
-    safe_float,
-    fmt_amount,
-)
-from ..widgets import SimpleField, LabeledEntry, LabeledCombo, MoneyEntry
-from ..windows import ImportWizard, CariEkstreWindow
+from ...config import APP_TITLE
+
+if TYPE_CHECKING:
+    from ...app import App
 
 class SirketlerFrame(ttk.Frame):
     """Kullanıcı girişinden sonra birden fazla şirket (firma) yönetimi.
 
-    Her şirketin kendi SQLite DB dosyası vardır; böylece cariler/hareketler/ayarlar
+    Her şirketin kendi SQLite DB dosyası vardır
+    böylece cariler/hareketler/ayarlar
     şirket bazında tamamen ayrılır.
     """
     def __init__(self, master, app: "App"):
@@ -44,11 +33,13 @@ class SirketlerFrame(ttk.Frame):
                 "Şirket seçtiğinizde program o şirketin veritabanına geçer (cariler/hareketler/raporlar).")
         ttk.Label(top, text=info, foreground="#555").pack(anchor="w", padx=10, pady=(8, 10))
 
-        row = ttk.Frame(top); row.pack(fill=tk.X, padx=10, pady=(0, 8))
+        row = ttk.Frame(top)
+        row.pack(fill=tk.X, padx=10, pady=(0, 8))
         self.lbl_active = ttk.Label(row, text="")
         self.lbl_active.pack(side=tk.LEFT)
 
-        btns = ttk.Frame(top); btns.pack(fill=tk.X, padx=10, pady=(0, 8))
+        btns = ttk.Frame(top)
+        btns.pack(fill=tk.X, padx=10, pady=(0, 8))
         ttk.Button(btns, text="➕ Yeni Şirket", command=self.on_new).pack(side=tk.LEFT, padx=4)
         ttk.Button(btns, text="✅ Seç / Aç", command=self.on_open).pack(side=tk.LEFT, padx=4)
         ttk.Button(btns, text="✏️ Yeniden Adlandır", command=self.on_rename).pack(side=tk.LEFT, padx=4)
@@ -214,5 +205,4 @@ class SirketlerFrame(ttk.Frame):
             self.refresh()
         except Exception as e:
             messagebox.showerror(APP_TITLE, f"Silinemedi:\n{e}")
-
 

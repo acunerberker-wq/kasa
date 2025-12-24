@@ -3,7 +3,7 @@
 
 from __future__ import annotations
 
-from typing import Optional
+from typing import Optional, TYPE_CHECKING
 
 import tkinter as tk
 from tkinter import ttk, messagebox
@@ -12,6 +12,8 @@ from ...config import APP_TITLE
 from ...utils import today_iso, fmt_tr_date, parse_number_smart, safe_float, fmt_amount
 from ..widgets import LabeledEntry, LabeledCombo
 
+if TYPE_CHECKING:
+    from ...app import App
 
 PLUGIN_META = {
     "key": "stok",

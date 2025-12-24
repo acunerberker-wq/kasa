@@ -45,7 +45,7 @@ class NakliyeRepo:
             (str(ad).strip(), telefon or "", eposta or "", adres or "", int(aktif), notlar or ""),
         )
         self.conn.commit()
-        return int(cur.lastrowid)
+        return int(cur.lastrowid or 0)
 
     def firma_get(self, fid: int) -> Optional[sqlite3.Row]:
         return self.conn.execute("SELECT * FROM nakliye_firma WHERE id=?", (int(fid),)).fetchone()
@@ -129,7 +129,7 @@ class NakliyeRepo:
             VALUES(?,?,?,?,?,?,?,?,?,?)
             """,
             (
-                int(firma_id) if firma_id else None,
+                int(firma_id) if firma_id is not None else None,
                 str(plaka).strip(),
                 tip or "",
                 marka or "",
@@ -142,7 +142,7 @@ class NakliyeRepo:
             ),
         )
         self.conn.commit()
-        return int(cur.lastrowid)
+        return int(cur.lastrowid or 0)
 
     def arac_get(self, aid: int) -> Optional[sqlite3.Row]:
         return self.conn.execute("SELECT * FROM nakliye_arac WHERE id=?", (int(aid),)).fetchone()
@@ -168,7 +168,7 @@ class NakliyeRepo:
             WHERE id=?
             """,
             (
-                int(firma_id) if firma_id else None,
+                int(firma_id) if firma_id is not None else None,
                 str(plaka).strip(),
                 tip or "",
                 marka or "",
@@ -225,7 +225,7 @@ class NakliyeRepo:
             (str(ad).strip(), cikis or "", varis or "", safe_float(mesafe_km), safe_float(sure_saat), int(aktif), notlar or ""),
         )
         self.conn.commit()
-        return int(cur.lastrowid)
+        return int(cur.lastrowid or 0)
 
     def rota_get(self, rid: int) -> Optional[sqlite3.Row]:
         return self.conn.execute("SELECT * FROM nakliye_rota WHERE id=?", (int(rid),)).fetchone()
@@ -341,9 +341,9 @@ class NakliyeRepo:
                 is_no,
                 parse_date_smart(tarih),
                 saat or "",
-                int(firma_id) if firma_id else None,
-                int(arac_id) if arac_id else None,
-                int(rota_id) if rota_id else None,
+                int(firma_id) if firma_id is not None else None,
+                int(arac_id) if arac_id is not None else None,
+                int(rota_id) if rota_id is not None else None,
                 cikis or "",
                 varis or "",
                 yuk or "",
@@ -354,7 +354,7 @@ class NakliyeRepo:
             ),
         )
         self.conn.commit()
-        return int(cur.lastrowid)
+        return int(cur.lastrowid or 0)
 
     def is_get(self, iid: int) -> Optional[sqlite3.Row]:
         return self.conn.execute("SELECT * FROM nakliye_is WHERE id=?", (int(iid),)).fetchone()
@@ -387,9 +387,9 @@ class NakliyeRepo:
                 str(is_no).strip(),
                 parse_date_smart(tarih),
                 saat or "",
-                int(firma_id) if firma_id else None,
-                int(arac_id) if arac_id else None,
-                int(rota_id) if rota_id else None,
+                int(firma_id) if firma_id is not None else None,
+                int(arac_id) if arac_id is not None else None,
+                int(rota_id) if rota_id is not None else None,
                 cikis or "",
                 varis or "",
                 yuk or "",
@@ -439,7 +439,7 @@ class NakliyeRepo:
             (int(is_id), parse_date_smart(tarih), saat or "", tip or "İşlem", aciklama or ""),
         )
         self.conn.commit()
-        return int(cur.lastrowid)
+        return int(cur.lastrowid or 0)
 
     def islem_delete(self, islem_id: int) -> None:
         self.conn.execute("DELETE FROM nakliye_islem WHERE id=?", (int(islem_id),))

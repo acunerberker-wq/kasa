@@ -14,7 +14,7 @@ Not:
 from __future__ import annotations
 
 from datetime import date, datetime, timedelta
-from typing import Optional, Dict, Any, List, Tuple
+from typing import Optional, Dict, Any, Tuple, TYPE_CHECKING
 
 import tkinter as tk
 from tkinter import ttk, messagebox, filedialog
@@ -26,6 +26,8 @@ from ..windows.import_wizard import ImportWizard
 from ..windows import BankaWorkspaceWindow
 from ..widgets import LabeledEntry, LabeledCombo, MoneyEntry
 
+if TYPE_CHECKING:
+    from ...app import App
 
 PLUGIN_META = {
     "key": "maas_takibi",
@@ -324,8 +326,10 @@ class MaasTakibiFrame(ttk.Frame):
             pass
 
     def _open_bank_workspace(self, *, auto_run: bool):
-        date_from = (getattr(self, "s_from", None).get() or "").strip() if hasattr(self, "s_from") else ""
-        date_to = (getattr(self, "s_to", None).get() or "").strip() if hasattr(self, "s_to") else ""
+        s_from = getattr(self, "s_from", None)
+        s_to = getattr(self, "s_to", None)
+        date_from = s_from.get().strip() if isinstance(s_from, tk.StringVar) else ""
+        date_to = s_to.get().strip() if isinstance(s_to, tk.StringVar) else ""
 
         flt = {
             "q": "",
@@ -1319,14 +1323,17 @@ class MaasTakibiFrame(ttk.Frame):
             if existing_link or best_link[1] is None:
                 continue
 
-            score, bid, name_sc, amt_sc, date_sc, mode = best_link
+            score, bid_opt, name_sc, amt_sc, date_sc, mode = best_link
+            if bid_opt is None:
+                continue
+            bid = int(bid_opt)
             strong_by_name = (name_sc >= 0.90)
             strong_by_date_amt = (amt_sc >= 0.92 and date_sc >= 0.92)
             if score >= 0.92 and (score - second_link) >= 0.07 and (strong_by_name or strong_by_date_amt):
                 try:
                     note = "auto_name_scan" if mode == "name" else "auto_amt_date"
-                    self.app.db.maas_odeme_link_bank(oid, int(bid), score=float(score), note=note)  # type: ignore
-                    used_bank_ids.add(int(bid))
+                    self.app.db.maas_odeme_link_bank(oid, bid, score=float(score), note=note)  # type: ignore
+                    used_bank_ids.add(bid)
                     auto_linked += 1
                 except Exception:
                     pass
@@ -1403,11 +1410,6 @@ class MaasTakibiFrame(ttk.Frame):
 
         # Önce DB'de linkli olanları göster
         for pr in pay_rows:
-            try:
-                pid = int(pr["id"])
-            except Exception:
-                continue
-
             existing_bank_id = int(pr.get("banka_hareket_id") or 0) if isinstance(pr, dict) else int(pr["banka_hareket_id"] or 0)
             if existing_bank_id:
                 b = self.app.db.banka_get(existing_bank_id)
@@ -1419,11 +1421,6 @@ class MaasTakibiFrame(ttk.Frame):
         # Linkli olmayanlara öneri üret (greedy)
         pending: list[tuple[int, float, Any, Any, str]] = []  # (tag_rank, score, pr, br_or_None, tag)
         for pr in pay_rows:
-            try:
-                pid = int(pr["id"])
-            except Exception:
-                continue
-
             existing_bank_id = int(pr.get("banka_hareket_id") or 0) if isinstance(pr, dict) else int(pr["banka_hareket_id"] or 0)
             if existing_bank_id:
                 continue

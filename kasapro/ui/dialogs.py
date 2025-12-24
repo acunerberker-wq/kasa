@@ -32,7 +32,8 @@ def simple_input(parent, title, prompt, password=False) -> Optional[str]:
         res["v"] = None
         w.destroy()
 
-    b = ttk.Frame(w); b.pack(fill=tk.X, padx=14, pady=12)
+    b = ttk.Frame(w)
+    b.pack(fill=tk.X, padx=14, pady=12)
     ttk.Button(b, text="OK", command=ok).pack(side=tk.LEFT)
     ttk.Button(b, text="İptal", command=cancel).pack(side=tk.RIGHT)
 
@@ -62,7 +63,8 @@ def simple_choice(parent, title, prompt, options: List[str], default: str="") ->
         res["v"] = None
         w.destroy()
 
-    b = ttk.Frame(w); b.pack(fill=tk.X, padx=14, pady=12)
+    b = ttk.Frame(w)
+    b.pack(fill=tk.X, padx=14, pady=12)
     ttk.Button(b, text="OK", command=ok).pack(side=tk.LEFT)
     ttk.Button(b, text="İptal", command=cancel).pack(side=tk.RIGHT)
 

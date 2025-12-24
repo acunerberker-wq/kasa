@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 from datetime import date, timedelta
+from typing import TYPE_CHECKING
 
 import tkinter as tk
 from tkinter import ttk, messagebox, filedialog
@@ -11,6 +12,9 @@ from tkinter import ttk, messagebox, filedialog
 from ...config import APP_TITLE, HAS_OPENPYXL, HAS_REPORTLAB
 from ...utils import center_window, fmt_tr_date, fmt_amount, ensure_pdf_fonts
 from ..widgets import LabeledEntry
+
+if TYPE_CHECKING:
+    from ...app import App
 
 class CariEkstreWindow(tk.Toplevel):
     def __init__(self, app: "App", cari_id: int):
@@ -36,16 +40,21 @@ class CariEkstreWindow(tk.Toplevel):
         top = ttk.LabelFrame(self, text="Filtre")
         top.pack(fill=tk.X, padx=10, pady=10)
 
-        r1 = ttk.Frame(top); r1.pack(fill=tk.X, pady=6)
-        self.f_from = LabeledEntry(r1, "Başlangıç:", 12); self.f_from.pack(side=tk.LEFT, padx=6)
-        self.f_to = LabeledEntry(r1, "Bitiş:", 12); self.f_to.pack(side=tk.LEFT, padx=6)
-        self.f_q = LabeledEntry(r1, "Ara:", 22); self.f_q.pack(side=tk.LEFT, padx=6)
+        r1 = ttk.Frame(top)
+        r1.pack(fill=tk.X, pady=6)
+        self.f_from = LabeledEntry(r1, "Başlangıç:", 12)
+        self.f_from.pack(side=tk.LEFT, padx=6)
+        self.f_to = LabeledEntry(r1, "Bitiş:", 12)
+        self.f_to.pack(side=tk.LEFT, padx=6)
+        self.f_q = LabeledEntry(r1, "Ara:", 22)
+        self.f_q.pack(side=tk.LEFT, padx=6)
 
         ttk.Button(r1, text="Son 30 gün", command=self.last30).pack(side=tk.LEFT, padx=6)
         ttk.Button(r1, text="Yenile", command=self.refresh).pack(side=tk.LEFT, padx=6)
 
         ttk.Separator(top, orient="horizontal").pack(fill=tk.X, padx=6, pady=8)
-        r2 = ttk.Frame(top); r2.pack(fill=tk.X, pady=6)
+        r2 = ttk.Frame(top)
+        r2.pack(fill=tk.X, pady=6)
         self.btn_pdf = ttk.Button(r2, text="📄 PDF Ekstre", command=self.export_pdf)
         self.btn_pdf.pack(side=tk.LEFT, padx=6)
         if not HAS_REPORTLAB:

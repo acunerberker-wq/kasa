@@ -3,30 +3,25 @@
 
 from __future__ import annotations
 
-import os
-import re
-from datetime import datetime, timedelta
-from typing import Any, Optional, List, Dict, Tuple
+from datetime import date, timedelta
+from typing import Optional, List, TYPE_CHECKING
 
 import tkinter as tk
-from tkinter import ttk, messagebox, filedialog, simpledialog
+from tkinter import ttk, messagebox
 
-from ...config import APP_TITLE, HAS_OPENPYXL, HAS_REPORTLAB
+from ...config import APP_TITLE
 from ...utils import (
     center_window,
     today_iso,
-    now_iso,
     fmt_tr_date,
-    parse_date_smart,
-    parse_number_smart,
-    safe_float,
     fmt_amount,
 )
 from ..widgets import SimpleField, LabeledEntry, LabeledCombo, MoneyEntry
-from ..windows import ImportWizard, CariEkstreWindow
 
+if TYPE_CHECKING:
+    from ...app import App
 class CariHareketFrame(ttk.Frame):
-    def __init__(self, master, app:"App"):
+    def __init__(self, master, app: "App"):
         super().__init__(master)
         self.app = app
         self.edit_id: Optional[int] = None
@@ -39,22 +34,32 @@ class CariHareketFrame(ttk.Frame):
         top = ttk.LabelFrame(self, text="Cari Hareket Ekle")
         top.pack(fill=tk.X, padx=10, pady=10)
 
-        r1 = ttk.Frame(top); r1.pack(fill=tk.X, pady=4)
-        self.in_tarih = LabeledEntry(r1, "Tarih:", 14); self.in_tarih.pack(side=tk.LEFT, padx=6)
+        r1 = ttk.Frame(top)
+        r1.pack(fill=tk.X, pady=4)
+        self.in_tarih = LabeledEntry(r1, "Tarih:", 14)
+        self.in_tarih.pack(side=tk.LEFT, padx=6)
         ttk.Button(r1, text="Bugün", command=lambda: self.in_tarih.set(fmt_tr_date(today_iso()))).pack(side=tk.LEFT, padx=6)
 
-        self.in_cari = LabeledCombo(r1, "Cari:", ["Seç"], 26); self.in_cari.pack(side=tk.LEFT, padx=6)
-        self.in_tip = LabeledCombo(r1, "Tip:", ["Borç", "Alacak"], 10); self.in_tip.pack(side=tk.LEFT, padx=6)
+        self.in_cari = LabeledCombo(r1, "Cari:", ["Seç"], 26)
+        self.in_cari.pack(side=tk.LEFT, padx=6)
+        self.in_tip = LabeledCombo(r1, "Tip:", ["Borç", "Alacak"], 10)
+        self.in_tip.pack(side=tk.LEFT, padx=6)
         self.in_tip.set("Borç")
 
-        self.in_tutar = MoneyEntry(r1, "Tutar:"); self.in_tutar.pack(side=tk.LEFT, padx=6)
-        self.in_para = LabeledCombo(r1, "Para:", self.app.db.list_currencies(), 8); self.in_para.pack(side=tk.LEFT, padx=6)
+        self.in_tutar = MoneyEntry(r1, "Tutar:")
+        self.in_tutar.pack(side=tk.LEFT, padx=6)
+        self.in_para = LabeledCombo(r1, "Para:", self.app.db.list_currencies(), 8)
+        self.in_para.pack(side=tk.LEFT, padx=6)
         self.in_para.set("TL")
 
-        r2 = ttk.Frame(top); r2.pack(fill=tk.X, pady=4)
-        self.in_odeme = LabeledCombo(r2, "Ödeme:", self.app.db.list_payments(), 14); self.in_odeme.pack(side=tk.LEFT, padx=6)
-        self.in_belge = LabeledEntry(r2, "Belge:", 14); self.in_belge.pack(side=tk.LEFT, padx=6)
-        self.in_etiket = LabeledEntry(r2, "Etiket:", 14); self.in_etiket.pack(side=tk.LEFT, padx=6)
+        r2 = ttk.Frame(top)
+        r2.pack(fill=tk.X, pady=4)
+        self.in_odeme = LabeledCombo(r2, "Ödeme:", self.app.db.list_payments(), 14)
+        self.in_odeme.pack(side=tk.LEFT, padx=6)
+        self.in_belge = LabeledEntry(r2, "Belge:", 14)
+        self.in_belge.pack(side=tk.LEFT, padx=6)
+        self.in_etiket = LabeledEntry(r2, "Etiket:", 14)
+        self.in_etiket.pack(side=tk.LEFT, padx=6)
         # Açıklama: buton + sekmeli editör
         self.in_aciklama = SimpleField("")
         desc_box = ttk.Frame(r2)
@@ -72,13 +77,18 @@ class CariHareketFrame(ttk.Frame):
         mid = ttk.LabelFrame(self, text="Liste / Filtre")
         mid.pack(fill=tk.BOTH, expand=True, padx=10, pady=(0,10))
 
-        f = ttk.Frame(mid); f.pack(fill=tk.X, pady=4)
+        f = ttk.Frame(mid)
+        f.pack(fill=tk.X, pady=4)
         self.btn_multi = ttk.Button(f, text="Çoklu Seçim: Kapalı", command=self.toggle_multi)
         self.btn_multi.pack(side=tk.LEFT, padx=6)
-        self.f_cari = LabeledCombo(f, "Cari:", ["(Tümü)"], 26); self.f_cari.pack(side=tk.LEFT, padx=6)
-        self.f_q = LabeledEntry(f, "Ara:", 20); self.f_q.pack(side=tk.LEFT, padx=6)
-        self.f_from = LabeledEntry(f, "Başlangıç:", 12); self.f_from.pack(side=tk.LEFT, padx=6)
-        self.f_to = LabeledEntry(f, "Bitiş:", 12); self.f_to.pack(side=tk.LEFT, padx=6)
+        self.f_cari = LabeledCombo(f, "Cari:", ["(Tümü)"], 26)
+        self.f_cari.pack(side=tk.LEFT, padx=6)
+        self.f_q = LabeledEntry(f, "Ara:", 20)
+        self.f_q.pack(side=tk.LEFT, padx=6)
+        self.f_from = LabeledEntry(f, "Başlangıç:", 12)
+        self.f_from.pack(side=tk.LEFT, padx=6)
+        self.f_to = LabeledEntry(f, "Bitiş:", 12)
+        self.f_to.pack(side=tk.LEFT, padx=6)
         ttk.Button(f, text="Son 30 gün", command=self.last30).pack(side=tk.LEFT, padx=6)
         ttk.Button(f, text="Yenile", command=self.refresh).pack(side=tk.LEFT, padx=6)
 
@@ -101,7 +111,8 @@ class CariHareketFrame(ttk.Frame):
         self.tree.bind("<Button-1>", self._on_tree_click)
         self.tree.bind("<Double-1>", lambda _e: self.edit_selected())
 
-        btm = ttk.Frame(mid); btm.pack(fill=tk.X, pady=(0,6))
+        btm = ttk.Frame(mid)
+        btm.pack(fill=tk.X, pady=(0,6))
         self.btn_edit = ttk.Button(btm, text="Seçili Kaydı Düzenle", command=self.edit_selected)
         self.btn_edit.pack(side=tk.LEFT, padx=6)
         self.btn_del = ttk.Button(btm, text="Seçili Kaydı Sil", command=self.delete_selected)

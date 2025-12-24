@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 """Kasa ekranı.
 
-Bu ekran; kasa hareketi ekleme/düzenleme, geçmiş listeleme ve raporları tek yerde toplar.
+Bu ekran
+kasa hareketi ekleme/düzenleme, geçmiş listeleme ve raporları tek yerde toplar.
 
 Not: DB'de para birimi dönüşümü yapılmadığı için raporlar (gelir/gider/net)
 tek para birimi varsayımıyla gösterilir. (Çok para birimi kullanıyorsanız,
@@ -11,7 +12,7 @@ aynı raporda farklı para birimleri karışabilir.)
 from __future__ import annotations
 
 from datetime import date, timedelta
-from typing import Optional, List, Tuple
+from typing import Optional, TYPE_CHECKING
 
 import tkinter as tk
 from tkinter import ttk, messagebox
@@ -20,6 +21,8 @@ from ...config import APP_TITLE
 from ...utils import today_iso, fmt_tr_date, fmt_amount
 from ..widgets import SimpleField, LabeledEntry, LabeledCombo, MoneyEntry
 
+if TYPE_CHECKING:
+    from ...app import App
 
 class KasaFrame(ttk.Frame):
     def __init__(self, master, app: "App"):
@@ -278,7 +281,9 @@ class KasaFrame(ttk.Frame):
         win = getattr(self, "_aciklama_win", None)
         try:
             if win is not None and win.winfo_exists():
-                win.deiconify(); win.lift(); win.focus_force()
+                win.deiconify()
+                win.lift()
+                win.focus_force()
                 return
         except Exception:
             pass
