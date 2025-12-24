@@ -325,6 +325,84 @@ def init_schema(conn: sqlite3.Connection) -> None:
         FOREIGN KEY(banka_hareket_id) REFERENCES banka_hareket(id) ON DELETE CASCADE
     );""")
 
+    # -----------------
+    # Nakliye Sistemi
+    # -----------------
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS nakliye_firma(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        ad TEXT NOT NULL,
+        telefon TEXT DEFAULT '',
+        eposta TEXT DEFAULT '',
+        adres TEXT DEFAULT '',
+        aktif INTEGER NOT NULL DEFAULT 1,
+        notlar TEXT DEFAULT '',
+        UNIQUE(ad)
+    );""")
+
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS nakliye_arac(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        firma_id INTEGER,
+        plaka TEXT NOT NULL,
+        tip TEXT DEFAULT '',
+        marka TEXT DEFAULT '',
+        model TEXT DEFAULT '',
+        yil TEXT DEFAULT '',
+        kapasite TEXT DEFAULT '',
+        surucu TEXT DEFAULT '',
+        aktif INTEGER NOT NULL DEFAULT 1,
+        notlar TEXT DEFAULT '',
+        UNIQUE(plaka),
+        FOREIGN KEY(firma_id) REFERENCES nakliye_firma(id) ON DELETE SET NULL
+    );""")
+
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS nakliye_rota(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        ad TEXT NOT NULL,
+        cikis TEXT DEFAULT '',
+        varis TEXT DEFAULT '',
+        mesafe_km REAL DEFAULT 0,
+        sure_saat REAL DEFAULT 0,
+        aktif INTEGER NOT NULL DEFAULT 1,
+        notlar TEXT DEFAULT ''
+    );""")
+
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS nakliye_is(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        is_no TEXT NOT NULL UNIQUE,
+        tarih TEXT NOT NULL,
+        saat TEXT DEFAULT '',
+        firma_id INTEGER,
+        arac_id INTEGER,
+        rota_id INTEGER,
+        cikis TEXT DEFAULT '',
+        varis TEXT DEFAULT '',
+        yuk TEXT DEFAULT '',
+        durum TEXT DEFAULT 'Planlandı',
+        ucret REAL DEFAULT 0,
+        para TEXT DEFAULT 'TL',
+        notlar TEXT DEFAULT '',
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY(firma_id) REFERENCES nakliye_firma(id) ON DELETE SET NULL,
+        FOREIGN KEY(arac_id) REFERENCES nakliye_arac(id) ON DELETE SET NULL,
+        FOREIGN KEY(rota_id) REFERENCES nakliye_rota(id) ON DELETE SET NULL
+    );""")
+
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS nakliye_islem(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        is_id INTEGER NOT NULL,
+        tarih TEXT NOT NULL,
+        saat TEXT DEFAULT '',
+        tip TEXT NOT NULL,
+        aciklama TEXT DEFAULT '',
+        FOREIGN KEY(is_id) REFERENCES nakliye_is(id) ON DELETE CASCADE
+    );""")
+
     conn.commit()
 
 
@@ -509,6 +587,93 @@ def migrate_schema(conn: sqlite3.Connection, log_fn: Optional[Callable[[str, str
     _ensure_column(conn, "kasa_hareket", "aciklama", "TEXT DEFAULT ''", log_fn)
     _ensure_column(conn, "kasa_hareket", "belge", "TEXT DEFAULT ''", log_fn)
     _ensure_column(conn, "kasa_hareket", "etiket", "TEXT DEFAULT ''", log_fn)
+
+    # -----------------
+    # Nakliye Sistemi (eski DB'ler için)
+    # -----------------
+    try:
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS nakliye_firma(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                ad TEXT NOT NULL,
+                telefon TEXT DEFAULT '',
+                eposta TEXT DEFAULT '',
+                adres TEXT DEFAULT '',
+                aktif INTEGER NOT NULL DEFAULT 1,
+                notlar TEXT DEFAULT '',
+                UNIQUE(ad)
+            );"""
+        )
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS nakliye_arac(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                firma_id INTEGER,
+                plaka TEXT NOT NULL,
+                tip TEXT DEFAULT '',
+                marka TEXT DEFAULT '',
+                model TEXT DEFAULT '',
+                yil TEXT DEFAULT '',
+                kapasite TEXT DEFAULT '',
+                surucu TEXT DEFAULT '',
+                aktif INTEGER NOT NULL DEFAULT 1,
+                notlar TEXT DEFAULT '',
+                UNIQUE(plaka),
+                FOREIGN KEY(firma_id) REFERENCES nakliye_firma(id) ON DELETE SET NULL
+            );"""
+        )
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS nakliye_rota(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                ad TEXT NOT NULL,
+                cikis TEXT DEFAULT '',
+                varis TEXT DEFAULT '',
+                mesafe_km REAL DEFAULT 0,
+                sure_saat REAL DEFAULT 0,
+                aktif INTEGER NOT NULL DEFAULT 1,
+                notlar TEXT DEFAULT ''
+            );"""
+        )
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS nakliye_is(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                is_no TEXT NOT NULL UNIQUE,
+                tarih TEXT NOT NULL,
+                saat TEXT DEFAULT '',
+                firma_id INTEGER,
+                arac_id INTEGER,
+                rota_id INTEGER,
+                cikis TEXT DEFAULT '',
+                varis TEXT DEFAULT '',
+                yuk TEXT DEFAULT '',
+                durum TEXT DEFAULT 'Planlandı',
+                ucret REAL DEFAULT 0,
+                para TEXT DEFAULT 'TL',
+                notlar TEXT DEFAULT '',
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY(firma_id) REFERENCES nakliye_firma(id) ON DELETE SET NULL,
+                FOREIGN KEY(arac_id) REFERENCES nakliye_arac(id) ON DELETE SET NULL,
+                FOREIGN KEY(rota_id) REFERENCES nakliye_rota(id) ON DELETE SET NULL
+            );"""
+        )
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS nakliye_islem(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                is_id INTEGER NOT NULL,
+                tarih TEXT NOT NULL,
+                saat TEXT DEFAULT '',
+                tip TEXT NOT NULL,
+                aciklama TEXT DEFAULT '',
+                FOREIGN KEY(is_id) REFERENCES nakliye_is(id) ON DELETE CASCADE
+            );"""
+        )
+        conn.commit()
+    except Exception as e:
+        if log_fn:
+            try:
+                log_fn("Schema Migration Error", f"nakliye tables: {e}")
+            except Exception:
+                pass
 
 
 def seed_defaults(conn: sqlite3.Connection, log_fn: Optional[Callable[[str, str], None]] = None) -> None:
