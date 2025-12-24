@@ -443,6 +443,24 @@ def _ensure_column(
                 pass
 
 
+def _ensure_index(
+    conn: sqlite3.Connection,
+    name: str,
+    table: str,
+    cols_sql: str,
+    log_fn: Optional[Callable[[str, str], None]] = None,
+) -> None:
+    try:
+        conn.execute(f"CREATE INDEX IF NOT EXISTS {name} ON {table} ({cols_sql})")
+        conn.commit()
+    except Exception as e:
+        if log_fn:
+            try:
+                log_fn("Schema Migration Error", f"index {name}: {e}")
+            except Exception:
+                pass
+
+
 def migrate_schema(conn: sqlite3.Connection, log_fn: Optional[Callable[[str, str], None]] = None) -> None:
     # Banka tabloları (eski DB'ler için)
     try:
@@ -674,6 +692,17 @@ def migrate_schema(conn: sqlite3.Connection, log_fn: Optional[Callable[[str, str
                 log_fn("Schema Migration Error", f"nakliye tables: {e}")
             except Exception:
                 pass
+
+    # Sık kullanılan sorgular için indeksler
+    _ensure_index(conn, "idx_cari_hareket_cari_tarih", "cari_hareket", "cari_id, tarih", log_fn)
+    _ensure_index(conn, "idx_cari_hareket_tarih", "cari_hareket", "tarih", log_fn)
+    _ensure_index(conn, "idx_kasa_hareket_tarih", "kasa_hareket", "tarih", log_fn)
+    _ensure_index(conn, "idx_banka_hareket_tarih", "banka_hareket", "tarih", log_fn)
+    _ensure_index(conn, "idx_banka_hareket_import_grup", "banka_hareket", "import_grup", log_fn)
+    _ensure_index(conn, "idx_fatura_cari_tarih", "fatura", "cari_id, tarih", log_fn)
+    _ensure_index(conn, "idx_fatura_kalem_fatura_id", "fatura_kalem", "fatura_id", log_fn)
+    _ensure_index(conn, "idx_fatura_odeme_fatura_id", "fatura_odeme", "fatura_id", log_fn)
+    _ensure_index(conn, "idx_stok_hareket_urun_id", "stok_hareket", "urun_id", log_fn)
 
 
 def seed_defaults(conn: sqlite3.Connection, log_fn: Optional[Callable[[str, str], None]] = None) -> None:
