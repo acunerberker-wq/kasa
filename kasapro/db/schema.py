@@ -352,6 +352,81 @@ def init_schema(conn: sqlite3.Connection) -> None:
     )
 
     # -----------------
+    # Satın Alma Siparişleri
+    # -----------------
+    c.execute(
+        """
+    CREATE TABLE IF NOT EXISTS satin_alma_siparis(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        siparis_no TEXT NOT NULL UNIQUE,
+        tedarikci_id INTEGER NOT NULL,
+        tarih TEXT NOT NULL,
+        teslim_tarihi TEXT DEFAULT '',
+        durum TEXT NOT NULL DEFAULT 'oluşturuldu',
+        para TEXT DEFAULT 'TL',
+        kur REAL DEFAULT 1,
+        iskonto_oran REAL DEFAULT 0,
+        depo_id INTEGER,
+        notlar TEXT DEFAULT '',
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY(tedarikci_id) REFERENCES cariler(id),
+        FOREIGN KEY(depo_id) REFERENCES stok_lokasyon(id)
+    );"""
+    )
+
+    c.execute(
+        """
+    CREATE TABLE IF NOT EXISTS satin_alma_siparis_kalem(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        siparis_id INTEGER NOT NULL,
+        urun_id INTEGER,
+        urun_ad TEXT DEFAULT '',
+        miktar REAL NOT NULL DEFAULT 0,
+        birim TEXT DEFAULT 'Adet',
+        birim_fiyat REAL NOT NULL DEFAULT 0,
+        iskonto_oran REAL DEFAULT 0,
+        iskonto_tutar REAL DEFAULT 0,
+        toplam REAL DEFAULT 0,
+        FOREIGN KEY(siparis_id) REFERENCES satin_alma_siparis(id) ON DELETE CASCADE,
+        FOREIGN KEY(urun_id) REFERENCES stok_urun(id)
+    );"""
+    )
+
+    c.execute(
+        """
+    CREATE TABLE IF NOT EXISTS satin_alma_teslim(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        siparis_id INTEGER NOT NULL,
+        tarih TEXT NOT NULL,
+        depo_id INTEGER,
+        fatura_id INTEGER,
+        durum TEXT DEFAULT 'kısmi teslim alındı',
+        notlar TEXT DEFAULT '',
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY(siparis_id) REFERENCES satin_alma_siparis(id) ON DELETE CASCADE,
+        FOREIGN KEY(depo_id) REFERENCES stok_lokasyon(id),
+        FOREIGN KEY(fatura_id) REFERENCES fatura(id)
+    );"""
+    )
+
+    c.execute(
+        """
+    CREATE TABLE IF NOT EXISTS satin_alma_teslim_kalem(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        teslim_id INTEGER NOT NULL,
+        urun_id INTEGER,
+        urun_ad TEXT DEFAULT '',
+        miktar REAL NOT NULL DEFAULT 0,
+        birim TEXT DEFAULT 'Adet',
+        birim_fiyat REAL NOT NULL DEFAULT 0,
+        toplam REAL DEFAULT 0,
+        FOREIGN KEY(teslim_id) REFERENCES satin_alma_teslim(id) ON DELETE CASCADE,
+        FOREIGN KEY(urun_id) REFERENCES stok_urun(id)
+    );"""
+    )
+
+    # -----------------
     # Maaş Takibi
     # -----------------
     c.execute(
@@ -581,6 +656,80 @@ def migrate_schema(conn: sqlite3.Connection, log_fn: Optional[Callable[[str, str
 
     # banka_hareket (eski tablolar için kolon garantisi)
     _ensure_column(conn, "banka_hareket", "import_grup", "TEXT DEFAULT ''", log_fn)
+
+    # satın alma tabloları (eski DB'ler için)
+    try:
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS satin_alma_siparis(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                siparis_no TEXT NOT NULL UNIQUE,
+                tedarikci_id INTEGER NOT NULL,
+                tarih TEXT NOT NULL,
+                teslim_tarihi TEXT DEFAULT '',
+                durum TEXT NOT NULL DEFAULT 'oluşturuldu',
+                para TEXT DEFAULT 'TL',
+                kur REAL DEFAULT 1,
+                iskonto_oran REAL DEFAULT 0,
+                depo_id INTEGER,
+                notlar TEXT DEFAULT '',
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY(tedarikci_id) REFERENCES cariler(id),
+                FOREIGN KEY(depo_id) REFERENCES stok_lokasyon(id)
+            );"""
+        )
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS satin_alma_siparis_kalem(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                siparis_id INTEGER NOT NULL,
+                urun_id INTEGER,
+                urun_ad TEXT DEFAULT '',
+                miktar REAL NOT NULL DEFAULT 0,
+                birim TEXT DEFAULT 'Adet',
+                birim_fiyat REAL NOT NULL DEFAULT 0,
+                iskonto_oran REAL DEFAULT 0,
+                iskonto_tutar REAL DEFAULT 0,
+                toplam REAL DEFAULT 0,
+                FOREIGN KEY(siparis_id) REFERENCES satin_alma_siparis(id) ON DELETE CASCADE,
+                FOREIGN KEY(urun_id) REFERENCES stok_urun(id)
+            );"""
+        )
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS satin_alma_teslim(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                siparis_id INTEGER NOT NULL,
+                tarih TEXT NOT NULL,
+                depo_id INTEGER,
+                fatura_id INTEGER,
+                durum TEXT DEFAULT 'kısmi teslim alındı',
+                notlar TEXT DEFAULT '',
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY(siparis_id) REFERENCES satin_alma_siparis(id) ON DELETE CASCADE,
+                FOREIGN KEY(depo_id) REFERENCES stok_lokasyon(id),
+                FOREIGN KEY(fatura_id) REFERENCES fatura(id)
+            );"""
+        )
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS satin_alma_teslim_kalem(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                teslim_id INTEGER NOT NULL,
+                urun_id INTEGER,
+                urun_ad TEXT DEFAULT '',
+                miktar REAL NOT NULL DEFAULT 0,
+                birim TEXT DEFAULT 'Adet',
+                birim_fiyat REAL NOT NULL DEFAULT 0,
+                toplam REAL DEFAULT 0,
+                FOREIGN KEY(teslim_id) REFERENCES satin_alma_teslim(id) ON DELETE CASCADE,
+                FOREIGN KEY(urun_id) REFERENCES stok_urun(id)
+            );"""
+        )
+        conn.commit()
+    except Exception as e:
+        if log_fn:
+            try:
+                log_fn("Schema Migration Error", f"satin_alma: {e}")
+            except Exception:
+                pass
 
     # Yeni tabloları eski DB'lerde de oluştur (init_schema bazı eski DB'lerde çalışmış olsa bile güvenlik)
     try:
@@ -869,11 +1018,13 @@ def migrate_schema(conn: sqlite3.Connection, log_fn: Optional[Callable[[str, str
     _ensure_index(conn, "idx_satis_siparis_cari", "satis_siparis", "cari_id, tarih", log_fn)
     _ensure_index(conn, "idx_satis_siparis_kalem_siparis", "satis_siparis_kalem", "siparis_id", log_fn)
     _ensure_index(conn, "idx_stok_hareket_urun_id", "stok_hareket", "urun_id", log_fn)
-    _ensure_index(conn, "idx_messages_created_at", "messages", "created_at", log_fn)
-    _ensure_index(conn, "idx_message_recipients_recipient_created", "message_recipients", "recipient_id, created_at", log_fn)
-
-    _ensure_index(conn, "idx_stok_hareket_tarih", "stok_hareket", "tarih", log_fn)
-    _ensure_index(conn, "idx_kasa_hareket_tip_tarih", "kasa_hareket", "tip, tarih", log_fn)
+    _ensure_index(conn, "idx_satin_alma_siparis_tarih", "satin_alma_siparis", "tarih", log_fn)
+    _ensure_index(conn, "idx_satin_alma_siparis_tedarikci", "satin_alma_siparis", "tedarikci_id", log_fn)
+    _ensure_index(conn, "idx_satin_alma_siparis_durum", "satin_alma_siparis", "durum", log_fn)
+    _ensure_index(conn, "idx_satin_alma_siparis_kalem", "satin_alma_siparis_kalem", "siparis_id, urun_id", log_fn)
+    _ensure_index(conn, "idx_satin_alma_teslim_siparis", "satin_alma_teslim", "siparis_id, tarih", log_fn)
+    _ensure_index(conn, "idx_satin_alma_teslim_depo", "satin_alma_teslim", "depo_id", log_fn)
+    _ensure_index(conn, "idx_satin_alma_teslim_kalem", "satin_alma_teslim_kalem", "teslim_id, urun_id", log_fn)
 
 
 def seed_defaults(conn: sqlite3.Connection, log_fn: Optional[Callable[[str, str], None]] = None) -> None:

@@ -24,7 +24,7 @@ from .repos import (
     FaturaRepo,
     StokRepo,
     NakliyeRepo,
-    SatisSiparisRepo,
+    SatinAlmaRepo,
 )
 
 
@@ -49,7 +49,7 @@ class DB:
         self.fatura = FaturaRepo(self.conn)
         self.stok = StokRepo(self.conn)
         self.nakliye = NakliyeRepo(self.conn)
-        self.satis_siparis = SatisSiparisRepo(self.conn)
+        self.satin_alma = SatinAlmaRepo(self.conn)
 
         migrate_schema(self.conn, log_fn=self._safe_log)
         seed_defaults(self.conn, log_fn=self._safe_log)
@@ -408,22 +408,49 @@ class DB:
         return self.stok.hareket_delete(hid)
 
     # -----------------
-    # Satış Sipariş Raporları
+    # Satın Alma Siparişleri
     # -----------------
-    def satis_siparis_rapor_acik(self, filters: Dict[str, Any], open_statuses: List[str]) -> Dict[str, Any]:
-        return self.satis_siparis.rapor_acik_siparisler(filters, open_statuses)
+    def satin_alma_siparis_list(
+        self,
+        tedarikci_id: Optional[int] = None,
+        durum: str = "",
+        date_from: str = "",
+        date_to: str = "",
+        depo_id: Optional[int] = None,
+        urun_id: Optional[int] = None,
+        limit: int = 20000,
+    ):
+        return self.satin_alma.siparis_list(
+            tedarikci_id=tedarikci_id,
+            durum=durum,
+            date_from=date_from,
+            date_to=date_to,
+            depo_id=depo_id,
+            urun_id=urun_id,
+            limit=limit,
+        )
 
-    def satis_siparis_rapor_sevkiyata_hazir(self, filters: Dict[str, Any], status_pool: List[str]) -> Dict[str, Any]:
-        return self.satis_siparis.rapor_sevkiyata_hazir(filters, status_pool)
+    def satin_alma_siparis_kalem_totals(self, siparis_ids: List[int]) -> Dict[int, Dict[str, float]]:
+        return self.satin_alma.siparis_kalem_totals(siparis_ids)
 
-    def satis_siparis_rapor_kismi_sevk(self, filters: Dict[str, Any]) -> Dict[str, Any]:
-        return self.satis_siparis.rapor_kismi_sevk(filters)
+    def satin_alma_teslim_summary_by_siparis(self, siparis_ids: List[int]) -> Dict[int, Dict[str, Any]]:
+        return self.satin_alma.teslim_summary_by_siparis(siparis_ids)
 
-    def satis_siparis_rapor_donusum(self, filters: Dict[str, Any]) -> Dict[str, Any]:
-        return self.satis_siparis.rapor_donusum(filters)
-
-    def satis_siparis_acik_ozet(self, open_statuses: List[str]) -> Dict[str, Any]:
-        return self.satis_siparis.acik_siparis_ozet(open_statuses)
+    def satin_alma_teslim_list(
+        self,
+        tedarikci_id: Optional[int] = None,
+        date_from: str = "",
+        date_to: str = "",
+        depo_id: Optional[int] = None,
+        limit: int = 20000,
+    ):
+        return self.satin_alma.teslim_list(
+            tedarikci_id=tedarikci_id,
+            date_from=date_from,
+            date_to=date_to,
+            depo_id=depo_id,
+            limit=limit,
+        )
 
     # -----------------
     # Banka
