@@ -26,3 +26,17 @@ Traceback (most recent call last):
     for r in self.conn.execute(sql, tuple(params)):
              ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
 sqlite3.ProgrammingError: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 14568 and this is thread id 33188.
+2025-12-24 20:15:53,931 [ERROR] kasapro.ui.frames.purchase_report: Satın alma raporu oluşturulamadı
+Traceback (most recent call last):
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\frames\purchase_report.py", line 300, in worker
+    data = self.app.db.purchase_report_fetch(**filters)
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\db\main_db.py", line 385, in purchase_report_fetch
+    return self.purchase_reports.fetch_report(**kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\db\repos\purchase_report_repo.py", line 72, in fetch_report
+    self._fetch_invoice_items(df, dt, supplier_id, product_name, category)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\db\repos\purchase_report_repo.py", line 161, in _fetch_invoice_items
+    for r in self.conn.execute(sql, tuple(params)):
+             ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+sqlite3.ProgrammingError: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 26260 and this is thread id 9792.
