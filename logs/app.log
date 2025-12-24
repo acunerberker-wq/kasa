@@ -69,3 +69,45 @@ Traceback (most recent call last):
     c.execute("CREATE INDEX IF NOT EXISTS idx_reminders_due ON reminders(remind_at, status)")
     ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 sqlite3.OperationalError: no such column: remind_at
+2025-12-25 00:54:54,996 [ERROR] kasapro.app: Uygulama başlatma hatası
+Traceback (most recent call last):
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\app.py", line 1197, in main
+    App().run()
+    ~~~^^
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\app.py", line 124, in __init__
+    self._build_ui()
+    ~~~~~~~~~~~~~~^^
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\app.py", line 789, in _build_ui
+    self.frames["rapor_araclar"] = RaporAraclarHubFrame(body, self)
+                                   ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\frames\rapor_araclar_hub.py", line 69, in __init__
+    self.notes_reminders_frame = NotesRemindersFrame(self.tab_notes_reminders, self.app)
+                                 ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\modules\notes_reminders\ui.py", line 25, in __init__
+    self.service: NotesRemindersService = app.services.notes_reminders
+                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'Services' object has no attribute 'notes_reminders'
+2025-12-25 00:56:24,323 [ERROR] kasapro.app: Uygulama başlatma hatası
+Traceback (most recent call last):
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\app.py", line 1197, in main
+    App().run()
+    ~~~^^
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\app.py", line 113, in __init__
+    self.services = Services.build(self.db, self.usersdb, context_provider=self._hr_context)
+                    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\services\context.py", line 49, in build
+    notes_reminders=NotesRemindersService(db),
+                    ~~~~~~~~~~~~~~~~~~~~~^^^^
+TypeError: NotesRemindersService.__init__() missing 1 required positional argument: 'usersdb'
+2025-12-25 00:56:37,729 [ERROR] kasapro.app: Uygulama başlatma hatası
+Traceback (most recent call last):
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\app.py", line 1197, in main
+    App().run()
+    ~~~^^
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\app.py", line 113, in __init__
+    self.services = Services.build(self.db, self.usersdb, context_provider=self._hr_context)
+                    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\services\context.py", line 49, in build
+    notes_reminders=NotesRemindersService(db),
+                    ~~~~~~~~~~~~~~~~~~~~~^^^^
+TypeError: NotesRemindersService.__init__() missing 1 required positional argument: 'usersdb'

@@ -18,6 +18,7 @@ from .company_users_service import CompanyUsersService
 from .cari_service import CariService
 from .messages_service import MessagesService
 from ..modules.dms.service import DmsService
+from ..modules.notes_reminders.service import NotesRemindersService
 
 
 @dataclass
@@ -31,6 +32,7 @@ class Services:
     cari: CariService
     messages: MessagesService
     dms: DmsService
+    notes_reminders: NotesRemindersService
 
     @classmethod
     def build(cls, db: DB, usersdb: UsersDB, context_provider: Callable[[], HRContext]) -> "Services":
@@ -44,4 +46,5 @@ class Services:
             cari=CariService(db, exporter),
             messages=MessagesService(db, usersdb),
             dms=DmsService(db),
+            notes_reminders=NotesRemindersService(db, usersdb),
         )

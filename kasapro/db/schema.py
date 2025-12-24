@@ -308,6 +308,30 @@ def init_schema(conn: sqlite3.Connection) -> None:
     )
     c.execute(
         """
+    CREATE TABLE IF NOT EXISTS messages(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        sender_id INTEGER NOT NULL,
+        sender_username TEXT NOT NULL,
+        subject TEXT NOT NULL DEFAULT '',
+        body TEXT NOT NULL DEFAULT '',
+        is_draft INTEGER NOT NULL DEFAULT 0,
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    );"""
+    )
+    c.execute(
+        """
+    CREATE TABLE IF NOT EXISTS message_recipients(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        message_id INTEGER NOT NULL,
+        recipient_id INTEGER NOT NULL,
+        is_read INTEGER NOT NULL DEFAULT 0,
+        read_at TEXT DEFAULT NULL,
+        FOREIGN KEY(message_id) REFERENCES messages(id) ON DELETE CASCADE
+    );"""
+    )
+    c.execute(
+        """
     CREATE TABLE IF NOT EXISTS reminders(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         company_id INTEGER NOT NULL,
