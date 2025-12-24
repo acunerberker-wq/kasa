@@ -13,22 +13,6 @@ from .fatura_repo import FaturaRepo
 from .stok_repo import StokRepo
 from .nakliye_repo import NakliyeRepo
 from .purchase_report_repo import PurchaseReportRepo
-from .logs_repo import LogsRepo as LogsRepo
-from .settings_repo import SettingsRepo as SettingsRepo
-from .cariler_repo import CarilerRepo as CarilerRepo
-from .cari_hareket_repo import CariHareketRepo as CariHareketRepo
-from .kasa_repo import KasaRepo as KasaRepo
-from .users_repo import UsersRepo as UsersRepo
-from .search_repo import SearchRepo as SearchRepo
-from .maas_repo import MaasRepo as MaasRepo
-from .banka_repo import BankaRepo as BankaRepo
-from .fatura_repo import FaturaRepo as FaturaRepo
-from .stok_repo import StokRepo as StokRepo
-from .nakliye_repo import NakliyeRepo as NakliyeRepo
-from .satin_alma_repo import SatinAlmaRepo as SatinAlmaRepo
-from .satis_siparis_repo import SatisSiparisRepo as SatisSiparisRepo
-from .messages_repo import MessagesRepo as MessagesRepo
-from .purchase_report_repo import PurchaseReportRepo as PurchaseReportRepo
 
 __all__ = [
     "LogsRepo",
@@ -43,9 +27,5 @@ __all__ = [
     "FaturaRepo",
     "StokRepo",
     "NakliyeRepo",
-    "PurchaseReportRepo",
-    "SatinAlmaRepo",
-    "SatisSiparisRepo",
-    "MessagesRepo",
     "PurchaseReportRepo",
 ]

@@ -834,35 +834,6 @@ def migrate_schema(conn: sqlite3.Connection, log_fn: Optional[Callable[[str, str
     _ensure_index(conn, "idx_stok_hareket_urun_id", "stok_hareket", "urun_id", log_fn)
     _ensure_index(conn, "idx_stok_hareket_tarih", "stok_hareket", "tarih", log_fn)
     _ensure_index(conn, "idx_kasa_hareket_tip_tarih", "kasa_hareket", "tip, tarih", log_fn)
-    _ensure_column(conn, "stok_urun", "kategori", "TEXT DEFAULT ''", log_fn)
-    _ensure_column(conn, "stok_urun", "birim", "TEXT DEFAULT 'Adet'", log_fn)
-    _ensure_column(conn, "stok_urun", "min_stok", "REAL DEFAULT 0", log_fn)
-    _ensure_column(conn, "stok_urun", "max_stok", "REAL DEFAULT 0", log_fn)
-    _ensure_column(conn, "stok_urun", "kritik_stok", "REAL DEFAULT 0", log_fn)
-    _ensure_column(conn, "stok_urun", "raf", "TEXT DEFAULT ''", log_fn)
-    _ensure_column(conn, "stok_urun", "tedarikci_id", "INTEGER", log_fn)
-    _ensure_column(conn, "stok_urun", "barkod", "TEXT DEFAULT ''", log_fn)
-    _ensure_column(conn, "stok_urun", "aktif", "INTEGER NOT NULL DEFAULT 1", log_fn)
-    _ensure_column(conn, "stok_urun", "aciklama", "TEXT DEFAULT ''", log_fn)
-    _ensure_column(conn, "stok_urun", "created_at", "TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP", log_fn)
-    _ensure_column(conn, "stok_urun", "updated_at", "TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP", log_fn)
-
-    _ensure_column(conn, "stok_lokasyon", "aciklama", "TEXT DEFAULT ''", log_fn)
-    _ensure_column(conn, "stok_lokasyon", "aktif", "INTEGER NOT NULL DEFAULT 1", log_fn)
-
-    _ensure_column(conn, "stok_parti", "skt", "TEXT DEFAULT ''", log_fn)
-    _ensure_column(conn, "stok_parti", "uretim_tarih", "TEXT DEFAULT ''", log_fn)
-    _ensure_column(conn, "stok_parti", "aciklama", "TEXT DEFAULT ''", log_fn)
-
-    _ensure_column(conn, "stok_hareket", "birim", "TEXT DEFAULT 'Adet'", log_fn)
-    _ensure_column(conn, "stok_hareket", "kaynak_lokasyon_id", "INTEGER", log_fn)
-    _ensure_column(conn, "stok_hareket", "hedef_lokasyon_id", "INTEGER", log_fn)
-    _ensure_column(conn, "stok_hareket", "parti_id", "INTEGER", log_fn)
-    _ensure_column(conn, "stok_hareket", "referans_tipi", "TEXT DEFAULT ''", log_fn)
-    _ensure_column(conn, "stok_hareket", "referans_id", "INTEGER", log_fn)
-    _ensure_column(conn, "stok_hareket", "maliyet", "REAL DEFAULT 0", log_fn)
-    _ensure_column(conn, "stok_hareket", "aciklama", "TEXT DEFAULT ''", log_fn)
-    _ensure_column(conn, "stok_hareket", "created_at", "TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP", log_fn)
 
 
 def seed_defaults(conn: sqlite3.Connection, log_fn: Optional[Callable[[str, str], None]] = None) -> None:
