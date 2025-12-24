@@ -890,6 +890,63 @@ class App:
         except Exception:
             pass
 
+        # Stok
+        try:
+            urunler = self.db.stok_urun_list()
+            add_sheet(
+                "Stok_Urun",
+                ["id","kod","ad","kategori","birim","min_stok","kritik_stok","max_stok","raf","tedarikci_id","barkod","aktif","aciklama"],
+                [
+                    (
+                        r["id"],
+                        r["kod"],
+                        r["ad"],
+                        r["kategori"],
+                        r["birim"],
+                        r["min_stok"],
+                        r["kritik_stok"],
+                        r["max_stok"],
+                        r["raf"],
+                        r["tedarikci_id"],
+                        r["barkod"],
+                        r["aktif"],
+                        r["aciklama"],
+                    )
+                    for r in urunler
+                ],
+            )
+            loks = self.db.stok_lokasyon_list(only_active=False)
+            add_sheet("Stok_Lokasyon", ["id","ad","aciklama","aktif"],
+                      [(r["id"], r["ad"], r["aciklama"], r["aktif"]) for r in loks])
+            partiler = self.db.stok_parti_list()
+            add_sheet("Stok_Parti", ["id","urun_id","parti_no","skt","uretim_tarih","aciklama"],
+                      [(r["id"], r["urun_id"], r["parti_no"], r["skt"], r["uretim_tarih"], r["aciklama"]) for r in partiler])
+            hareketler = self.db.stok_hareket_list(limit=200000)
+            add_sheet(
+                "Stok_Hareket",
+                ["id","tarih","urun_id","tip","miktar","birim","kaynak_lokasyon_id","hedef_lokasyon_id","parti_id","referans_tipi","referans_id","maliyet","aciklama"],
+                [
+                    (
+                        r["id"],
+                        r["tarih"],
+                        r["urun_id"],
+                        r["tip"],
+                        r["miktar"],
+                        r["birim"],
+                        r["kaynak_lokasyon_id"],
+                        r["hedef_lokasyon_id"],
+                        r["parti_id"],
+                        r["referans_tipi"],
+                        r["referans_id"],
+                        r["maliyet"],
+                        r["aciklama"],
+                    )
+                    for r in hareketler
+                ],
+            )
+        except Exception:
+            pass
+
         ws = wb.create_sheet("Ozet")
         totals = self.db.kasa_toplam()
         ws["A1"] = "Kasa Özet"

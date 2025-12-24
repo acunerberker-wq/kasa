@@ -7,7 +7,13 @@ import re
 import sqlite3
 from typing import List, Optional, Callable
 
-from ...config import DEFAULT_CURRENCIES, DEFAULT_PAYMENTS, DEFAULT_CATEGORIES
+from ...config import (
+    DEFAULT_CURRENCIES,
+    DEFAULT_PAYMENTS,
+    DEFAULT_CATEGORIES,
+    DEFAULT_STOCK_UNITS,
+    DEFAULT_STOCK_CATEGORIES,
+)
 
 
 class SettingsRepo:
@@ -47,6 +53,12 @@ class SettingsRepo:
 
     def list_categories(self) -> List[str]:
         return self._get_list("categories", DEFAULT_CATEGORIES)
+
+    def list_stock_units(self) -> List[str]:
+        return self._get_list("stock_units", DEFAULT_STOCK_UNITS)
+
+    def list_stock_categories(self) -> List[str]:
+        return self._get_list("stock_categories", DEFAULT_STOCK_CATEGORIES)
 
     def _scan_max_belge_seq(self) -> int:
         maxn = 0

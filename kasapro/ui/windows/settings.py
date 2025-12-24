@@ -51,6 +51,9 @@ class SettingsWindow(tk.Toplevel):
         tab_users = ttk.Frame(nb)
         nb.add(tab_users, text="Kullanıcılar")
 
+        tab_stock = ttk.Frame(nb)
+        nb.add(tab_stock, text="Stok")
+
         tab_db_backup = ttk.Frame(nb)
         nb.add(tab_db_backup, text="DB Yedek")
 
@@ -61,6 +64,9 @@ class SettingsWindow(tk.Toplevel):
         self._list_editor(tab_lists, "Para Birimleri", "currencies", self.db.list_currencies(), y=0)
         self._list_editor(tab_lists, "Ödeme Tipleri", "payments", self.db.list_payments(), y=170)
         self._list_editor(tab_lists, "Kategoriler", "categories", self.db.list_categories(), y=340)
+
+        self._list_editor(tab_stock, "Stok Birimleri", "stock_units", self.db.list_stock_units(), y=0)
+        self._list_editor(tab_stock, "Stok Kategorileri", "stock_categories", self.db.list_stock_categories(), y=170)
 
         # ---- Aktif/Pasif (Maaş) ----
         self._build_active_tab(tab_active)

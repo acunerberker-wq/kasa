@@ -32,7 +32,7 @@ class GlobalSearchFrame(ttk.Frame):
         self._build()
 
     def _build(self):
-        top = ttk.LabelFrame(self, text="Global Arama (Cari + Gelir + Hareket)")
+        top = ttk.LabelFrame(self, text="Global Arama (Cari + Kasa + Stok)")
         top.pack(fill=tk.X, padx=10, pady=10)
 
         r = ttk.Frame(top); r.pack(fill=tk.X, pady=6)
@@ -56,4 +56,11 @@ class GlobalSearchFrame(ttk.Frame):
         for r in res["kasa"]:
             self.txt.insert(tk.END, f"{r['id']} | {fmt_tr_date(r['tarih'])} | {r['tip']} | {r['tutar']} | {r['kategori']} | {r['cari_ad'] or ''}\n")
 
+        self.txt.insert(tk.END, f"\nSTOK ÜRÜN ({len(res['stok_urun'])})\n" + "-"*80 + "\n")
+        for r in res["stok_urun"]:
+            self.txt.insert(tk.END, f"{r['id']} | {r['kod']} | {r['ad']} | {r['kategori']} | {r['birim']}\n")
+
+        self.txt.insert(tk.END, f"\nSTOK HAREKET ({len(res['stok_hareket'])})\n" + "-"*80 + "\n")
+        for r in res["stok_hareket"]:
+            self.txt.insert(tk.END, f"{r['id']} | {fmt_tr_date(r['tarih'])} | {r['urun_kod']} | {r['urun_ad']} | {r['tip']} | {r['miktar']}\n")
 

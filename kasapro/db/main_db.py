@@ -22,6 +22,7 @@ from .repos import (
     MaasRepo,
     BankaRepo,
     FaturaRepo,
+    StokRepo,
 )
 
 
@@ -44,6 +45,7 @@ class DB:
         self.maas = MaasRepo(self.conn)
         self.banka = BankaRepo(self.conn)
         self.fatura = FaturaRepo(self.conn)
+        self.stok = StokRepo(self.conn)
 
         migrate_schema(self.conn, log_fn=self._safe_log)
         seed_defaults(self.conn, log_fn=self._safe_log)
@@ -106,6 +108,12 @@ class DB:
 
     def list_categories(self) -> List[str]:
         return self.settings.list_categories()
+
+    def list_stock_units(self) -> List[str]:
+        return self.settings.list_stock_units()
+
+    def list_stock_categories(self) -> List[str]:
+        return self.settings.list_stock_categories()
 
     # -----------------
     # Company içi Users (SettingsWindow)
@@ -211,6 +219,143 @@ class DB:
 
     def kasa_aylik_ozet(self, limit: int = 24, has_cari: Optional[bool] = None):
         return self.kasa.aylik_ozet(limit=limit, has_cari=has_cari)
+
+    # -----------------
+    # Stok
+    # -----------------
+    def stok_urun_list(self, q: str = "", only_active: bool = False) -> List[sqlite3.Row]:
+        return self.stok.urun_list(q=q, only_active=only_active)
+
+    def stok_urun_get(self, uid: int) -> Optional[sqlite3.Row]:
+        return self.stok.urun_get(uid)
+
+    def stok_urun_get_by_code(self, kod: str) -> Optional[sqlite3.Row]:
+        return self.stok.urun_get_by_code(kod)
+
+    def stok_urun_add(
+        self,
+        kod: str,
+        ad: str,
+        kategori: str,
+        birim: str,
+        min_stok: float,
+        max_stok: float,
+        kritik_stok: float,
+        raf: str,
+        tedarikci_id: Optional[int],
+        barkod: str,
+        aktif: int,
+        aciklama: str,
+    ) -> int:
+        return self.stok.urun_add(
+            kod,
+            ad,
+            kategori,
+            birim,
+            min_stok,
+            max_stok,
+            kritik_stok,
+            raf,
+            tedarikci_id,
+            barkod,
+            aktif,
+            aciklama,
+        )
+
+    def stok_urun_update(
+        self,
+        uid: int,
+        kod: str,
+        ad: str,
+        kategori: str,
+        birim: str,
+        min_stok: float,
+        max_stok: float,
+        kritik_stok: float,
+        raf: str,
+        tedarikci_id: Optional[int],
+        barkod: str,
+        aktif: int,
+        aciklama: str,
+    ) -> None:
+        return self.stok.urun_update(
+            uid,
+            kod,
+            ad,
+            kategori,
+            birim,
+            min_stok,
+            max_stok,
+            kritik_stok,
+            raf,
+            tedarikci_id,
+            barkod,
+            aktif,
+            aciklama,
+        )
+
+    def stok_urun_delete(self, uid: int) -> None:
+        return self.stok.urun_delete(uid)
+
+    def stok_urun_stok_ozet(self, uid: int) -> Dict[str, float]:
+        return self.stok.urun_stok_ozet(uid)
+
+    def stok_urun_stok_by_location(self, uid: int) -> List[sqlite3.Row]:
+        return self.stok.urun_stok_by_location(uid)
+
+    def stok_summary_by_location(self) -> List[sqlite3.Row]:
+        return self.stok.stok_summary_by_location()
+
+    def stok_lokasyon_list(self, only_active: bool = False) -> List[sqlite3.Row]:
+        return self.stok.lokasyon_list(only_active=only_active)
+
+    def stok_lokasyon_upsert(self, ad: str, aciklama: str = "", aktif: int = 1) -> int:
+        return self.stok.lokasyon_upsert(ad=ad, aciklama=aciklama, aktif=aktif)
+
+    def stok_lokasyon_set_active(self, lid: int, aktif: int) -> None:
+        return self.stok.lokasyon_set_active(lid, aktif)
+
+    def stok_parti_list(self, urun_id: Optional[int] = None) -> List[sqlite3.Row]:
+        return self.stok.parti_list(urun_id=urun_id)
+
+    def stok_parti_upsert(self, urun_id: int, parti_no: str, skt: str = "", uretim_tarih: str = "", aciklama: str = "") -> int:
+        return self.stok.parti_upsert(urun_id=urun_id, parti_no=parti_no, skt=skt, uretim_tarih=uretim_tarih, aciklama=aciklama)
+
+    def stok_hareket_add(
+        self,
+        tarih: Any,
+        urun_id: int,
+        tip: str,
+        miktar: float,
+        birim: str,
+        kaynak_lokasyon_id: Optional[int],
+        hedef_lokasyon_id: Optional[int],
+        parti_id: Optional[int],
+        referans_tipi: str,
+        referans_id: Optional[int],
+        maliyet: float,
+        aciklama: str,
+    ) -> int:
+        return self.stok.hareket_add(
+            tarih,
+            urun_id,
+            tip,
+            miktar,
+            birim,
+            kaynak_lokasyon_id,
+            hedef_lokasyon_id,
+            parti_id,
+            referans_tipi,
+            referans_id,
+            maliyet,
+            aciklama,
+        )
+
+    def stok_hareket_list(self, q: str = "", urun_id: Optional[int] = None, limit: int = 500) -> List[sqlite3.Row]:
+        return self.stok.hareket_list(q=q, urun_id=urun_id, limit=limit)
+
+    def stok_hareket_delete(self, hid: int) -> None:
+        return self.stok.hareket_delete(hid)
 
     # -----------------
     # Banka

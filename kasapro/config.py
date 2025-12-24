@@ -32,6 +32,8 @@ DEFAULT_LOG_LEVEL = "INFO"
 DEFAULT_CURRENCIES = ["TL", "USD", "EUR"]
 DEFAULT_PAYMENTS = ["Nakit", "Kredi Kartı", "Havale/EFT", "Çek", "Diğer"]
 DEFAULT_CATEGORIES = ["Yemek", "Ulaşım", "Malzeme", "Kira", "Maaş", "Vergi", "Diğer"]
+DEFAULT_STOCK_UNITS = ["Adet", "Kg", "Lt", "M", "Paket", "Kutu", "Set"]
+DEFAULT_STOCK_CATEGORIES = ["Hammadde", "Yarı Mamul", "Mamül", "Sarf", "Ambalaj", "Diğer"]
 
 HAS_OPENPYXL = _importlib_util.find_spec("openpyxl") is not None
 HAS_REPORTLAB = _importlib_util.find_spec("reportlab") is not None

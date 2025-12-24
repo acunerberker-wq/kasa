@@ -189,6 +189,79 @@ def init_schema(conn: sqlite3.Connection) -> None:
     );""")
 
     # -----------------
+    # Stok Yönetimi
+    # -----------------
+    c.execute(
+        """
+    CREATE TABLE IF NOT EXISTS stok_urun(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        kod TEXT NOT NULL UNIQUE,
+        ad TEXT NOT NULL,
+        kategori TEXT DEFAULT '',
+        birim TEXT DEFAULT 'Adet',
+        min_stok REAL DEFAULT 0,
+        max_stok REAL DEFAULT 0,
+        kritik_stok REAL DEFAULT 0,
+        raf TEXT DEFAULT '',
+        tedarikci_id INTEGER,
+        barkod TEXT DEFAULT '',
+        aktif INTEGER NOT NULL DEFAULT 1,
+        aciklama TEXT DEFAULT '',
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY(tedarikci_id) REFERENCES cariler(id)
+    );"""
+    )
+
+    c.execute(
+        """
+    CREATE TABLE IF NOT EXISTS stok_lokasyon(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        ad TEXT NOT NULL UNIQUE,
+        aciklama TEXT DEFAULT '',
+        aktif INTEGER NOT NULL DEFAULT 1
+    );"""
+    )
+
+    c.execute(
+        """
+    CREATE TABLE IF NOT EXISTS stok_parti(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        urun_id INTEGER NOT NULL,
+        parti_no TEXT NOT NULL,
+        skt TEXT DEFAULT '',
+        uretim_tarih TEXT DEFAULT '',
+        aciklama TEXT DEFAULT '',
+        UNIQUE(urun_id, parti_no),
+        FOREIGN KEY(urun_id) REFERENCES stok_urun(id) ON DELETE CASCADE
+    );"""
+    )
+
+    c.execute(
+        """
+    CREATE TABLE IF NOT EXISTS stok_hareket(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        tarih TEXT NOT NULL,
+        urun_id INTEGER NOT NULL,
+        tip TEXT NOT NULL, -- Giris/Cikis/Transfer/Fire/Sayim/Duzeltme/Uretim
+        miktar REAL NOT NULL DEFAULT 0,
+        birim TEXT DEFAULT 'Adet',
+        kaynak_lokasyon_id INTEGER,
+        hedef_lokasyon_id INTEGER,
+        parti_id INTEGER,
+        referans_tipi TEXT DEFAULT '',
+        referans_id INTEGER,
+        maliyet REAL DEFAULT 0,
+        aciklama TEXT DEFAULT '',
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY(urun_id) REFERENCES stok_urun(id),
+        FOREIGN KEY(kaynak_lokasyon_id) REFERENCES stok_lokasyon(id),
+        FOREIGN KEY(hedef_lokasyon_id) REFERENCES stok_lokasyon(id),
+        FOREIGN KEY(parti_id) REFERENCES stok_parti(id)
+    );"""
+    )
+
+    # -----------------
     # Maaş Takibi
     # -----------------
     c.execute(
@@ -437,6 +510,104 @@ def migrate_schema(conn: sqlite3.Connection, log_fn: Optional[Callable[[str, str
     _ensure_column(conn, "kasa_hareket", "belge", "TEXT DEFAULT ''", log_fn)
     _ensure_column(conn, "kasa_hareket", "etiket", "TEXT DEFAULT ''", log_fn)
 
+    # -----------------
+    # Stok Yönetimi (eski DB'ler için)
+    # -----------------
+    try:
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS stok_urun(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                kod TEXT NOT NULL UNIQUE,
+                ad TEXT NOT NULL,
+                kategori TEXT DEFAULT '',
+                birim TEXT DEFAULT 'Adet',
+                min_stok REAL DEFAULT 0,
+                max_stok REAL DEFAULT 0,
+                kritik_stok REAL DEFAULT 0,
+                raf TEXT DEFAULT '',
+                tedarikci_id INTEGER,
+                barkod TEXT DEFAULT '',
+                aktif INTEGER NOT NULL DEFAULT 1,
+                aciklama TEXT DEFAULT '',
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+            );"""
+        )
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS stok_lokasyon(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                ad TEXT NOT NULL UNIQUE,
+                aciklama TEXT DEFAULT '',
+                aktif INTEGER NOT NULL DEFAULT 1
+            );"""
+        )
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS stok_parti(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                urun_id INTEGER NOT NULL,
+                parti_no TEXT NOT NULL,
+                skt TEXT DEFAULT '',
+                uretim_tarih TEXT DEFAULT '',
+                aciklama TEXT DEFAULT '',
+                UNIQUE(urun_id, parti_no)
+            );"""
+        )
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS stok_hareket(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                tarih TEXT NOT NULL,
+                urun_id INTEGER NOT NULL,
+                tip TEXT NOT NULL,
+                miktar REAL NOT NULL DEFAULT 0,
+                birim TEXT DEFAULT 'Adet',
+                kaynak_lokasyon_id INTEGER,
+                hedef_lokasyon_id INTEGER,
+                parti_id INTEGER,
+                referans_tipi TEXT DEFAULT '',
+                referans_id INTEGER,
+                maliyet REAL DEFAULT 0,
+                aciklama TEXT DEFAULT '',
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+            );"""
+        )
+        conn.commit()
+    except Exception as e:
+        if log_fn:
+            try:
+                log_fn("Schema Migration Error", f"stok tables: {e}")
+            except Exception:
+                pass
+
+    _ensure_column(conn, "stok_urun", "kategori", "TEXT DEFAULT ''", log_fn)
+    _ensure_column(conn, "stok_urun", "birim", "TEXT DEFAULT 'Adet'", log_fn)
+    _ensure_column(conn, "stok_urun", "min_stok", "REAL DEFAULT 0", log_fn)
+    _ensure_column(conn, "stok_urun", "max_stok", "REAL DEFAULT 0", log_fn)
+    _ensure_column(conn, "stok_urun", "kritik_stok", "REAL DEFAULT 0", log_fn)
+    _ensure_column(conn, "stok_urun", "raf", "TEXT DEFAULT ''", log_fn)
+    _ensure_column(conn, "stok_urun", "tedarikci_id", "INTEGER", log_fn)
+    _ensure_column(conn, "stok_urun", "barkod", "TEXT DEFAULT ''", log_fn)
+    _ensure_column(conn, "stok_urun", "aktif", "INTEGER NOT NULL DEFAULT 1", log_fn)
+    _ensure_column(conn, "stok_urun", "aciklama", "TEXT DEFAULT ''", log_fn)
+    _ensure_column(conn, "stok_urun", "created_at", "TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP", log_fn)
+    _ensure_column(conn, "stok_urun", "updated_at", "TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP", log_fn)
+
+    _ensure_column(conn, "stok_lokasyon", "aciklama", "TEXT DEFAULT ''", log_fn)
+    _ensure_column(conn, "stok_lokasyon", "aktif", "INTEGER NOT NULL DEFAULT 1", log_fn)
+
+    _ensure_column(conn, "stok_parti", "skt", "TEXT DEFAULT ''", log_fn)
+    _ensure_column(conn, "stok_parti", "uretim_tarih", "TEXT DEFAULT ''", log_fn)
+    _ensure_column(conn, "stok_parti", "aciklama", "TEXT DEFAULT ''", log_fn)
+
+    _ensure_column(conn, "stok_hareket", "birim", "TEXT DEFAULT 'Adet'", log_fn)
+    _ensure_column(conn, "stok_hareket", "kaynak_lokasyon_id", "INTEGER", log_fn)
+    _ensure_column(conn, "stok_hareket", "hedef_lokasyon_id", "INTEGER", log_fn)
+    _ensure_column(conn, "stok_hareket", "parti_id", "INTEGER", log_fn)
+    _ensure_column(conn, "stok_hareket", "referans_tipi", "TEXT DEFAULT ''", log_fn)
+    _ensure_column(conn, "stok_hareket", "referans_id", "INTEGER", log_fn)
+    _ensure_column(conn, "stok_hareket", "maliyet", "REAL DEFAULT 0", log_fn)
+    _ensure_column(conn, "stok_hareket", "aciklama", "TEXT DEFAULT ''", log_fn)
+    _ensure_column(conn, "stok_hareket", "created_at", "TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP", log_fn)
+
 
 def seed_defaults(conn: sqlite3.Connection, log_fn: Optional[Callable[[str, str], None]] = None) -> None:
     """DB ilk kurulum: kullanıcı + settings seed."""
@@ -462,7 +633,7 @@ def seed_defaults(conn: sqlite3.Connection, log_fn: Optional[Callable[[str, str]
     # default lists (settings)
     try:
         import json
-        from ..config import DEFAULT_CURRENCIES, DEFAULT_PAYMENTS, DEFAULT_CATEGORIES
+        from ..config import DEFAULT_CURRENCIES, DEFAULT_PAYMENTS, DEFAULT_CATEGORIES, DEFAULT_STOCK_UNITS, DEFAULT_STOCK_CATEGORIES
 
         def _get(k: str):
             r = conn.execute("SELECT value FROM settings WHERE key=?", (k,)).fetchone()
@@ -481,5 +652,9 @@ def seed_defaults(conn: sqlite3.Connection, log_fn: Optional[Callable[[str, str]
             _set("payments", json.dumps(DEFAULT_PAYMENTS, ensure_ascii=False))
         if not _get("categories"):
             _set("categories", json.dumps(DEFAULT_CATEGORIES, ensure_ascii=False))
+        if not _get("stock_units"):
+            _set("stock_units", json.dumps(DEFAULT_STOCK_UNITS, ensure_ascii=False))
+        if not _get("stock_categories"):
+            _set("stock_categories", json.dumps(DEFAULT_STOCK_CATEGORIES, ensure_ascii=False))
     except Exception:
         pass

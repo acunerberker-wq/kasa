@@ -13,7 +13,7 @@ class SearchRepo:
     def global_search(self, q: str, limit: int = 300) -> Dict[str, List[sqlite3.Row]]:
         q = (q or "").strip()
         if not q:
-            return {"cariler": [], "cari_hareket": [], "kasa": []}
+            return {"cariler": [], "cari_hareket": [], "kasa": [], "stok_urun": [], "stok_hareket": []}
 
         like = f"%{q}%"
 
@@ -46,4 +46,32 @@ class SearchRepo:
             )
         )
 
-        return {"cariler": cariler, "cari_hareket": ch, "kasa": kasa}
+        stok_urun = list(
+            self.conn.execute(
+                """
+                SELECT u.*, c.ad tedarikci_ad
+                FROM stok_urun u LEFT JOIN cariler c ON c.id=u.tedarikci_id
+                WHERE u.kod LIKE ? OR u.ad LIKE ? OR u.kategori LIKE ? OR u.barkod LIKE ?
+                ORDER BY u.ad LIMIT ?""",
+                (like, like, like, like, int(limit)),
+            )
+        )
+
+        stok_hareket = list(
+            self.conn.execute(
+                """
+                SELECT h.*, u.kod urun_kod, u.ad urun_ad
+                FROM stok_hareket h JOIN stok_urun u ON u.id=h.urun_id
+                WHERE u.kod LIKE ? OR u.ad LIKE ? OR h.tip LIKE ? OR h.aciklama LIKE ?
+                ORDER BY h.tarih DESC LIMIT ?""",
+                (like, like, like, like, int(limit)),
+            )
+        )
+
+        return {
+            "cariler": cariler,
+            "cari_hareket": ch,
+            "kasa": kasa,
+            "stok_urun": stok_urun,
+            "stok_hareket": stok_hareket,
+        }
