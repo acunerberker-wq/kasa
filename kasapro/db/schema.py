@@ -586,164 +586,233 @@ def init_schema(conn: sqlite3.Connection) -> None:
     );""")
 
     # -----------------
-    # Ticari Modül (Gelişmiş Alış/Satış)
+    # Hakediş Modülü
     # -----------------
-    c.execute(
-        """
-    CREATE TABLE IF NOT EXISTS trade_docs(
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS projects(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        company_id INTEGER NOT NULL DEFAULT 0,
-        doc_type TEXT NOT NULL,
-        doc_no TEXT NOT NULL,
-        doc_date TEXT NOT NULL,
-        status TEXT NOT NULL DEFAULT 'posted',
-        cari_id INTEGER,
-        cari_name TEXT DEFAULT '',
-        currency TEXT DEFAULT 'TL',
-        subtotal REAL DEFAULT 0,
-        tax_total REAL DEFAULT 0,
-        discount_total REAL DEFAULT 0,
-        total REAL DEFAULT 0,
-        notes TEXT DEFAULT '',
-        related_doc_id INTEGER,
-        order_id INTEGER,
-        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        UNIQUE(company_id, doc_no)
-    );"""
-    )
-
-    c.execute(
-        """
-    CREATE TABLE IF NOT EXISTS trade_doc_lines(
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        doc_id INTEGER NOT NULL,
-        item TEXT DEFAULT '',
-        description TEXT DEFAULT '',
-        qty REAL DEFAULT 0,
-        unit TEXT DEFAULT 'Adet',
-        unit_price REAL DEFAULT 0,
-        tax_rate REAL DEFAULT 0,
-        line_total REAL DEFAULT 0,
-        tax_total REAL DEFAULT 0,
-        FOREIGN KEY(doc_id) REFERENCES trade_docs(id) ON DELETE CASCADE
-    );"""
-    )
-
-    c.execute(
-        """
-    CREATE TABLE IF NOT EXISTS trade_warehouses(
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        company_id INTEGER NOT NULL DEFAULT 0,
+        company_id INTEGER NOT NULL,
         name TEXT NOT NULL,
-        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        UNIQUE(company_id, name)
-    );"""
-    )
-
-    c.execute(
-        """
-    CREATE TABLE IF NOT EXISTS trade_stock_moves(
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        company_id INTEGER NOT NULL DEFAULT 0,
-        doc_id INTEGER,
-        line_id INTEGER,
-        item TEXT NOT NULL,
-        qty REAL NOT NULL,
-        unit TEXT DEFAULT 'Adet',
-        direction TEXT NOT NULL,
-        warehouse_id INTEGER,
-        move_type TEXT DEFAULT '',
-        note TEXT DEFAULT '',
-        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY(doc_id) REFERENCES trade_docs(id) ON DELETE SET NULL,
-        FOREIGN KEY(warehouse_id) REFERENCES trade_warehouses(id) ON DELETE SET NULL
-    );"""
-    )
-
-    c.execute(
-        """
-    CREATE TABLE IF NOT EXISTS trade_payments(
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        company_id INTEGER NOT NULL DEFAULT 0,
-        doc_id INTEGER,
-        pay_date TEXT NOT NULL,
-        direction TEXT NOT NULL,
-        amount REAL NOT NULL,
-        currency TEXT DEFAULT 'TL',
-        method TEXT DEFAULT '',
-        reference TEXT DEFAULT '',
-        kasa_hareket_id INTEGER,
-        banka_hareket_id INTEGER,
+        code TEXT DEFAULT '',
+        status TEXT NOT NULL DEFAULT 'active',
         notes TEXT DEFAULT '',
-        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY(doc_id) REFERENCES trade_docs(id) ON DELETE SET NULL,
-        FOREIGN KEY(kasa_hareket_id) REFERENCES kasa_hareket(id) ON DELETE SET NULL,
-        FOREIGN KEY(banka_hareket_id) REFERENCES banka_hareket(id) ON DELETE SET NULL
-    );"""
-    )
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL
+    );""")
 
-    c.execute(
-        """
-    CREATE TABLE IF NOT EXISTS trade_audit_log(
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS sites(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        company_id INTEGER NOT NULL DEFAULT 0,
+        company_id INTEGER NOT NULL,
+        project_id INTEGER NOT NULL,
+        name TEXT NOT NULL,
+        location TEXT DEFAULT '',
+        status TEXT NOT NULL DEFAULT 'active',
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL,
+        FOREIGN KEY(project_id) REFERENCES projects(id)
+    );""")
+
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS contracts(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        company_id INTEGER NOT NULL,
+        project_id INTEGER NOT NULL,
+        site_id INTEGER,
+        contract_no TEXT NOT NULL,
+        contract_type TEXT NOT NULL DEFAULT 'birim_fiyat',
+        currency TEXT DEFAULT 'TL',
+        advance_rate REAL DEFAULT 0,
+        retention_rate REAL DEFAULT 0,
+        advance_deduction_rate REAL DEFAULT 0,
+        penalty_rate REAL DEFAULT 0,
+        price_diff_enabled INTEGER NOT NULL DEFAULT 0,
+        formula_template TEXT DEFAULT '',
+        formula_params TEXT DEFAULT '',
+        status TEXT NOT NULL DEFAULT 'active',
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL,
+        FOREIGN KEY(project_id) REFERENCES projects(id),
+        FOREIGN KEY(site_id) REFERENCES sites(id)
+    );""")
+
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS boq_items(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        company_id INTEGER NOT NULL,
+        project_id INTEGER NOT NULL,
+        contract_id INTEGER NOT NULL,
+        poz_code TEXT NOT NULL,
+        name TEXT NOT NULL,
+        unit TEXT DEFAULT '',
+        qty_contract REAL DEFAULT 0,
+        unit_price REAL DEFAULT 0,
+        group_name TEXT DEFAULT '',
+        mahal TEXT DEFAULT '',
+        budget REAL DEFAULT 0,
+        status TEXT NOT NULL DEFAULT 'active',
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL,
+        FOREIGN KEY(project_id) REFERENCES projects(id),
+        FOREIGN KEY(contract_id) REFERENCES contracts(id)
+    );""")
+
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS boq_revisions(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        company_id INTEGER NOT NULL,
+        boq_item_id INTEGER NOT NULL,
+        rev_no INTEGER NOT NULL,
+        note TEXT DEFAULT '',
+        snapshot_json TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        FOREIGN KEY(boq_item_id) REFERENCES boq_items(id)
+    );""")
+
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS attachments(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        company_id INTEGER NOT NULL,
+        module TEXT NOT NULL,
+        filename TEXT NOT NULL,
+        stored_name TEXT NOT NULL,
+        stored_path TEXT NOT NULL,
+        size_bytes INTEGER NOT NULL,
+        created_at TEXT NOT NULL
+    );""")
+
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS pay_estimates(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        company_id INTEGER NOT NULL,
+        project_id INTEGER NOT NULL,
+        contract_id INTEGER NOT NULL,
+        period_no INTEGER NOT NULL,
+        start_date TEXT NOT NULL,
+        end_date TEXT NOT NULL,
+        status TEXT NOT NULL DEFAULT 'Taslak',
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL,
+        FOREIGN KEY(project_id) REFERENCES projects(id),
+        FOREIGN KEY(contract_id) REFERENCES contracts(id)
+    );""")
+
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS measurements(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        company_id INTEGER NOT NULL,
+        project_id INTEGER NOT NULL,
+        contract_id INTEGER NOT NULL,
+        period_id INTEGER NOT NULL,
+        boq_item_id INTEGER NOT NULL,
+        qty REAL NOT NULL,
+        tarih TEXT NOT NULL,
+        mahal TEXT DEFAULT '',
+        note TEXT DEFAULT '',
+        attachment_id INTEGER,
+        status TEXT NOT NULL DEFAULT 'active',
+        created_at TEXT NOT NULL,
+        FOREIGN KEY(period_id) REFERENCES pay_estimates(id),
+        FOREIGN KEY(boq_item_id) REFERENCES boq_items(id),
+        FOREIGN KEY(attachment_id) REFERENCES attachments(id)
+    );""")
+
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS pay_estimate_lines(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        company_id INTEGER NOT NULL,
+        pay_estimate_id INTEGER NOT NULL,
+        boq_item_id INTEGER NOT NULL,
+        prev_qty REAL DEFAULT 0,
+        current_qty REAL DEFAULT 0,
+        cum_qty REAL DEFAULT 0,
+        unit_price REAL DEFAULT 0,
+        prev_amount REAL DEFAULT 0,
+        current_amount REAL DEFAULT 0,
+        cum_amount REAL DEFAULT 0,
+        status TEXT NOT NULL DEFAULT 'active',
+        created_at TEXT NOT NULL,
+        FOREIGN KEY(pay_estimate_id) REFERENCES pay_estimates(id),
+        FOREIGN KEY(boq_item_id) REFERENCES boq_items(id)
+    );""")
+
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS deductions(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        company_id INTEGER NOT NULL,
+        pay_estimate_id INTEGER NOT NULL,
+        type TEXT NOT NULL,
+        rate REAL DEFAULT 0,
+        amount REAL DEFAULT 0,
+        note TEXT DEFAULT '',
+        status TEXT NOT NULL DEFAULT 'active',
+        created_at TEXT NOT NULL,
+        FOREIGN KEY(pay_estimate_id) REFERENCES pay_estimates(id)
+    );""")
+
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS indices_cache(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        company_id INTEGER NOT NULL,
+        provider TEXT NOT NULL,
+        index_code TEXT NOT NULL,
+        index_value REAL NOT NULL,
+        period TEXT NOT NULL,
+        fetched_at TEXT NOT NULL,
+        raw_json TEXT DEFAULT ''
+    );""")
+
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS price_diff_rules(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        company_id INTEGER NOT NULL,
+        contract_id INTEGER NOT NULL,
+        formula_name TEXT NOT NULL,
+        formula_params TEXT NOT NULL,
+        base_period TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        FOREIGN KEY(contract_id) REFERENCES contracts(id)
+    );""")
+
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS approvals(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        company_id INTEGER NOT NULL,
+        module TEXT NOT NULL,
+        ref_id INTEGER NOT NULL,
+        status TEXT NOT NULL,
         user_id INTEGER,
         username TEXT DEFAULT '',
+        comment TEXT DEFAULT '',
+        created_at TEXT NOT NULL
+    );""")
+
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS audit_log(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        company_id INTEGER NOT NULL,
+        module TEXT NOT NULL,
+        ref_id INTEGER,
         action TEXT NOT NULL,
-        entity TEXT NOT NULL,
-        entity_id INTEGER,
-        detail TEXT DEFAULT '',
-        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
-    );"""
-    )
-
-    c.execute(
-        """
-    CREATE TABLE IF NOT EXISTS trade_user_roles(
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        company_id INTEGER NOT NULL DEFAULT 0,
-        user_id INTEGER NOT NULL,
+        user_id INTEGER,
         username TEXT DEFAULT '',
-        role TEXT NOT NULL DEFAULT 'read-only',
-        UNIQUE(company_id, user_id)
-    );"""
-    )
+        detail TEXT DEFAULT '',
+        created_at TEXT NOT NULL
+    );""")
 
-    c.execute(
-        """
-    CREATE TABLE IF NOT EXISTS trade_orders(
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS subcontracts(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        company_id INTEGER NOT NULL DEFAULT 0,
-        order_type TEXT NOT NULL,
-        order_no TEXT NOT NULL,
-        order_date TEXT NOT NULL,
-        status TEXT NOT NULL DEFAULT 'Açık',
-        cari_id INTEGER,
-        cari_name TEXT DEFAULT '',
-        currency TEXT DEFAULT 'TL',
-        total REAL DEFAULT 0,
-        notes TEXT DEFAULT '',
-        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        UNIQUE(company_id, order_no)
-    );"""
-    )
-
-    c.execute(
-        """
-    CREATE TABLE IF NOT EXISTS trade_order_lines(
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        order_id INTEGER NOT NULL,
-        item TEXT DEFAULT '',
-        qty REAL DEFAULT 0,
-        fulfilled_qty REAL DEFAULT 0,
-        unit TEXT DEFAULT 'Adet',
-        unit_price REAL DEFAULT 0,
-        line_total REAL DEFAULT 0,
-        FOREIGN KEY(order_id) REFERENCES trade_orders(id) ON DELETE CASCADE
-    );"""
-    )
+        company_id INTEGER NOT NULL,
+        project_id INTEGER NOT NULL,
+        contract_id INTEGER NOT NULL,
+        vendor_name TEXT NOT NULL,
+        contract_amount REAL DEFAULT 0,
+        status TEXT NOT NULL DEFAULT 'active',
+        created_at TEXT NOT NULL,
+        FOREIGN KEY(project_id) REFERENCES projects(id),
+        FOREIGN KEY(contract_id) REFERENCES contracts(id)
+    );""")
 
     conn.commit()
 
@@ -1237,6 +1306,242 @@ def migrate_schema(conn: sqlite3.Connection, log_fn: Optional[Callable[[str, str
             except Exception:
                 pass
 
+    # Hakediş modülü tabloları (eski DB'ler için)
+    try:
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS projects(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                company_id INTEGER NOT NULL,
+                name TEXT NOT NULL,
+                code TEXT DEFAULT '',
+                status TEXT NOT NULL DEFAULT 'active',
+                notes TEXT DEFAULT '',
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL
+            );"""
+        )
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS sites(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                company_id INTEGER NOT NULL,
+                project_id INTEGER NOT NULL,
+                name TEXT NOT NULL,
+                location TEXT DEFAULT '',
+                status TEXT NOT NULL DEFAULT 'active',
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                FOREIGN KEY(project_id) REFERENCES projects(id)
+            );"""
+        )
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS contracts(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                company_id INTEGER NOT NULL,
+                project_id INTEGER NOT NULL,
+                site_id INTEGER,
+                contract_no TEXT NOT NULL,
+                contract_type TEXT NOT NULL DEFAULT 'birim_fiyat',
+                currency TEXT DEFAULT 'TL',
+                advance_rate REAL DEFAULT 0,
+                retention_rate REAL DEFAULT 0,
+                advance_deduction_rate REAL DEFAULT 0,
+                penalty_rate REAL DEFAULT 0,
+                price_diff_enabled INTEGER NOT NULL DEFAULT 0,
+                formula_template TEXT DEFAULT '',
+                formula_params TEXT DEFAULT '',
+                status TEXT NOT NULL DEFAULT 'active',
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                FOREIGN KEY(project_id) REFERENCES projects(id),
+                FOREIGN KEY(site_id) REFERENCES sites(id)
+            );"""
+        )
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS boq_items(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                company_id INTEGER NOT NULL,
+                project_id INTEGER NOT NULL,
+                contract_id INTEGER NOT NULL,
+                poz_code TEXT NOT NULL,
+                name TEXT NOT NULL,
+                unit TEXT DEFAULT '',
+                qty_contract REAL DEFAULT 0,
+                unit_price REAL DEFAULT 0,
+                group_name TEXT DEFAULT '',
+                mahal TEXT DEFAULT '',
+                budget REAL DEFAULT 0,
+                status TEXT NOT NULL DEFAULT 'active',
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                FOREIGN KEY(project_id) REFERENCES projects(id),
+                FOREIGN KEY(contract_id) REFERENCES contracts(id)
+            );"""
+        )
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS boq_revisions(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                company_id INTEGER NOT NULL,
+                boq_item_id INTEGER NOT NULL,
+                rev_no INTEGER NOT NULL,
+                note TEXT DEFAULT '',
+                snapshot_json TEXT NOT NULL,
+                created_at TEXT NOT NULL,
+                FOREIGN KEY(boq_item_id) REFERENCES boq_items(id)
+            );"""
+        )
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS attachments(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                company_id INTEGER NOT NULL,
+                module TEXT NOT NULL,
+                filename TEXT NOT NULL,
+                stored_name TEXT NOT NULL,
+                stored_path TEXT NOT NULL,
+                size_bytes INTEGER NOT NULL,
+                created_at TEXT NOT NULL
+            );"""
+        )
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS pay_estimates(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                company_id INTEGER NOT NULL,
+                project_id INTEGER NOT NULL,
+                contract_id INTEGER NOT NULL,
+                period_no INTEGER NOT NULL,
+                start_date TEXT NOT NULL,
+                end_date TEXT NOT NULL,
+                status TEXT NOT NULL DEFAULT 'Taslak',
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                FOREIGN KEY(project_id) REFERENCES projects(id),
+                FOREIGN KEY(contract_id) REFERENCES contracts(id)
+            );"""
+        )
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS measurements(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                company_id INTEGER NOT NULL,
+                project_id INTEGER NOT NULL,
+                contract_id INTEGER NOT NULL,
+                period_id INTEGER NOT NULL,
+                boq_item_id INTEGER NOT NULL,
+                qty REAL NOT NULL,
+                tarih TEXT NOT NULL,
+                mahal TEXT DEFAULT '',
+                note TEXT DEFAULT '',
+                attachment_id INTEGER,
+                status TEXT NOT NULL DEFAULT 'active',
+                created_at TEXT NOT NULL,
+                FOREIGN KEY(period_id) REFERENCES pay_estimates(id),
+                FOREIGN KEY(boq_item_id) REFERENCES boq_items(id),
+                FOREIGN KEY(attachment_id) REFERENCES attachments(id)
+            );"""
+        )
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS pay_estimate_lines(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                company_id INTEGER NOT NULL,
+                pay_estimate_id INTEGER NOT NULL,
+                boq_item_id INTEGER NOT NULL,
+                prev_qty REAL DEFAULT 0,
+                current_qty REAL DEFAULT 0,
+                cum_qty REAL DEFAULT 0,
+                unit_price REAL DEFAULT 0,
+                prev_amount REAL DEFAULT 0,
+                current_amount REAL DEFAULT 0,
+                cum_amount REAL DEFAULT 0,
+                status TEXT NOT NULL DEFAULT 'active',
+                created_at TEXT NOT NULL,
+                FOREIGN KEY(pay_estimate_id) REFERENCES pay_estimates(id),
+                FOREIGN KEY(boq_item_id) REFERENCES boq_items(id)
+            );"""
+        )
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS deductions(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                company_id INTEGER NOT NULL,
+                pay_estimate_id INTEGER NOT NULL,
+                type TEXT NOT NULL,
+                rate REAL DEFAULT 0,
+                amount REAL DEFAULT 0,
+                note TEXT DEFAULT '',
+                status TEXT NOT NULL DEFAULT 'active',
+                created_at TEXT NOT NULL,
+                FOREIGN KEY(pay_estimate_id) REFERENCES pay_estimates(id)
+            );"""
+        )
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS indices_cache(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                company_id INTEGER NOT NULL,
+                provider TEXT NOT NULL,
+                index_code TEXT NOT NULL,
+                index_value REAL NOT NULL,
+                period TEXT NOT NULL,
+                fetched_at TEXT NOT NULL,
+                raw_json TEXT DEFAULT ''
+            );"""
+        )
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS price_diff_rules(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                company_id INTEGER NOT NULL,
+                contract_id INTEGER NOT NULL,
+                formula_name TEXT NOT NULL,
+                formula_params TEXT NOT NULL,
+                base_period TEXT NOT NULL,
+                created_at TEXT NOT NULL,
+                FOREIGN KEY(contract_id) REFERENCES contracts(id)
+            );"""
+        )
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS approvals(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                company_id INTEGER NOT NULL,
+                module TEXT NOT NULL,
+                ref_id INTEGER NOT NULL,
+                status TEXT NOT NULL,
+                user_id INTEGER,
+                username TEXT DEFAULT '',
+                comment TEXT DEFAULT '',
+                created_at TEXT NOT NULL
+            );"""
+        )
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS audit_log(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                company_id INTEGER NOT NULL,
+                module TEXT NOT NULL,
+                ref_id INTEGER,
+                action TEXT NOT NULL,
+                user_id INTEGER,
+                username TEXT DEFAULT '',
+                detail TEXT DEFAULT '',
+                created_at TEXT NOT NULL
+            );"""
+        )
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS subcontracts(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                company_id INTEGER NOT NULL,
+                project_id INTEGER NOT NULL,
+                contract_id INTEGER NOT NULL,
+                vendor_name TEXT NOT NULL,
+                contract_amount REAL DEFAULT 0,
+                status TEXT NOT NULL DEFAULT 'active',
+                created_at TEXT NOT NULL,
+                FOREIGN KEY(project_id) REFERENCES projects(id),
+                FOREIGN KEY(contract_id) REFERENCES contracts(id)
+            );"""
+        )
+        conn.commit()
+    except Exception as e:
+        if log_fn:
+            try:
+                log_fn("Schema Migration Error", f"hakedis tables: {e}")
+            except Exception:
+                pass
+
     # Sık kullanılan sorgular için indeksler
     _ensure_index(conn, "idx_cari_hareket_cari_tarih", "cari_hareket", "cari_id, tarih", log_fn)
     _ensure_index(conn, "idx_cari_hareket_tarih", "cari_hareket", "tarih", log_fn)
@@ -1252,13 +1557,19 @@ def migrate_schema(conn: sqlite3.Connection, log_fn: Optional[Callable[[str, str
     _ensure_index(conn, "idx_stok_hareket_urun_id", "stok_hareket", "urun_id", log_fn)
     _ensure_index(conn, "idx_stok_hareket_tarih", "stok_hareket", "tarih", log_fn)
     _ensure_index(conn, "idx_kasa_hareket_tip_tarih", "kasa_hareket", "tip, tarih", log_fn)
-    _ensure_index(conn, "idx_trade_docs_company_type_date", "trade_docs", "company_id, doc_type, doc_date", log_fn)
-    _ensure_index(conn, "idx_trade_docs_status", "trade_docs", "status", log_fn)
-    _ensure_index(conn, "idx_trade_doc_lines_doc", "trade_doc_lines", "doc_id", log_fn)
-    _ensure_index(conn, "idx_trade_stock_moves_company_item", "trade_stock_moves", "company_id, item", log_fn)
-    _ensure_index(conn, "idx_trade_payments_doc", "trade_payments", "doc_id", log_fn)
-    _ensure_index(conn, "idx_trade_orders_company_status", "trade_orders", "company_id, status", log_fn)
-    _ensure_index(conn, "idx_trade_audit_company_time", "trade_audit_log", "company_id, created_at", log_fn)
+
+    # Hakediş indeksleri
+    _ensure_index(conn, "idx_projects_company", "projects", "company_id, status", log_fn)
+    _ensure_index(conn, "idx_sites_project", "sites", "project_id, status", log_fn)
+    _ensure_index(conn, "idx_contracts_project", "contracts", "project_id, status", log_fn)
+    _ensure_index(conn, "idx_boq_contract", "boq_items", "contract_id, poz_code", log_fn)
+    _ensure_index(conn, "idx_measurements_period", "measurements", "period_id, tarih", log_fn)
+    _ensure_index(conn, "idx_pay_estimates_contract", "pay_estimates", "contract_id, period_no", log_fn)
+    _ensure_index(conn, "idx_pay_estimate_lines_period", "pay_estimate_lines", "pay_estimate_id", log_fn)
+    _ensure_index(conn, "idx_deductions_period", "deductions", "pay_estimate_id, type", log_fn)
+    _ensure_index(conn, "idx_indices_cache_key", "indices_cache", "provider, index_code, period", log_fn)
+    _ensure_index(conn, "idx_approvals_ref", "approvals", "module, ref_id, status", log_fn)
+    _ensure_index(conn, "idx_audit_log_ref", "audit_log", "module, ref_id, action", log_fn)
 
 
 def seed_defaults(conn: sqlite3.Connection, log_fn: Optional[Callable[[str, str], None]] = None) -> None:

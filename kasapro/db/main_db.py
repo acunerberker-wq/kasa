@@ -30,7 +30,7 @@ from .repos import (
     SatisSiparisRepo,
     MessagesRepo,
 )
-from ..modules.trade.repo import TradeRepo
+from ..modules.hakedis.repo import HakedisRepo
 
 
 class DB:
@@ -58,7 +58,7 @@ class DB:
         self.satin_alma = SatinAlmaRepo(self.conn)
         self.satis_siparis = SatisSiparisRepo(self.conn)
         self.messages = MessagesRepo(self.conn)
-        self.invoice_adv = AdvancedInvoiceRepo(self.conn)
+        self.hakedis = HakedisRepo(self.conn, log_fn=self.logs.log)
 
         migrate_schema(self.conn, log_fn=self._safe_log)
         seed_defaults(self.conn, log_fn=self._safe_log)
