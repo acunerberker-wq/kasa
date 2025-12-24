@@ -333,15 +333,43 @@ def init_schema(conn: sqlite3.Connection) -> None:
     );"""
     )
 
-    c.execute("CREATE INDEX IF NOT EXISTS idx_documents_status ON documents(status, updated_at)")
-    c.execute("CREATE INDEX IF NOT EXISTS idx_documents_company ON documents(company_id)")
-    c.execute("CREATE INDEX IF NOT EXISTS idx_document_tags_tag ON document_tags(tag)")
-    c.execute("CREATE INDEX IF NOT EXISTS idx_document_links_entity ON document_links(entity_type, entity_id)")
-    c.execute("CREATE INDEX IF NOT EXISTS idx_document_versions_doc ON document_versions(document_id, version_no)")
-    c.execute("CREATE INDEX IF NOT EXISTS idx_workflow_instances_status ON workflow_instances(status, updated_at)")
-    c.execute("CREATE INDEX IF NOT EXISTS idx_tasks_due ON tasks(due_at, status)")
-    c.execute("CREATE INDEX IF NOT EXISTS idx_reminders_due ON reminders(remind_at, status)")
-    c.execute("CREATE INDEX IF NOT EXISTS idx_audit_entity ON audit_log(entity_type, entity_id)")
+    # Create indexes (safe mode - skip if table/column doesn't exist)
+    try:
+        c.execute("CREATE INDEX IF NOT EXISTS idx_documents_status ON documents(status, updated_at)")
+    except sqlite3.OperationalError:
+        pass
+    try:
+        c.execute("CREATE INDEX IF NOT EXISTS idx_documents_company ON documents(company_id)")
+    except sqlite3.OperationalError:
+        pass
+    try:
+        c.execute("CREATE INDEX IF NOT EXISTS idx_document_tags_tag ON document_tags(tag)")
+    except sqlite3.OperationalError:
+        pass
+    try:
+        c.execute("CREATE INDEX IF NOT EXISTS idx_document_links_entity ON document_links(entity_type, entity_id)")
+    except sqlite3.OperationalError:
+        pass
+    try:
+        c.execute("CREATE INDEX IF NOT EXISTS idx_document_versions_doc ON document_versions(document_id, version_no)")
+    except sqlite3.OperationalError:
+        pass
+    try:
+        c.execute("CREATE INDEX IF NOT EXISTS idx_workflow_instances_status ON workflow_instances(status, updated_at)")
+    except sqlite3.OperationalError:
+        pass
+    try:
+        c.execute("CREATE INDEX IF NOT EXISTS idx_tasks_due ON tasks(due_at, status)")
+    except sqlite3.OperationalError:
+        pass
+    try:
+        c.execute("CREATE INDEX IF NOT EXISTS idx_reminders_due ON reminders(remind_at, status)")
+    except sqlite3.OperationalError:
+        pass
+    try:
+        c.execute("CREATE INDEX IF NOT EXISTS idx_audit_entity ON audit_log(entity_type, entity_id)")
+    except sqlite3.OperationalError:
+        pass
 
     # -----------------
     # Satış Siparişleri

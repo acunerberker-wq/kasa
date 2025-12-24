@@ -54,3 +54,18 @@ Traceback (most recent call last):
     data = self.app.db.purchase_report_fetch(**filters)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 AttributeError: 'DB' object has no attribute 'purchase_report_fetch'. Did you mean: 'purchase_reports'?
+2025-12-25 00:53:03,279 [ERROR] kasapro.app: Uygulama başlatma hatası
+Traceback (most recent call last):
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\app.py", line 1197, in main
+    App().run()
+    ~~~^^
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\app.py", line 111, in __init__
+    self.db = DB(db_path)
+              ~~^^^^^^^^^
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\db\main_db.py", line 43, in __init__
+    init_schema(self.conn)
+    ~~~~~~~~~~~^^^^^^^^^^^
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\db\schema.py", line 343, in init_schema
+    c.execute("CREATE INDEX IF NOT EXISTS idx_reminders_due ON reminders(remind_at, status)")
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sqlite3.OperationalError: no such column: remind_at
