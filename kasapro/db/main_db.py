@@ -25,6 +25,9 @@ from .repos import (
     StokRepo,
     NakliyeRepo,
     SatinAlmaRepo,
+    SatisSiparisRepo,
+    MessagesRepo,
+    PurchaseReportRepo,
 )
 
 
@@ -50,6 +53,9 @@ class DB:
         self.stok = StokRepo(self.conn)
         self.nakliye = NakliyeRepo(self.conn)
         self.satin_alma = SatinAlmaRepo(self.conn)
+        self.satis_siparis = SatisSiparisRepo(self.conn)
+        self.messages = MessagesRepo(self.conn)
+        self.purchase_reports = PurchaseReportRepo(self.conn)
 
         migrate_schema(self.conn, log_fn=self._safe_log)
         seed_defaults(self.conn, log_fn=self._safe_log)
