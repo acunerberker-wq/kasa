@@ -51,7 +51,7 @@ class DB:
         self.stok = StokRepo(self.conn)
         self.nakliye = NakliyeRepo(self.conn)
 
-            self.purchase_reports = PurchaseReportRepo(self.conn)
+        self.purchase_reports = PurchaseReportRepo(self.conn)
 
         migrate_schema(self.conn, log_fn=self._safe_log)
         seed_defaults(self.conn, log_fn=self._safe_log)
