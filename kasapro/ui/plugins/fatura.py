@@ -1220,18 +1220,14 @@ class FaturaFrame(ttk.Frame):
         )
         if not silent:
             try:
-                self.nb.select(self.tab_report)
-            except Exception:
-                pass
+            self.nb.select(self.tab_report)
+        except Exception:
+            pass
 
-<<<<<<< ours
-    def _report_rows(self, rows, *, label: str):
-        for i in self.report_tree.get_children():
-            self.report_tree.delete(i)
-=======
     def report_month(self, year: int, month: int):
         # basit rapor: belirtilen ayın faturaları
-        self._clear_report_tree()
+        for i in self.report_tree.get_children():
+            self.report_tree.delete(i)
         try:
             df = date(year, month, 1).strftime("%d.%m.%Y")
             if month == 12:
@@ -1267,45 +1263,6 @@ class FaturaFrame(ttk.Frame):
             self.nb.select(self.tab_report)
         except Exception:
             pass
-
-<<<<<<< ours
-    def report_month(self, year: int, month: int):
-        # basit rapor: belirtilen ayın faturaları
-        self.report_month_filtered(year, month)
-
-    def report_month_filtered(self, year: int, month: int, *, tur: str = "", label: str = ""):
-        try:
-            df = date(year, month, 1).strftime("%d.%m.%Y")
-            if month == 12:
-                dt = date(year, 12, 31).strftime("%d.%m.%Y")
-            else:
-                dt = (date(year, month + 1, 1) - timedelta(days=1)).strftime("%d.%m.%Y")
-        except Exception:
-            # fallback: kullanma
-            df, dt = "", ""
-
-        try:
-            rows = self.app.db.fatura_list(date_from=df, date_to=dt, tur=tur)
-        except Exception:
-            rows = []
-
-        title = label or f"{year}-{month:02d} fatura"
-        self._report_rows(rows, label=title)
-
-    def report_purchase_month(self, year: int, month: int):
-        self.report_month_filtered(year, month, tur="Alış", label=f"{year}-{month:02d} satın alma")
-
-    def report_purchase_all(self):
-        try:
-            rows = self.app.db.fatura_list(tur="Alış")
-        except Exception:
-            rows = []
-        self._report_rows(rows, label="Satın alma faturaları")
-=======
-    def _clear_report_tree(self) -> None:
-        for i in self.report_tree.get_children():
-            self.report_tree.delete(i)
->>>>>>> theirs
 
     # -----------------
     # PDF
