@@ -6,9 +6,11 @@ Bu modül; kullanıcı girişi, şirket seçimi ve ana UI'ı başlatır.
 
 from __future__ import annotations
 
+import logging
 import os
 import shutil
 import sqlite3
+import sys
 import threading
 from datetime import datetime, date, time, timedelta
 from typing import Any, Optional, List, Dict, Tuple
@@ -33,11 +35,13 @@ from .ui.frames import (
 from .ui.plugins.loader import discover_ui_plugins
 
 class App:
-    def __init__(self):
+    def __init__(self, base_dir: Optional[str] = None, test_mode: bool = False):
         self.root = tk.Tk()
         self.root.title(APP_TITLE)
         self.root.geometry("1320x780")
         self.root.minsize(1120, 650)
+        self._test_mode = test_mode
+        self._install_exception_handlers()
 
         # Tema/Fontları login penceresinde de uygula
         try:
@@ -52,10 +56,13 @@ class App:
         except Exception:
             pass
 
-        self.base_dir = APP_BASE_DIR
+        self.base_dir = base_dir or APP_BASE_DIR
         self.usersdb = UsersDB(self.base_dir)
 
-        self.user = self._login()
+        if self._test_mode:
+            self.user = self._load_test_user()
+        else:
+            self.user = self._login()
         if not self.user:
             try:
                 self.usersdb.close()
@@ -117,12 +124,13 @@ class App:
         self._schedule_sales_order_summary()
 
         # Login başarılı -> ana pencereyi göster
-        try:
-            self.root.deiconify()
-            self.root.lift()
-            self.root.after(80, self.root.lift)
-        except Exception:
-            pass
+        if not self._test_mode:
+            try:
+                self.root.deiconify()
+                self.root.lift()
+                self.root.after(80, self.root.lift)
+            except Exception:
+                pass
 
     def _schedule_sales_order_summary(self) -> None:
         try:
@@ -163,6 +171,32 @@ class App:
                 return
 
         threading.Thread(target=worker, daemon=True).start()
+
+    def _install_exception_handlers(self) -> None:
+        logger = logging.getLogger(__name__)
+
+        def handle_exception(exc_type, exc, tb):
+            logger.exception("Unhandled exception", exc_info=(exc_type, exc, tb))
+            try:
+                messagebox.showerror(APP_TITLE, f"Beklenmeyen hata:\n{exc}")
+            except Exception:
+                pass
+
+        def handle_tk_exception(exc, val, tb):
+            logger.exception("Tkinter callback exception", exc_info=(exc, val, tb))
+            try:
+                messagebox.showerror(APP_TITLE, f"Arayüz hatası:\n{val}")
+            except Exception:
+                pass
+
+        sys.excepthook = handle_exception
+        self.root.report_callback_exception = handle_tk_exception
+
+    def _load_test_user(self) -> sqlite3.Row:
+        user = self.usersdb.get_user_by_username("admin")
+        if not user:
+            raise RuntimeError("Test modu için admin kullanıcı bulunamadı.")
+        return user
 
     def _login(self) -> Optional[sqlite3.Row]:
         # LoginWindow kullanıcı seçimi + şifre doğrulama yapar
@@ -1117,8 +1151,7 @@ def main():
     except SystemExit:
         raise
     except Exception as e:
-        import traceback
-        traceback.print_exc()
+        logging.getLogger(__name__).exception("Uygulama başlatma hatası")
         try:
             messagebox.showerror(APP_TITLE, f"Hata:\n{e}")
         except Exception:

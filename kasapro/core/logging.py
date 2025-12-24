@@ -11,7 +11,7 @@ def setup_logging(base_dir: str, log_dirname: str = "logs", level: str = "INFO")
     lvl = getattr(logging, str(level).upper(), logging.INFO)
     log_dir = os.path.join(base_dir, log_dirname)
     os.makedirs(log_dir, exist_ok=True)
-    log_path = os.path.join(log_dir, "kasapro.log")
+    log_path = os.path.join(log_dir, "app.log")
 
     root = logging.getLogger()
     root.setLevel(lvl)
