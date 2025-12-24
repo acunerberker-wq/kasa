@@ -449,16 +449,22 @@ class AdvancedInvoiceRepo:
     ) -> None:
         cur.execute(
             """
-            INSERT INTO audit_log(company_id, user_id, username, action, entity, entity_id, message)
-            VALUES(?,?,?,?,?,?,?)
+            INSERT INTO audit_log(
+                company_id, entity_type, entity_id, module, ref_id,
+                action, user_id, username, details, message
+            )
+            VALUES(?,?,?,?,?,?,?,?,?,?)
             """,
             (
                 int(company_id),
-                int(user_id) if user_id is not None else None,
-                str(username or ""),
-                str(action),
                 str(entity),
                 int(entity_id),
+                "invoice",
+                int(entity_id),
+                str(action),
+                int(user_id) if user_id is not None else None,
+                str(username or ""),
+                str(message or ""),
                 str(message or ""),
             ),
         )

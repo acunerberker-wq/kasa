@@ -59,6 +59,12 @@ class ConnectionProxy:
             except Exception:
                 pass
 
+    def __del__(self):
+        try:
+            self.close()
+        except Exception:
+            pass
+
 
 def connect(path: str) -> ConnectionProxy:
     """Return a ConnectionProxy for given DB path."""

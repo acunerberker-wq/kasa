@@ -334,13 +334,21 @@ def init_schema(conn: sqlite3.Connection) -> None:
         """
     CREATE TABLE IF NOT EXISTS reminders(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        company_id INTEGER NOT NULL,
-        document_id INTEGER NOT NULL,
+        company_id INTEGER NOT NULL DEFAULT 1,
+        owner_user_id INTEGER,
+        assignee_user_id INTEGER,
+        document_id INTEGER,
         task_id INTEGER,
-        remind_at TEXT NOT NULL,
+        title TEXT DEFAULT '',
+        body TEXT DEFAULT '',
+        due_at TEXT DEFAULT '',
+        remind_at TEXT DEFAULT '',
+        priority TEXT DEFAULT 'normal',
+        status TEXT NOT NULL DEFAULT 'scheduled',
+        series_id INTEGER,
         snooze_until TEXT DEFAULT '',
-        status TEXT NOT NULL DEFAULT 'PENDING',
-        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
     );"""
     )
     c.execute(
@@ -354,6 +362,242 @@ def init_schema(conn: sqlite3.Connection) -> None:
         actor_id INTEGER,
         details TEXT DEFAULT '',
         created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    );"""
+    )
+    c.execute(
+        """
+    CREATE TABLE IF NOT EXISTS series_counters(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        company_id INTEGER NOT NULL,
+        series TEXT NOT NULL,
+        year INTEGER NOT NULL,
+        last_no INTEGER NOT NULL DEFAULT 0,
+        padding INTEGER NOT NULL DEFAULT 6,
+        format TEXT NOT NULL DEFAULT '{series}-{year}-{no_pad}',
+        updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    );"""
+    )
+    c.execute(
+        """
+    CREATE TABLE IF NOT EXISTS docs(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        company_id INTEGER NOT NULL,
+        doc_no TEXT NOT NULL,
+        series TEXT NOT NULL,
+        year INTEGER NOT NULL,
+        doc_date TEXT NOT NULL,
+        due_date TEXT DEFAULT '',
+        doc_type TEXT NOT NULL,
+        status TEXT NOT NULL,
+        is_proforma INTEGER NOT NULL DEFAULT 0,
+        customer_id INTEGER,
+        customer_name TEXT DEFAULT '',
+        currency TEXT NOT NULL DEFAULT 'TL',
+        vat_included INTEGER NOT NULL DEFAULT 0,
+        invoice_discount_type TEXT DEFAULT 'amount',
+        invoice_discount_value REAL NOT NULL DEFAULT 0,
+        subtotal REAL NOT NULL DEFAULT 0,
+        discount_total REAL NOT NULL DEFAULT 0,
+        vat_total REAL NOT NULL DEFAULT 0,
+        grand_total REAL NOT NULL DEFAULT 0,
+        notes TEXT DEFAULT '',
+        warehouse_id INTEGER,
+        created_by INTEGER,
+        created_by_name TEXT DEFAULT '',
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        voided_at TEXT,
+        reversed_doc_id INTEGER
+    );"""
+    )
+    c.execute(
+        """
+    CREATE TABLE IF NOT EXISTS doc_lines(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        doc_id INTEGER NOT NULL,
+        line_no INTEGER NOT NULL,
+        item_id INTEGER,
+        description TEXT NOT NULL,
+        qty REAL NOT NULL,
+        unit TEXT DEFAULT '',
+        unit_price REAL NOT NULL,
+        vat_rate REAL NOT NULL DEFAULT 0,
+        line_discount_type TEXT DEFAULT 'amount',
+        line_discount_value REAL NOT NULL DEFAULT 0,
+        line_subtotal REAL NOT NULL DEFAULT 0,
+        line_discount REAL NOT NULL DEFAULT 0,
+        line_vat REAL NOT NULL DEFAULT 0,
+        line_total REAL NOT NULL DEFAULT 0,
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    );"""
+    )
+    c.execute(
+        """
+    CREATE TABLE IF NOT EXISTS payments(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        doc_id INTEGER NOT NULL,
+        pay_date TEXT NOT NULL,
+        amount REAL NOT NULL,
+        currency TEXT NOT NULL DEFAULT 'TL',
+        method TEXT DEFAULT '',
+        description TEXT DEFAULT '',
+        ref TEXT DEFAULT '',
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    );"""
+    )
+    c.execute(
+        """
+    CREATE TABLE IF NOT EXISTS stock_moves(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        doc_id INTEGER NOT NULL,
+        line_id INTEGER,
+        item_id INTEGER,
+        qty REAL NOT NULL,
+        unit TEXT DEFAULT '',
+        direction TEXT DEFAULT '',
+        move_date TEXT NOT NULL,
+        warehouse_id INTEGER,
+        doc_type TEXT DEFAULT '',
+        doc_no TEXT DEFAULT '',
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    );"""
+    )
+    c.execute(
+        """
+    CREATE TABLE IF NOT EXISTS trade_warehouses(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        company_id INTEGER NOT NULL,
+        name TEXT NOT NULL,
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    );"""
+    )
+    c.execute(
+        """
+    CREATE TABLE IF NOT EXISTS trade_docs(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        company_id INTEGER NOT NULL,
+        doc_type TEXT NOT NULL,
+        doc_no TEXT NOT NULL,
+        doc_date TEXT NOT NULL,
+        status TEXT NOT NULL,
+        cari_id INTEGER,
+        cari_name TEXT DEFAULT '',
+        currency TEXT NOT NULL DEFAULT 'TL',
+        subtotal REAL NOT NULL DEFAULT 0,
+        tax_total REAL NOT NULL DEFAULT 0,
+        discount_total REAL NOT NULL DEFAULT 0,
+        total REAL NOT NULL DEFAULT 0,
+        notes TEXT DEFAULT '',
+        related_doc_id INTEGER,
+        order_id INTEGER,
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    );"""
+    )
+    c.execute(
+        """
+    CREATE TABLE IF NOT EXISTS trade_doc_lines(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        doc_id INTEGER NOT NULL,
+        item TEXT NOT NULL DEFAULT '',
+        description TEXT DEFAULT '',
+        qty REAL NOT NULL DEFAULT 0,
+        unit TEXT NOT NULL DEFAULT 'Adet',
+        unit_price REAL NOT NULL DEFAULT 0,
+        tax_rate REAL NOT NULL DEFAULT 0,
+        line_total REAL NOT NULL DEFAULT 0,
+        tax_total REAL NOT NULL DEFAULT 0,
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    );"""
+    )
+    c.execute(
+        """
+    CREATE TABLE IF NOT EXISTS trade_stock_moves(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        company_id INTEGER NOT NULL,
+        doc_id INTEGER,
+        line_id INTEGER,
+        item TEXT NOT NULL DEFAULT '',
+        qty REAL NOT NULL,
+        unit TEXT NOT NULL DEFAULT 'Adet',
+        direction TEXT NOT NULL DEFAULT '',
+        warehouse_id INTEGER,
+        move_type TEXT NOT NULL DEFAULT '',
+        note TEXT DEFAULT '',
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    );"""
+    )
+    c.execute(
+        """
+    CREATE TABLE IF NOT EXISTS trade_payments(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        company_id INTEGER NOT NULL,
+        doc_id INTEGER,
+        pay_date TEXT NOT NULL,
+        direction TEXT NOT NULL DEFAULT '',
+        amount REAL NOT NULL,
+        currency TEXT NOT NULL DEFAULT 'TL',
+        method TEXT DEFAULT '',
+        reference TEXT DEFAULT '',
+        kasa_hareket_id INTEGER,
+        banka_hareket_id INTEGER,
+        notes TEXT DEFAULT '',
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    );"""
+    )
+    c.execute(
+        """
+    CREATE TABLE IF NOT EXISTS trade_orders(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        company_id INTEGER NOT NULL,
+        order_type TEXT NOT NULL,
+        order_no TEXT NOT NULL,
+        order_date TEXT NOT NULL,
+        status TEXT NOT NULL,
+        cari_id INTEGER,
+        cari_name TEXT DEFAULT '',
+        currency TEXT NOT NULL DEFAULT 'TL',
+        total REAL NOT NULL DEFAULT 0,
+        notes TEXT DEFAULT '',
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    );"""
+    )
+    c.execute(
+        """
+    CREATE TABLE IF NOT EXISTS trade_order_lines(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        order_id INTEGER NOT NULL,
+        item TEXT NOT NULL DEFAULT '',
+        qty REAL NOT NULL DEFAULT 0,
+        fulfilled_qty REAL NOT NULL DEFAULT 0,
+        unit TEXT NOT NULL DEFAULT 'Adet',
+        unit_price REAL NOT NULL DEFAULT 0,
+        line_total REAL NOT NULL DEFAULT 0,
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    );"""
+    )
+    c.execute(
+        """
+    CREATE TABLE IF NOT EXISTS trade_audit_log(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        company_id INTEGER NOT NULL,
+        user_id INTEGER,
+        username TEXT NOT NULL DEFAULT '',
+        action TEXT NOT NULL,
+        entity TEXT NOT NULL,
+        entity_id INTEGER,
+        detail TEXT DEFAULT '',
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    );"""
+    )
+    c.execute(
+        """
+    CREATE TABLE IF NOT EXISTS trade_user_roles(
+        company_id INTEGER NOT NULL,
+        user_id INTEGER NOT NULL,
+        username TEXT NOT NULL,
+        role TEXT NOT NULL,
+        PRIMARY KEY(company_id, user_id)
     );"""
     )
 
@@ -1485,6 +1729,14 @@ def migrate_schema(conn: sqlite3.Connection, log_fn: Optional[Callable[[str, str
     _ensure_index(conn, "idx_tasks_due", "tasks", "due_at, status", log_fn)
     _ensure_index(conn, "idx_reminders_due", "reminders", "remind_at, status", log_fn)
     _ensure_index(conn, "idx_audit_entity", "audit_log", "entity_type, entity_id", log_fn)
+    _ensure_index(conn, "idx_audit_module", "audit_log", "module, ref_id", log_fn)
+    _ensure_index(conn, "idx_trade_docs_company", "trade_docs", "company_id, doc_type, status", log_fn)
+    _ensure_index(conn, "idx_trade_doc_lines_doc", "trade_doc_lines", "doc_id", log_fn)
+    _ensure_index(conn, "idx_trade_stock_moves_company", "trade_stock_moves", "company_id, item", log_fn)
+    _ensure_index(conn, "idx_trade_payments_doc", "trade_payments", "doc_id", log_fn)
+    _ensure_index(conn, "idx_trade_orders_company", "trade_orders", "company_id, order_type, status", log_fn)
+    _ensure_index(conn, "idx_trade_order_lines_order", "trade_order_lines", "order_id", log_fn)
+    _ensure_index(conn, "idx_trade_user_roles_company", "trade_user_roles", "company_id, user_id", log_fn)
 
     # users (eski DB'ler için kolon garantisi)
     _ensure_column(conn, "users", "role", "TEXT NOT NULL DEFAULT 'user'", log_fn)
@@ -1498,6 +1750,34 @@ def migrate_schema(conn: sqlite3.Connection, log_fn: Optional[Callable[[str, str
     _ensure_column(conn, "cariler", "telefon", "TEXT DEFAULT ''", log_fn)
     _ensure_column(conn, "cariler", "notlar", "TEXT DEFAULT ''", log_fn)
     _ensure_column(conn, "cariler", "acilis_bakiye", "REAL DEFAULT 0", log_fn)
+
+    # audit_log (eski DB'ler için kolon garantisi)
+    _ensure_column(conn, "audit_log", "module", "TEXT DEFAULT ''", log_fn)
+    _ensure_column(conn, "audit_log", "ref_id", "INTEGER", log_fn)
+    _ensure_column(conn, "audit_log", "user_id", "INTEGER", log_fn)
+    _ensure_column(conn, "audit_log", "username", "TEXT DEFAULT ''", log_fn)
+    _ensure_column(conn, "audit_log", "entity", "TEXT DEFAULT ''", log_fn)
+    _ensure_column(conn, "audit_log", "message", "TEXT DEFAULT ''", log_fn)
+    _ensure_column(conn, "audit_log", "detail", "TEXT DEFAULT ''", log_fn)
+
+    # reminders (eski DB'ler için kolon garantisi)
+    _ensure_column(conn, "reminders", "owner_user_id", "INTEGER", log_fn)
+    _ensure_column(conn, "reminders", "assignee_user_id", "INTEGER", log_fn)
+    _ensure_column(conn, "reminders", "title", "TEXT DEFAULT ''", log_fn)
+    _ensure_column(conn, "reminders", "body", "TEXT DEFAULT ''", log_fn)
+    _ensure_column(conn, "reminders", "due_at", "TEXT DEFAULT ''", log_fn)
+    _ensure_column(conn, "reminders", "priority", "TEXT DEFAULT 'normal'", log_fn)
+    _ensure_column(conn, "reminders", "status", "TEXT DEFAULT 'scheduled'", log_fn)
+    _ensure_column(conn, "reminders", "series_id", "INTEGER", log_fn)
+    _ensure_column(conn, "reminders", "updated_at", "TEXT DEFAULT CURRENT_TIMESTAMP", log_fn)
+    _ensure_column(conn, "reminders", "document_id", "INTEGER", log_fn)
+    _ensure_column(conn, "reminders", "task_id", "INTEGER", log_fn)
+    _ensure_column(conn, "reminders", "remind_at", "TEXT DEFAULT ''", log_fn)
+    _ensure_column(conn, "reminders", "snooze_until", "TEXT DEFAULT ''", log_fn)
+
+    # invoice docs
+    _ensure_column(conn, "docs", "voided_at", "TEXT", log_fn)
+    _ensure_column(conn, "docs", "reversed_doc_id", "INTEGER", log_fn)
 
     # cari_hareket
     _ensure_column(conn, "cari_hareket", "para", "TEXT DEFAULT 'TL'", log_fn)

@@ -37,11 +37,13 @@ class HakedisRepo:
         try:
             self.conn.execute(
                 """
-                INSERT INTO audit_log(company_id, module, ref_id, action, user_id, username, detail, created_at)
-                VALUES (?,?,?,?,?,?,?,?)
+                INSERT INTO audit_log(company_id, entity_type, entity_id, module, ref_id, action, user_id, username, details, created_at)
+                VALUES (?,?,?,?,?,?,?,?,?,?)
                 """,
                 (
                     company_id,
+                    module,
+                    ref_id,
                     module,
                     ref_id,
                     action,
