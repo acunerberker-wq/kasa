@@ -24,6 +24,8 @@ from .repos import (
     FaturaRepo,
     StokRepo,
     NakliyeRepo,
+    StokRepo,
+    NakliyeRepo,
     PurchaseReportRepo,
     SatinAlmaRepo,
     SatisSiparisRepo,
@@ -51,6 +53,8 @@ class DB:
         self.maas = MaasRepo(self.conn)
         self.banka = BankaRepo(self.conn)
         self.fatura = FaturaRepo(self.conn)
+        self.stok = StokRepo(self.conn)
+        self.nakliye = NakliyeRepo(self.conn)
         self.stok = StokRepo(self.conn)
         self.nakliye = NakliyeRepo(self.conn)
         self.purchase_reports = PurchaseReportRepo(self.conn)

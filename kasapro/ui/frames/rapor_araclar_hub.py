@@ -25,6 +25,9 @@ from .satin_alma_raporlar import SatinAlmaRaporlarFrame
 if TYPE_CHECKING:
     from ...app import App
 
+if TYPE_CHECKING:
+    from ...app import App
+
 
 class RaporAraclarHubFrame(ttk.Frame):
     """Rapor & Araçlar tek ekranda: Raporlar / Global Arama / Log."""
