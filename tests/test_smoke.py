@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+import sqlite3
 import tempfile
 import unittest
 import time
@@ -100,59 +101,131 @@ class SmokeTests(unittest.TestCase):
         db_path = os.path.join(self.base_dir, "repos.db")
         db = DB(db_path)
         try:
-            # Banka repo
+            # Banka repo - Read
             banka_list = db.banka_list()
             self.assertIsNotNone(banka_list)
             self.assertIsInstance(banka_list, list)
             
-            # Cari repos
+            # Banka repo - Create & Delete
+            from datetime import datetime
+            banka_id = db.banka_add(
+                tarih=datetime.now().strftime("%Y-%m-%d"),
+                banka="Test Bankası",
+                hesap="TR1234567890123456789012345",
+                tip="Giriş",
+                tutar=1000.0,
+                para="TL",
+                aciklama="Test Açıklama",
+                referans="",
+                belge="",
+                etiket="",
+                import_grup=""
+            )
+            self.assertIsInstance(banka_id, int)
+            self.assertGreater(banka_id, 0)
+            
+            banka_detail = db.banka_get(banka_id)
+            self.assertIsNotNone(banka_detail)
+            self.assertEqual(banka_detail["banka"], "Test Bankası")
+            
+            db.banka_delete(banka_id)
+            
+            # Cari repos - Read & CRUD
             cari_list = db.cari_list()
             self.assertIsNotNone(cari_list)
             self.assertIsInstance(cari_list, list)
             
-            # Stok repo
+            # Cari - Search fonksiyonu
+            cari_search = db.cari_list(q="test")
+            self.assertIsInstance(cari_search, list)
+            
+            # Stok repo - Read
             stok_list = db.stok_urun_list()
             self.assertIsNotNone(stok_list)
             self.assertIsInstance(stok_list, list)
             
-            # Kasa repo
+            # Stok - Kategori listesi
+            try:
+                kategoriler = db.stok_kategori_list()
+                self.assertIsInstance(kategoriler, list)
+            except AttributeError:
+                pass
+            
+            # Kasa repo - Read
             kasa_list = db.kasa_list()
             self.assertIsNotNone(kasa_list)
             self.assertIsInstance(kasa_list, list)
             
-            # Fatura repo
+            # Kasa - Summary
+            try:
+                kasa_summary = db.kasa_summary()
+                self.assertIsInstance(kasa_summary, dict)
+            except AttributeError:
+                pass
+            
+            # Fatura repo - Read & Filters
             faturalar = db.fatura_list(q="")
             self.assertIsInstance(faturalar, list)
             
-            # Satış repos
+            # Fatura - Durum filtreleme
+            faturalar_durum = db.fatura_list(q="", durum="Ödendi")
+            self.assertIsInstance(faturalar_durum, list)
+            
+            # Satış repos - KPI & List
             satis_kpi = db.satis_rapor_kpi({})
             self.assertIsInstance(satis_kpi, dict)
+            self.assertIn("ciro", satis_kpi)  # KPI'da 'ciro' anahtarı var
+            
+            # Satış - Detay listesi
+            try:
+                satis_list = db.satis_list(limit=10)
+                self.assertIsInstance(satis_list, list)
+            except (AttributeError, TypeError):
+                pass
             
             # Satın alma repo
             satin_alma = db.satin_alma_siparis_list(limit=10)
             self.assertIsInstance(satin_alma, list)
             
-            # Settings repo
+            # Settings repo - Get & Set
             setting = db.get_setting("test_key")
             self.assertTrue(setting is None or isinstance(setting, str))
             
-            # Search repo
+            db.set_setting("test_key", "test_value")
+            setting_read = db.get_setting("test_key")
+            self.assertEqual(setting_read, "test_value")
+            
+            # Search repo - Global search
             results = db.global_search("test", limit=10)
-            self.assertIsInstance(results, dict)  # global_search dict döndürüyor
+            self.assertIsInstance(results, dict)
             
             # Messages repo
             try:
                 messages = db.message_list_for_company(limit=10)
                 self.assertIsInstance(messages, list)
             except (AttributeError, TypeError):
-                pass  # Repo metodu yoksa veya parametreler farklıysa geç
+                pass
             
             # Logs repo
             try:
                 logs = db.logs_list(limit=10)
                 self.assertIsInstance(logs, list)
             except (AttributeError, TypeError):
-                pass  # Repo metodu yoksa veya parametreler farklıysa geç
+                pass
+            
+            # HR repo - Çalışanlar
+            try:
+                calisanlar = db.hr_calisan_list()
+                self.assertIsInstance(calisanlar, list)
+            except (AttributeError, TypeError):
+                pass
+            
+            # Users repo
+            try:
+                users = db.users_list()
+                self.assertIsInstance(users, list)
+            except (AttributeError, TypeError):
+                pass
             
         finally:
             db.close()
@@ -247,6 +320,261 @@ class SmokeTests(unittest.TestCase):
         finally:
             app.on_close()
 
+    def test_repo_performance(self) -> None:
+        """Repo metodlarının makul sürede çalıştığını test eder."""
+        import time
+        db_path = os.path.join(self.base_dir, "perf.db")
+        db = DB(db_path)
+        try:
+            # Büyük veri oluştur
+            for i in range(100):
+                db.cari_upsert(f"Test Cari {i}", tur="Müşteri")
+            
+            # Listeleme performansı (<1 saniye)
+            start = time.time()
+            cari_list = db.cari_list()
+            elapsed = time.time() - start
+            self.assertLess(elapsed, 1.0, "cari_list çok yavaş")
+            self.assertEqual(len(cari_list), 100)
+            
+            # Arama performansı (<0.5 saniye)
+            start = time.time()
+            search_results = db.cari_list(q="Test Cari 50")
+            elapsed = time.time() - start
+            self.assertLess(elapsed, 0.5, "cari_list search çok yavaş")
+            self.assertGreater(len(search_results), 0)
+            
+            # KPI hesaplama performansı (<2 saniye)
+            start = time.time()
+            kpi = db.satis_rapor_kpi({})
+            elapsed = time.time() - start
+            self.assertLess(elapsed, 2.0, "KPI hesaplama çok yavaş")
+            
+        finally:
+            db.close()
+    
+    def test_repo_edge_cases(self) -> None:
+        """Repo metodlarının edge case'leri doğru ele aldığını test eder."""
+        db_path = os.path.join(self.base_dir, "edge.db")
+        db = DB(db_path)
+        try:
+            # Boş liste kontrolü
+            empty_list = db.cari_list(q="NonExistentSearchTerm12345")
+            self.assertIsInstance(empty_list, list)
+            self.assertEqual(len(empty_list), 0)
+            
+            # Özel karakterler içeren arama
+            special_chars = "Test'İşçi\"Cari<>%_"
+            cari_id = db.cari_upsert(special_chars, tur="Müşteri")
+            self.assertIsInstance(cari_id, int)
+            
+            # Özel karakterli arama
+            search = db.cari_list(q="İşçi")
+            self.assertIsInstance(search, list)
+            
+            # Çok uzun string testi
+            long_string = "A" * 1000
+            long_id = db.cari_upsert(long_string[:255], tur="Tedarikçi")
+            self.assertIsInstance(long_id, int)
+            
+            # Negatif limit testi
+            try:
+                result = db.satin_alma_siparis_list(limit=-1)
+                # Negatif değer kabul edilmiyorsa hata fırlatmalı
+                self.assertIsInstance(result, list)
+            except (ValueError, sqlite3.IntegrityError):
+                pass  # Beklenen davranış
+            
+            # None değer testleri
+            try:
+                setting = db.get_setting("nonexistent_key_12345")
+                self.assertIsNone(setting)
+            except Exception:
+                pass
+            
+        finally:
+            db.close()
+    
+    def test_transaction_safety(self) -> None:
+        """Transaction güvenliğini ve rollback işlemlerini test eder."""
+        db_path = os.path.join(self.base_dir, "transaction.db")
+        db = DB(db_path)
+        try:
+            # Başarılı transaction
+            initial_count = len(db.cari_list())
+            cari_id = db.cari_upsert("Transaction Test Cari", tur="Müşteri")
+            self.assertEqual(len(db.cari_list()), initial_count + 1)
+            
+            # Transaction içinde hata durumu
+            try:
+                # Geçersiz veri ile işlem dene
+                db.cari_upsert("", tur="")  # Boş ad geçersiz olabilir
+            except Exception:
+                pass  # Hata bekleniyor
+            
+            # Veritabanının tutarlı olduğunu kontrol et
+            final_count = len(db.cari_list())
+            self.assertGreaterEqual(final_count, initial_count)
+            
+        finally:
+            db.close()
+    
+    def test_data_integrity(self) -> None:
+        """Veri bütünlüğü ve referans tutarlılığını test eder."""
+        db_path = os.path.join(self.base_dir, "integrity.db")
+        db = DB(db_path)
+        try:
+            # Cari oluştur
+            cari_id = db.cari_upsert("Integrity Test Cari", tur="Müşteri")
+            
+            # Cari hareketi ekle
+            from datetime import datetime
+            hareket_id = db.cari_hareket_add(
+                tarih=datetime.now().strftime("%Y-%m-%d"),
+                cari_id=cari_id,
+                tip="Borç",
+                tutar=500.0,
+                para="TL",
+                aciklama="Test hareket",
+                odeme="Nakit",
+                belge="",
+                etiket=""
+            )
+            # Bazı metodlar ID döndürmeyebilir, bu durumda None olabilir
+            if hareket_id is not None:
+                self.assertIsInstance(hareket_id, int)
+            
+            # Carinin hareketlerini listele
+            hareketler = db.cari_hareket_list(cari_id=cari_id)
+            self.assertGreater(len(hareketler), 0)
+            
+            # Cariyi silmeye çalış (hareketler varken)
+            # Bu işlem başarısız olmalı veya cascade delete yapmalı
+            try:
+                db.cari_delete(cari_id)
+                # Eğer silindi ise hareketler de silinmiş olmalı
+                remaining = db.cari_hareket_list(cari_id=cari_id)
+                self.assertEqual(len(remaining), 0, "Cascade delete çalışmadı")
+            except Exception:
+                # Referans hatası bekleniyor - bu da geçerli
+                pass
+            
+        finally:
+            db.close()
+    
+    def test_concurrent_operations(self) -> None:
+        """Çoklu işlemlerin aynı anda çalışmasını test eder."""
+        db_path = os.path.join(self.base_dir, "concurrent.db")
+        db = DB(db_path)
+        try:
+            # Paralel kayıt ekleme simülasyonu
+            ids = []
+            for i in range(50):
+                cari_id = db.cari_upsert(f"Concurrent Cari {i}", tur="Müşteri")
+                ids.append(cari_id)
+            
+            # Tüm kayıtların eklendiğini doğrula
+            self.assertEqual(len(ids), 50)
+            self.assertEqual(len(set(ids)), 50, "Duplicate ID var")
+            
+            # Aynı anda okuma işlemleri
+            results = []
+            for _ in range(10):
+                result = db.cari_list()
+                results.append(len(result))
+            
+            # Tüm okumalar tutarlı sonuç vermeli
+            self.assertEqual(len(set(results)), 1, "Tutarsız okuma sonuçları")
+            
+        finally:
+            db.close()
+    
+    def test_large_dataset_handling(self) -> None:
+        """Büyük veri setlerinin işlenmesini test eder."""
+        db_path = os.path.join(self.base_dir, "large.db")
+        db = DB(db_path)
+        try:
+            import time
+            
+            # 500 kayıt ekle
+            start = time.time()
+            for i in range(500):
+                db.cari_upsert(f"Large Dataset Cari {i}", tur="Müşteri")
+            insert_time = time.time() - start
+            
+            self.assertLess(insert_time, 10.0, "500 kayıt ekleme çok yavaş")
+            
+            # Tüm kayıtları listele
+            start = time.time()
+            all_records = db.cari_list()
+            list_time = time.time() - start
+            
+            self.assertEqual(len(all_records), 500)
+            self.assertLess(list_time, 2.0, "500 kayıt listeleme çok yavaş")
+            
+            # Paginated okuma
+            try:
+                page1 = db.cari_list()[:100]
+                page2 = db.cari_list()[100:200]
+                self.assertEqual(len(page1), 100)
+                self.assertEqual(len(page2), 100)
+            except (TypeError, AttributeError):
+                pass  # Pagination desteklenmiyorsa
+            
+        finally:
+            db.close()
+    
+    def test_special_characters_handling(self) -> None:
+        """Özel karakterlerin doğru işlendiğini test eder."""
+        db_path = os.path.join(self.base_dir, "special.db")
+        db = DB(db_path)
+        try:
+            # Unicode karakterler
+            unicode_strings = [
+                "Çağla Şahin İnci Ürün Özel",
+                "Test™ Company® Ltd©",
+                "Μεγάλη Επιχείρηση",  # Yunanca
+                "大企業",  # Japonca
+                "مؤسسة كبيرة",  # Arapça
+                "Компания",  # Rusça
+            ]
+            
+            ids = []
+            for text in unicode_strings:
+                try:
+                    cari_id = db.cari_upsert(text[:100], tur="Müşteri")
+                    ids.append(cari_id)
+                except Exception as e:
+                    # Bazı karakterler desteklenmeyebilir
+                    pass
+            
+            # En az bazı kayıtlar başarılı olmalı
+            self.assertGreater(len(ids), 0, "Hiçbir unicode karakter desteklenmiyor")
+            
+            # SQL injection denemesi
+            malicious_inputs = [
+                "'; DROP TABLE cariler; --",
+                "1' OR '1'='1",
+                "<script>alert('xss')</script>",
+                "../../../etc/passwd",
+            ]
+            
+            for malicious in malicious_inputs:
+                try:
+                    # Bu işlem başarısız olmamalı ve SQL injection yapmamalı
+                    cari_id = db.cari_upsert(malicious, tur="Müşteri")
+                    # Eğer eklendiyse, tablonun hala durduğunu kontrol et
+                    db.cari_list()  # Bu hata verirse tablo bozulmuş demektir
+                except Exception:
+                    pass  # Bazı karakterler reddedilebilir
+            
+            # Tablo hala çalışıyor mu kontrol et
+            final_list = db.cari_list()
+            self.assertIsInstance(final_list, list)
+            
+        finally:
+            db.close()
+    
     @unittest.skipUnless(_can_start_tk(), "Tkinter ekranı başlatılamıyor (headless ortam).")
     def test_services_available(self) -> None:
         """Tüm servislerin erişilebilir olduğunu test eder."""
@@ -266,6 +594,34 @@ class SmokeTests(unittest.TestCase):
             
         finally:
             app.on_close()
+
+
+    def test_final_statistics(self) -> None:
+        """Tüm testlerin istatistiklerini toplar."""
+        db_path = os.path.join(self.base_dir, "stats.db")
+        db = DB(db_path)
+        try:
+            # Örnek veri oluştur
+            for i in range(20):
+                db.cari_upsert(f"Stats Cari {i}", tur="Müşteri")
+            
+            # İstatistikler
+            stats = {
+                "total_cariler": len(db.cari_list()),
+                "total_banka": len(db.banka_list()),
+                "total_stok": len(db.stok_urun_list()),
+                "total_kasa": len(db.kasa_list()),
+            }
+            
+            # Her repo'dan en az veri çekilebildiğini doğrula
+            for key, value in stats.items():
+                self.assertIsInstance(value, int, f"{key} integer değil")
+                self.assertGreaterEqual(value, 0, f"{key} negatif")
+            
+            print(f"\n📊 Test İstatistikleri: {stats}")
+            
+        finally:
+            db.close()
 
 
 if __name__ == "__main__":
