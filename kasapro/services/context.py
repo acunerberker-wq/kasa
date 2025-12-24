@@ -15,6 +15,7 @@ from .export_service import ExportService
 from .settings_service import SettingsService
 from .company_users_service import CompanyUsersService
 from .cari_service import CariService
+from .messages_service import MessagesService
 
 
 @dataclass
@@ -26,6 +27,7 @@ class Services:
     settings: SettingsService
     company_users: CompanyUsersService
     cari: CariService
+    messages: MessagesService
 
     @classmethod
     def build(cls, db: DB, usersdb: UsersDB) -> "Services":
@@ -37,4 +39,5 @@ class Services:
             settings=SettingsService(db),
             company_users=CompanyUsersService(db),
             cari=CariService(db, exporter),
+            messages=MessagesService(db, usersdb),
         )

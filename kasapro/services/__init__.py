@@ -5,6 +5,7 @@ from .settings_service import SettingsService
 from .company_users_service import CompanyUsersService
 from .cari_service import CariService
 from .export_service import ExportService
+from .messages_service import MessagesService
 
 __all__ = [
     "Services",
@@ -12,4 +13,5 @@ __all__ = [
     "CompanyUsersService",
     "CariService",
     "ExportService",
+    "MessagesService",
 ]

@@ -53,3 +53,11 @@ Notlar:
   - `style.py`, `widgets.py`, `dialogs.py`, `windows.py`
   - `frames/`: her sekme **ayrı dosya** (`kasa.py`, `cariler.py`, ...)
 - `kasapro/app.py`: App sınıfı ve main()
+
+## Mesajlar (Şirket İçi Mesajlaşma)
+
+- Menüde **📨 Mesajlar** ekranını açın.
+- **➕ Yeni Mesaj** ile alıcı(lar) seçin, konu/mesaj yazın ve gerekiyorsa ek dosya ekleyin.
+- Gelen kutusunda okunmamış mesajlar **Yeni** olarak görünür; mesaj açılınca **Okundu** olur.
+- **Ara** alanı ile konu/içerik/kişi bazlı filtreleyebilirsiniz.
+- Ekler dosya sisteminde `kasa_data/attachments/<company_db>` altında saklanır (DB’de yalnızca referans tutulur).

@@ -10,6 +10,7 @@ from .sirketler import SirketlerFrame as SirketlerFrame
 from .kullanicilar import KullanicilarFrame as KullanicilarFrame
 from .tanimlar_hub import TanimlarHubFrame as TanimlarHubFrame
 from .rapor_araclar_hub import RaporAraclarHubFrame as RaporAraclarHubFrame
+from .messages import MessagesFrame as MessagesFrame
 
 __all__ = [
     "KasaFrame",
@@ -21,4 +22,5 @@ __all__ = [
     "KullanicilarFrame",
     "TanimlarHubFrame",
     "RaporAraclarHubFrame",
+    "MessagesFrame",
 ]

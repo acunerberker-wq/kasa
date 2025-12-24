@@ -27,6 +27,7 @@ from .ui.frames import (
     TanimlarHubFrame,
     RaporAraclarHubFrame,
     KullanicilarFrame,
+    MessagesFrame,
 )
 from .ui.plugins.loader import discover_ui_plugins
 
@@ -112,6 +113,7 @@ class App:
 
         self.frames: Dict[str, ttk.Frame] = {}
         self._build_ui()
+        self._start_message_polling()
 
         # Login başarılı -> ana pencereyi göster
         try:
@@ -162,6 +164,68 @@ class App:
             if hasattr(self, "lbl_company"):
                 name = getattr(self, "active_company_name", "") or ""
                 self.lbl_company.config(text=f"Şirket: {name}")
+        except Exception:
+            pass
+
+    def update_messages_badge(self, count: int):
+        try:
+            btn = (getattr(self, "nav_buttons", {}) or {}).get("mesajlar")
+            if not btn:
+                return
+            base = getattr(self, "_messages_nav_base_text", "📨 Mesajlar")
+            text = f"{base} ({count})" if count and count > 0 else base
+            btn.config(text=text)
+        except Exception:
+            pass
+
+    def show_toast(self, text: str, duration_ms: int = 3500):
+        try:
+            toast = tk.Toplevel(self.root)
+            toast.overrideredirect(True)
+            toast.configure(bg="#333333")
+            label = tk.Label(toast, text=text, bg="#333333", fg="#ffffff", padx=12, pady=6)
+            label.pack()
+            toast.update_idletasks()
+            x = self.root.winfo_x() + self.root.winfo_width() - toast.winfo_width() - 24
+            y = self.root.winfo_y() + 60
+            toast.geometry(f"+{x}+{y}")
+            toast.after(duration_ms, toast.destroy)
+        except Exception:
+            pass
+
+    def _start_message_polling(self):
+        self._last_unread_count = None
+        self._message_polling_active = True
+        try:
+            self._poll_messages()
+        except Exception:
+            pass
+
+    def _refresh_message_badge(self):
+        uid = self.get_active_user_id()
+        if not uid:
+            return
+        try:
+            count = self.db.message_unread_count(uid)
+            self.update_messages_badge(count)
+            self._last_unread_count = count
+        except Exception:
+            pass
+
+    def _poll_messages(self):
+        uid = self.get_active_user_id()
+        if uid:
+            try:
+                count = self.db.message_unread_count(uid)
+                self.update_messages_badge(count)
+                if self._last_unread_count is not None and count > self._last_unread_count:
+                    self.show_toast("Yeni mesajınız var.")
+                self._last_unread_count = count
+            except Exception:
+                pass
+        try:
+            if getattr(self, "_message_polling_active", False):
+                self.root.after(15000, self._poll_messages)
         except Exception:
             pass
 
@@ -267,6 +331,12 @@ class App:
         except Exception:
             pass
 
+        try:
+            self._last_unread_count = None
+            self._refresh_message_badge()
+        except Exception:
+            pass
+
     def get_active_username(self) -> str:
         """Aktif veri sahibi kullanıcı adı (admin için seçili kullanıcı, diğerleri için kendi)."""
         try:
@@ -358,6 +428,12 @@ class App:
                     self.usersdb.set_last_company_id(int(self.data_owner_user_id), int(self.active_company_id))
             except Exception:
                 pass
+
+        try:
+            self._last_unread_count = None
+            self._refresh_message_badge()
+        except Exception:
+            pass
         else:
             # güvenlik
             new_path = self.usersdb.get_user_db_path(urow)
@@ -546,6 +622,8 @@ class App:
 
         nav_section("💳 İŞLEMLER")
         nav_btn("🏦 Kasa", "kasa")
+        self._messages_nav_base_text = "📨 Mesajlar"
+        nav_btn(self._messages_nav_base_text, "mesajlar")
         for p in self.ui_plugins:
             # Meslekler Tanımlar altında gösteriliyor
             if p.key == "maas_meslekler":
@@ -587,6 +665,7 @@ class App:
 
         # Ekranlar
         self.frames["kasa"] = KasaFrame(body, self)
+        self.frames["mesajlar"] = MessagesFrame(body, self)
         self.frames["tanimlar"] = TanimlarHubFrame(body, self)
         self.frames["rapor_araclar"] = RaporAraclarHubFrame(body, self)
 
@@ -648,6 +727,7 @@ class App:
             "search": "Global Arama",
             "loglar": "Log",
             "kullanicilar": "Kullanıcılar",
+            "mesajlar": "Mesajlar",
         }
 
         # Plugin başlıkları
@@ -743,7 +823,7 @@ class App:
         except Exception:
             pass
 
-        if key in ("tanimlar", "cariler", "cari_hareket_ekle", "cari_hareketler", "rapor_araclar", "raporlar", "search", "loglar", "kasa"):
+        if key in ("tanimlar", "cariler", "cari_hareket_ekle", "cari_hareketler", "rapor_araclar", "raporlar", "search", "loglar", "kasa", "mesajlar"):
             try:
                 for k2 in ("cari_hareket_ekle", "cari_hareketler"):
                     if k2 in self.frames and hasattr(self.frames[k2], "reload_cari"):
@@ -758,6 +838,12 @@ class App:
                 try:
                     if "rapor_araclar" in self.frames and hasattr(self.frames["rapor_araclar"], "refresh"):
                         self.frames["rapor_araclar"].refresh()  # type: ignore
+                except Exception:
+                    pass
+            if key == "mesajlar":
+                try:
+                    if "mesajlar" in self.frames and hasattr(self.frames["mesajlar"], "refresh"):
+                        self.frames["mesajlar"].refresh()  # type: ignore
                 except Exception:
                     pass
 

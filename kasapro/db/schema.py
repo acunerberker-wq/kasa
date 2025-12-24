@@ -189,6 +189,48 @@ def init_schema(conn: sqlite3.Connection) -> None:
     );""")
 
     # -----------------
+    # Mesajlar
+    # -----------------
+    c.execute(
+        """
+    CREATE TABLE IF NOT EXISTS messages(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        sender_id INTEGER NOT NULL,
+        sender_username TEXT NOT NULL,
+        subject TEXT DEFAULT '',
+        body TEXT DEFAULT '',
+        is_draft INTEGER NOT NULL DEFAULT 0,
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    );"""
+    )
+    c.execute(
+        """
+    CREATE TABLE IF NOT EXISTS message_recipients(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        message_id INTEGER NOT NULL,
+        recipient_id INTEGER NOT NULL,
+        recipient_username TEXT NOT NULL,
+        is_read INTEGER NOT NULL DEFAULT 0,
+        read_at TEXT DEFAULT '',
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY(message_id) REFERENCES messages(id) ON DELETE CASCADE
+    );"""
+    )
+    c.execute(
+        """
+    CREATE TABLE IF NOT EXISTS message_attachments(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        message_id INTEGER NOT NULL,
+        filename TEXT NOT NULL,
+        stored_name TEXT NOT NULL,
+        size_bytes INTEGER NOT NULL DEFAULT 0,
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY(message_id) REFERENCES messages(id) ON DELETE CASCADE
+    );"""
+    )
+
+    # -----------------
     # Stok Yönetimi
     # -----------------
     c.execute(
@@ -693,6 +735,56 @@ def migrate_schema(conn: sqlite3.Connection, log_fn: Optional[Callable[[str, str
             except Exception:
                 pass
 
+    # -----------------
+    # Mesajlaşma (eski DB'ler için)
+    # -----------------
+    try:
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS messages(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                sender_id INTEGER NOT NULL,
+                sender_username TEXT NOT NULL,
+                subject TEXT DEFAULT '',
+                body TEXT DEFAULT '',
+                is_draft INTEGER NOT NULL DEFAULT 0,
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+            );"""
+        )
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS message_recipients(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                message_id INTEGER NOT NULL,
+                recipient_id INTEGER NOT NULL,
+                recipient_username TEXT NOT NULL,
+                is_read INTEGER NOT NULL DEFAULT 0,
+                read_at TEXT DEFAULT '',
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY(message_id) REFERENCES messages(id) ON DELETE CASCADE
+            );"""
+        )
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS message_attachments(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                message_id INTEGER NOT NULL,
+                filename TEXT NOT NULL,
+                stored_name TEXT NOT NULL,
+                size_bytes INTEGER NOT NULL DEFAULT 0,
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY(message_id) REFERENCES messages(id) ON DELETE CASCADE
+            );"""
+        )
+        conn.commit()
+    except Exception as e:
+        if log_fn:
+            try:
+                log_fn("Schema Migration Error", f"messages tables: {e}")
+            except Exception:
+                pass
+
     # Sık kullanılan sorgular için indeksler
     _ensure_index(conn, "idx_cari_hareket_cari_tarih", "cari_hareket", "cari_id, tarih", log_fn)
     _ensure_index(conn, "idx_cari_hareket_tarih", "cari_hareket", "tarih", log_fn)
@@ -706,6 +798,8 @@ def migrate_schema(conn: sqlite3.Connection, log_fn: Optional[Callable[[str, str
     _ensure_index(conn, "idx_fatura_odeme_fatura_id", "fatura_odeme", "fatura_id", log_fn)
     _ensure_index(conn, "idx_fatura_odeme_tarih", "fatura_odeme", "tarih", log_fn)
     _ensure_index(conn, "idx_stok_hareket_urun_id", "stok_hareket", "urun_id", log_fn)
+    _ensure_index(conn, "idx_messages_created_at", "messages", "created_at", log_fn)
+    _ensure_index(conn, "idx_message_recipients_recipient_created", "message_recipients", "recipient_id, created_at", log_fn)
 
     _ensure_index(conn, "idx_stok_hareket_tarih", "stok_hareket", "tarih", log_fn)
     _ensure_index(conn, "idx_kasa_hareket_tip_tarih", "kasa_hareket", "tip, tarih", log_fn)

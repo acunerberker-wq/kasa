@@ -24,8 +24,7 @@ from .repos import (
     FaturaRepo,
     StokRepo,
     NakliyeRepo,
-
-    PurchaseReportRepo,
+    MessagesRepo,
 )
 
 
@@ -50,8 +49,7 @@ class DB:
         self.fatura = FaturaRepo(self.conn)
         self.stok = StokRepo(self.conn)
         self.nakliye = NakliyeRepo(self.conn)
-
-        self.purchase_reports = PurchaseReportRepo(self.conn)
+        self.messages = MessagesRepo(self.conn)
 
         migrate_schema(self.conn, log_fn=self._safe_log)
         seed_defaults(self.conn, log_fn=self._safe_log)
@@ -76,6 +74,52 @@ class DB:
 
     def logs_list(self, limit: int = 800):
         return self.logs.list(limit=limit)
+
+    # -----------------
+    # Mesajlar
+    # -----------------
+    def message_create(self, sender_id: int, sender_username: str, subject: str, body: str, is_draft: int = 0) -> int:
+        return self.messages.create_message(sender_id, sender_username, subject, body, is_draft=is_draft)
+
+    def message_update(self, message_id: int, subject: str, body: str, is_draft: int):
+        self.messages.update_message(message_id, subject, body, is_draft)
+
+    def message_delete(self, message_id: int):
+        self.messages.delete_message(message_id)
+
+    def message_recipients_set(self, message_id: int, recipients):
+        self.messages.clear_recipients(message_id)
+        self.messages.add_recipients(message_id, recipients)
+
+    def message_inbox_list(self, recipient_id: int, q: str = "", only_unread: bool = False, limit: int = 50, offset: int = 0):
+        return self.messages.list_inbox(recipient_id, q=q, only_unread=only_unread, limit=limit, offset=offset)
+
+    def message_sent_list(self, sender_id: int, q: str = "", limit: int = 50, offset: int = 0):
+        return self.messages.list_sent(sender_id, q=q, limit=limit, offset=offset)
+
+    def message_drafts_list(self, sender_id: int, q: str = "", limit: int = 50, offset: int = 0):
+        return self.messages.list_drafts(sender_id, q=q, limit=limit, offset=offset)
+
+    def message_get_for_recipient(self, message_id: int, recipient_id: int):
+        return self.messages.get_message_for_recipient(message_id, recipient_id)
+
+    def message_get_for_sender(self, message_id: int, sender_id: int):
+        return self.messages.get_message_for_sender(message_id, sender_id)
+
+    def message_list_recipients(self, message_id: int):
+        return self.messages.list_recipients(message_id)
+
+    def message_mark_read(self, message_id: int, recipient_id: int):
+        self.messages.mark_read(message_id, recipient_id)
+
+    def message_unread_count(self, recipient_id: int) -> int:
+        return self.messages.get_unread_count(recipient_id)
+
+    def message_attachment_add(self, message_id: int, filename: str, stored_name: str, size_bytes: int) -> int:
+        return self.messages.add_attachment(message_id, filename, stored_name, size_bytes)
+
+    def message_attachments_list(self, message_id: int):
+        return self.messages.list_attachments(message_id)
 
     # -----------------
     # Settings
