@@ -17,7 +17,6 @@ import tkinter as tk
 from tkinter import ttk
 
 from .raporlar import RaporlarFrame
-from .purchase_report import PurchaseReportFrame
 from .global_search import GlobalSearchFrame
 from .logs import LogsFrame
 from .satin_alma_raporlar import SatinAlmaRaporlarFrame
@@ -41,13 +40,11 @@ class RaporAraclarHubFrame(ttk.Frame):
 
         # Tab konteynerleri
         self.tab_raporlar = ttk.Frame(self.nb)
-        self.tab_purchase = ttk.Frame(self.nb)
         self.tab_search = ttk.Frame(self.nb)
         self.tab_loglar = ttk.Frame(self.nb)
         self.tab_satin_alma = ttk.Frame(self.nb)
 
         self.nb.add(self.tab_raporlar, text="📊 Raporlar")
-        self.nb.add(self.tab_purchase, text="🧾 Satın Alma Raporu")
         self.nb.add(self.tab_search, text="🔎 Global Arama")
         self.nb.add(self.tab_loglar, text="🧾 Log")
         self.nb.add(self.tab_satin_alma, text="📦 Satın Alma Sipariş Raporları")
@@ -55,9 +52,6 @@ class RaporAraclarHubFrame(ttk.Frame):
         # İçerikler
         self.raporlar_frame = RaporlarFrame(self.tab_raporlar, self.app)
         self.raporlar_frame.pack(fill=tk.BOTH, expand=True)
-
-        self.purchase_frame = PurchaseReportFrame(self.tab_purchase, self.app)
-        self.purchase_frame.pack(fill=tk.BOTH, expand=True)
 
         self.search_frame = GlobalSearchFrame(self.tab_search, self.app)
         self.search_frame.pack(fill=tk.BOTH, expand=True)
@@ -82,8 +76,6 @@ class RaporAraclarHubFrame(ttk.Frame):
         m = {
             "raporlar": self.tab_raporlar,
             "rapor": self.tab_raporlar,
-            "purchase": self.tab_purchase,
-            "satinalma": self.tab_purchase,
             "search": self.tab_search,
             "arama": self.tab_search,
             "loglar": self.tab_loglar,
@@ -104,11 +96,6 @@ class RaporAraclarHubFrame(ttk.Frame):
         try:
             if hasattr(self, "raporlar_frame") and hasattr(self.raporlar_frame, "refresh"):
                 self.raporlar_frame.refresh()  # type: ignore
-        except Exception:
-            pass
-        try:
-            if hasattr(self, "purchase_frame") and hasattr(self.purchase_frame, "reload_filters"):
-                self.purchase_frame.reload_filters()  # type: ignore
         except Exception:
             pass
         try:
@@ -144,13 +131,6 @@ class RaporAraclarHubFrame(ttk.Frame):
             if sel == str(self.tab_raporlar) and hasattr(self, "raporlar_frame"):
                 if hasattr(self.raporlar_frame, "refresh"):
                     self.raporlar_frame.refresh()  # type: ignore
-        except Exception:
-            pass
-
-        try:
-            if sel == str(self.tab_purchase) and hasattr(self, "purchase_frame"):
-                if hasattr(self.purchase_frame, "reload_filters"):
-                    self.purchase_frame.reload_filters()  # type: ignore
         except Exception:
             pass
 
