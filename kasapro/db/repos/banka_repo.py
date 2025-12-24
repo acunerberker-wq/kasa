@@ -45,7 +45,7 @@ class BankaRepo:
             ),
         )
         self.conn.commit()
-        return int(cur.lastrowid or 0)
+        return int(cur.lastrowid)
     def list(
         self,
         q: str = "",

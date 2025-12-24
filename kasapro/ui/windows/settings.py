@@ -9,7 +9,7 @@
 
 from __future__ import annotations
 
-from typing import Optional, List, TYPE_CHECKING
+from typing import Optional, List
 
 import os
 import sys
@@ -24,8 +24,6 @@ from ...config import APP_TITLE, APP_BASE_DIR, SHARED_STORAGE_DIRNAME
 from ...utils import center_window, fmt_amount, _safe_slug
 from ..dialogs import simple_input, simple_choice
 
-if TYPE_CHECKING:
-    from ...app import App
 
 class SettingsWindow(tk.Toplevel):
     def __init__(self, app: "App"):
@@ -98,7 +96,7 @@ class SettingsWindow(tk.Toplevel):
         txt.insert("1.0", "\n".join(items))
 
         def save():
-            lines = [line.strip() for line in txt.get("1.0", tk.END).splitlines() if line.strip()]
+            lines = [l.strip() for l in txt.get("1.0", tk.END).splitlines() if l.strip()]
             self.db.set_setting(key, json.dumps(lines, ensure_ascii=False))
             self.db.log("Settings", f"{key} updated ({len(lines)})")
             self.app.reload_settings()
@@ -1027,6 +1025,7 @@ class SettingsWindow(tk.Toplevel):
         except Exception:
             return
 
+        base = self._get_base_dir()
         for p in self._list_backup_files():
             try:
                 name = os.path.basename(p)

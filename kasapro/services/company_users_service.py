@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+from typing import List, Optional
 
 from ..db.main_db import DB
 

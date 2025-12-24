@@ -3,24 +3,30 @@
 
 from __future__ import annotations
 
-from datetime import timedelta, date
-from typing import List, Tuple, TYPE_CHECKING
+import os
+import re
+from datetime import datetime, timedelta, date
+from typing import Any, Optional, List, Dict, Tuple
 
 import tkinter as tk
-from tkinter import ttk
+from tkinter import ttk, messagebox, filedialog, simpledialog
 
+from ...config import APP_TITLE, HAS_OPENPYXL, HAS_REPORTLAB
 from ...utils import (
+    center_window,
+    today_iso,
+    now_iso,
     fmt_tr_date,
+    parse_date_smart,
+    parse_number_smart,
     safe_float,
     fmt_amount,
 )
-from ..widgets import LabeledEntry
-
-if TYPE_CHECKING:
-    from ...app import App
+from ..widgets import SimpleField, LabeledEntry, LabeledCombo, MoneyEntry
+from ..windows import ImportWizard, CariEkstreWindow
 
 class RaporlarFrame(ttk.Frame):
-    def __init__(self, master, app: "App"):
+    def __init__(self, master, app:"App"):
         super().__init__(master)
         self.app = app
         self._build()
@@ -29,20 +35,16 @@ class RaporlarFrame(ttk.Frame):
         top = ttk.LabelFrame(self, text="Raporlar / Özet")
         top.pack(fill=tk.X, padx=10, pady=10)
 
-        r = ttk.Frame(top)
-        r.pack(fill=tk.X, pady=6)
-        self.d_from = LabeledEntry(r, "Başlangıç:", 12)
-        self.d_from.pack(side=tk.LEFT, padx=6)
-        self.d_to = LabeledEntry(r, "Bitiş:", 12)
-        self.d_to.pack(side=tk.LEFT, padx=6)
+        r = ttk.Frame(top); r.pack(fill=tk.X, pady=6)
+        self.d_from = LabeledEntry(r, "Başlangıç:", 12); self.d_from.pack(side=tk.LEFT, padx=6)
+        self.d_to = LabeledEntry(r, "Bitiş:", 12); self.d_to.pack(side=tk.LEFT, padx=6)
         ttk.Button(r, text="Son 30 gün", command=self.last30).pack(side=tk.LEFT, padx=6)
         ttk.Button(r, text="Yenile", command=self.refresh).pack(side=tk.LEFT, padx=6)
 
         self.lbl_kasa = ttk.Label(top, text="")
         self.lbl_kasa.pack(anchor="w", padx=10, pady=(0,10))
 
-        body = ttk.Frame(self)
-        body.pack(fill=tk.BOTH, expand=True, padx=10, pady=(0,10))
+        body = ttk.Frame(self); body.pack(fill=tk.BOTH, expand=True, padx=10, pady=(0,10))
         left = ttk.LabelFrame(body, text="Seçili Carileri Topla")
         left.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=(0,8))
         right = ttk.LabelFrame(body, text="Kasa Analiz")
@@ -58,8 +60,7 @@ class RaporlarFrame(ttk.Frame):
         self.canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=6, pady=6)
         self.scroll.pack(side=tk.RIGHT, fill=tk.Y)
 
-        btmL = ttk.Frame(left)
-        btmL.pack(fill=tk.X, padx=6, pady=6)
+        btmL = ttk.Frame(left); btmL.pack(fill=tk.X, padx=6, pady=6)
         ttk.Button(btmL, text="Tümünü Seç", command=lambda: self.set_all(True)).pack(side=tk.LEFT, padx=6)
         ttk.Button(btmL, text="Tümünü Kaldır", command=lambda: self.set_all(False)).pack(side=tk.LEFT, padx=6)
         ttk.Button(btmL, text="Hesapla", command=self.calc_selected).pack(side=tk.LEFT, padx=6)
@@ -88,8 +89,7 @@ class RaporlarFrame(ttk.Frame):
         for r in self.app.db.cari_list(only_active=True):
             var = tk.BooleanVar(value=False)
             cid = int(r["id"])
-            frm = ttk.Frame(self.inner)
-            frm.pack(fill=tk.X, pady=2, padx=6)
+            frm = ttk.Frame(self.inner); frm.pack(fill=tk.X, pady=2, padx=6)
             ttk.Checkbutton(frm, variable=var, text=r["ad"]).pack(side=tk.LEFT)
             b = self.app.db.cari_bakiye(cid)
             ttk.Label(frm, text=f"Bakiye: {fmt_amount(b['bakiye'])}").pack(side=tk.RIGHT)
@@ -123,7 +123,7 @@ class RaporlarFrame(ttk.Frame):
         self.txt_kasa.insert(tk.END, "\nGünlük Özet\n")
         self.txt_kasa.insert(tk.END, "-"*55 + "\n")
         for r in self.app.db.kasa_gunluk(df, dt):
-            gelir = safe_float(r["gelir"])
-            gider = safe_float(r["gider"])
+            gelir = safe_float(r["gelir"]); gider = safe_float(r["gider"])
             self.txt_kasa.insert(tk.END, f"{fmt_tr_date(r['tarih'])} | gelir={fmt_amount(gelir)} | gider={fmt_amount(gider)} | net={fmt_amount((gelir-gider))}\n")
+
 

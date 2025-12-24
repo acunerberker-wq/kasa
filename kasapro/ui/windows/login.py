@@ -31,8 +31,7 @@ class LoginWindow(tk.Toplevel):
         self.protocol("WM_DELETE_WINDOW", self.do_exit)
 
         ttk.Label(self, text="KasaPro Giriş", font=("Calibri", 14, "bold")).pack(pady=(14, 6))
-        frm = ttk.Frame(self)
-        frm.pack(fill=tk.X, padx=18, pady=6)
+        frm = ttk.Frame(self); frm.pack(fill=tk.X, padx=18, pady=6)
         # Kullanıcı seçimi (liste)
         self.pick_user = LabeledCombo(frm, "Kullanıcı Seç:", self.usersdb.list_usernames(), 18)
         self.pick_user.pack(fill=tk.X, pady=6)
@@ -50,10 +49,8 @@ class LoginWindow(tk.Toplevel):
             pass
 
 
-        self.e_user = LabeledEntry(frm, "Kullanıcı:", 18)
-        self.e_user.pack(fill=tk.X, pady=6)
-        self.e_pass = LabeledEntry(frm, "Şifre:", 18)
-        self.e_pass.pack(fill=tk.X, pady=6)
+        self.e_user = LabeledEntry(frm, "Kullanıcı:", 18); self.e_user.pack(fill=tk.X, pady=6)
+        self.e_pass = LabeledEntry(frm, "Şifre:", 18); self.e_pass.pack(fill=tk.X, pady=6)
         self.e_pass.ent.config(show="*")
 
         # Başlangıçta seçilen kullanıcıyı kullanıcı alanına yansıt
@@ -62,8 +59,7 @@ class LoginWindow(tk.Toplevel):
         except Exception:
             pass
 
-        btn = ttk.Frame(self)
-        btn.pack(fill=tk.X, padx=18, pady=10)
+        btn = ttk.Frame(self); btn.pack(fill=tk.X, padx=18, pady=10)
         ttk.Button(btn, text="Giriş", command=self.do_login).pack(side=tk.LEFT)
         ttk.Button(btn, text="Çıkış", command=self.do_exit).pack(side=tk.RIGHT)
 
@@ -132,3 +128,4 @@ class LoginWindow(tk.Toplevel):
     def do_exit(self):
         self.user = None
         self.destroy()
+

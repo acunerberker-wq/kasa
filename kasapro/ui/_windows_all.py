@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-# mypy: ignore-errors
 """KasaPro v3 - Pencereler (Toplevel) ve import/ekstre ekranları"""
 
 from __future__ import annotations
@@ -7,27 +6,28 @@ from __future__ import annotations
 import os
 import re
 import sqlite3
-from datetime import datetime, timedelta, date
-from typing import Any, Optional, List, Dict, Tuple, TYPE_CHECKING
+from datetime import datetime, timedelta
+from typing import Any, Optional, List, Dict, Tuple
 
 import tkinter as tk
-from tkinter import ttk, messagebox, filedialog
+from tkinter import ttk, messagebox, filedialog, simpledialog
 
 from ..config import APP_TITLE, HAS_OPENPYXL, HAS_REPORTLAB
 from ..utils import (
     center_window,
     ensure_pdf_fonts,
+    today_iso,
+    now_iso,
     fmt_tr_date,
+    parse_date_smart,
+    parse_number_smart,
     safe_float,
     fmt_amount,
-    norm_header,
 )
 from ..db.users_db import UsersDB
-from .widgets import LabeledEntry, LabeledCombo
+from .widgets import SimpleField, LabeledEntry, LabeledCombo, MoneyEntry
 from .dialogs import simple_input, simple_choice
 
-if TYPE_CHECKING:
-    from ..app import App
 class LoginWindow(tk.Toplevel):
     def __init__(self, root: tk.Tk, usersdb: UsersDB):
         super().__init__(root)
@@ -45,8 +45,7 @@ class LoginWindow(tk.Toplevel):
         self.protocol("WM_DELETE_WINDOW", self.do_exit)
 
         ttk.Label(self, text="KasaPro Giriş", font=("Calibri", 14, "bold")).pack(pady=(14, 6))
-        frm = ttk.Frame(self)
-        frm.pack(fill=tk.X, padx=18, pady=6)
+        frm = ttk.Frame(self); frm.pack(fill=tk.X, padx=18, pady=6)
         # Kullanıcı seçimi (liste)
         self.pick_user = LabeledCombo(frm, "Kullanıcı Seç:", self.usersdb.list_usernames(), 18)
         self.pick_user.pack(fill=tk.X, pady=6)
@@ -64,10 +63,8 @@ class LoginWindow(tk.Toplevel):
             pass
 
 
-        self.e_user = LabeledEntry(frm, "Kullanıcı:", 18)
-        self.e_user.pack(fill=tk.X, pady=6)
-        self.e_pass = LabeledEntry(frm, "Şifre:", 18)
-        self.e_pass.pack(fill=tk.X, pady=6)
+        self.e_user = LabeledEntry(frm, "Kullanıcı:", 18); self.e_user.pack(fill=tk.X, pady=6)
+        self.e_pass = LabeledEntry(frm, "Şifre:", 18); self.e_pass.pack(fill=tk.X, pady=6)
         self.e_pass.ent.config(show="*")
 
         # Başlangıçta seçilen kullanıcıyı kullanıcı alanına yansıt
@@ -76,8 +73,7 @@ class LoginWindow(tk.Toplevel):
         except Exception:
             pass
 
-        btn = ttk.Frame(self)
-        btn.pack(fill=tk.X, padx=18, pady=10)
+        btn = ttk.Frame(self); btn.pack(fill=tk.X, padx=18, pady=10)
         ttk.Button(btn, text="Giriş", command=self.do_login).pack(side=tk.LEFT)
         ttk.Button(btn, text="Çıkış", command=self.do_exit).pack(side=tk.RIGHT)
 
@@ -161,10 +157,8 @@ class SettingsWindow(tk.Toplevel):
         nb = ttk.Notebook(self)
         nb.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
 
-        tab1 = ttk.Frame(nb)
-        nb.add(tab1, text="Listeler")
-        tab2 = ttk.Frame(nb)
-        nb.add(tab2, text="Kullanıcılar")
+        tab1 = ttk.Frame(nb); nb.add(tab1, text="Listeler")
+        tab2 = ttk.Frame(nb); nb.add(tab2, text="Kullanıcılar")
 
         self._list_editor(tab1, "Para Birimleri", "currencies", self.db.list_currencies(), y=0)
         self._list_editor(tab1, "Ödeme Tipleri", "payments", self.db.list_payments(), y=170)
@@ -174,8 +168,7 @@ class SettingsWindow(tk.Toplevel):
             ttk.Label(tab2, text="Kullanıcı yönetimi sadece admin içindir.").pack(padx=10, pady=10, anchor="w")
             return
 
-        top = ttk.Frame(tab2)
-        top.pack(fill=tk.X, padx=10, pady=10)
+        top = ttk.Frame(tab2); top.pack(fill=tk.X, padx=10, pady=10)
         ttk.Button(top, text="Yenile", command=self._users_refresh).pack(side=tk.LEFT)
         ttk.Button(top, text="Yeni", command=self._user_add).pack(side=tk.LEFT, padx=6)
         ttk.Button(top, text="Şifre", command=self._user_pass).pack(side=tk.LEFT, padx=6)
@@ -203,7 +196,7 @@ class SettingsWindow(tk.Toplevel):
         txt.insert("1.0", "\n".join(items))
 
         def save():
-            lines = [line.strip() for line in txt.get("1.0", tk.END).splitlines() if line.strip()]
+            lines = [l.strip() for l in txt.get("1.0", tk.END).splitlines() if l.strip()]
             self.db.set_setting(key, json.dumps(lines, ensure_ascii=False))
             self.db.log("Settings", f"{key} updated ({len(lines)})")
             self.app.reload_settings()
@@ -294,8 +287,7 @@ def _tr_norm(s: str) -> str:
 
 HELP_TOPICS: List[Tuple[str, str]] = [
     ("Genel Bakış",
-"""KasaPro
-Kasa hareketleri, Cariler ve Cari Hareketleri tek bir veritabanında tutar.
+"""KasaPro; Kasa hareketleri, Cariler ve Cari Hareketleri tek bir veritabanında tutar.
 Sol menüden ekranlar arasında geçiş yapabilirsin.
 
 Roller:
@@ -428,8 +420,7 @@ DB Geri Yükle:
 
     ("Sık Sorulanlar",
 """S: Tutar yazarken neden otomatik değişiyor?
-C: Para girişleri TR formatında maskelenir
-bu yanlış girişi azaltır.
+C: Para girişleri TR formatında maskelenir; bu yanlış girişi azaltır.
 
 S: Silme/Düzenleme butonları pasif.
 C: Admin hesabıyla giriş yapmalısın.
@@ -463,8 +454,7 @@ class HelpWindow(tk.Toplevel):
         center_window(self, app.root)
 
     def _build(self):
-        top = ttk.Frame(self)
-        top.pack(fill=tk.X, padx=12, pady=10)
+        top = ttk.Frame(self); top.pack(fill=tk.X, padx=12, pady=10)
 
         ttk.Label(top, text="Yardım", font=("Calibri", 14, "bold")).pack(side=tk.LEFT)
         ttk.Label(top, text=f"  (Kullanıcı: {self.app.user['username']} / {self.app.user['role']})", foreground="#666").pack(side=tk.LEFT)
@@ -482,8 +472,7 @@ class HelpWindow(tk.Toplevel):
         pw = ttk.PanedWindow(self, orient=tk.HORIZONTAL)
         pw.pack(fill=tk.BOTH, expand=True, padx=12, pady=(0, 12))
 
-        left = ttk.Frame(pw)
-        right = ttk.Frame(pw)
+        left = ttk.Frame(pw); right = ttk.Frame(pw)
         pw.add(left, weight=1)
         pw.add(right, weight=3)
 
@@ -498,8 +487,7 @@ class HelpWindow(tk.Toplevel):
         self.lb.bind("<<ListboxSelect>>", self._on_select_topic)
 
         # Sağ: içerik + arama içinde gezinme
-        nav = ttk.Frame(right)
-        nav.pack(fill=tk.X, padx=6, pady=(6, 0))
+        nav = ttk.Frame(right); nav.pack(fill=tk.X, padx=6, pady=(6, 0))
         ttk.Button(nav, text="Önceki", command=lambda: self.find_next(backwards=True)).pack(side=tk.LEFT)
         ttk.Button(nav, text="Sonraki", command=lambda: self.find_next(backwards=False)).pack(side=tk.LEFT, padx=6)
         ttk.Button(nav, text="Kopyala", command=self.copy_current).pack(side=tk.RIGHT)
@@ -805,8 +793,7 @@ class ImportWizard(tk.Toplevel):
         tab = ttk.Frame(self.nb)
         self.nb.add(tab, text=name)
 
-        top = ttk.Frame(tab)
-        top.pack(fill=tk.X, padx=10, pady=10)
+        top = ttk.Frame(tab); top.pack(fill=tk.X, padx=10, pady=10)
         ttk.Label(top, text="Sayfa:", width=8).pack(side=tk.LEFT)
 
         guess = self._guess_sheet(name)
@@ -1079,21 +1066,16 @@ class CariEkstreWindow(tk.Toplevel):
         top = ttk.LabelFrame(self, text="Filtre")
         top.pack(fill=tk.X, padx=10, pady=10)
 
-        r1 = ttk.Frame(top)
-        r1.pack(fill=tk.X, pady=6)
-        self.f_from = LabeledEntry(r1, "Başlangıç:", 12)
-        self.f_from.pack(side=tk.LEFT, padx=6)
-        self.f_to = LabeledEntry(r1, "Bitiş:", 12)
-        self.f_to.pack(side=tk.LEFT, padx=6)
-        self.f_q = LabeledEntry(r1, "Ara:", 22)
-        self.f_q.pack(side=tk.LEFT, padx=6)
+        r1 = ttk.Frame(top); r1.pack(fill=tk.X, pady=6)
+        self.f_from = LabeledEntry(r1, "Başlangıç:", 12); self.f_from.pack(side=tk.LEFT, padx=6)
+        self.f_to = LabeledEntry(r1, "Bitiş:", 12); self.f_to.pack(side=tk.LEFT, padx=6)
+        self.f_q = LabeledEntry(r1, "Ara:", 22); self.f_q.pack(side=tk.LEFT, padx=6)
 
         ttk.Button(r1, text="Son 30 gün", command=self.last30).pack(side=tk.LEFT, padx=6)
         ttk.Button(r1, text="Yenile", command=self.refresh).pack(side=tk.LEFT, padx=6)
 
         ttk.Separator(top, orient="horizontal").pack(fill=tk.X, padx=6, pady=8)
-        r2 = ttk.Frame(top)
-        r2.pack(fill=tk.X, pady=6)
+        r2 = ttk.Frame(top); r2.pack(fill=tk.X, pady=6)
         self.btn_pdf = ttk.Button(r2, text="📄 PDF Ekstre", command=self.export_pdf)
         self.btn_pdf.pack(side=tk.LEFT, padx=6)
         if not HAS_REPORTLAB:

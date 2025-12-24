@@ -13,7 +13,7 @@ Not: Bu eklenti, mevcut DB fonksiyonlarını kullanır.
 from __future__ import annotations
 
 from datetime import date, datetime, timedelta
-from typing import Any, Dict, List, Optional, Tuple, TYPE_CHECKING
+from typing import Any, Dict, List, Optional, Tuple
 
 import tkinter as tk
 from tkinter import ttk, messagebox, filedialog
@@ -24,8 +24,6 @@ from ...core.fuzzy import best_substring_similarity, amount_score, combine_score
 from ..widgets import LabeledEntry, LabeledCombo
 from ..windows import ImportWizard, BankaWorkspaceWindow
 
-if TYPE_CHECKING:
-    from ...app import App
 
 PLUGIN_META = {
     "key": "maas_eklentileri",
@@ -454,17 +452,14 @@ class MaasEklentileriFrame(ttk.Frame):
             if existing_link or best_link[1] is None:
                 continue
 
-            score, bid_opt, name_sc, amt_sc, date_sc, mode = best_link
-            if bid_opt is None:
-                continue
-            bid = int(bid_opt)
+            score, bid, name_sc, amt_sc, date_sc, mode = best_link
             strong_by_name = (name_sc >= 0.90)
             strong_by_date_amt = (amt_sc >= 0.92 and date_sc >= 0.92)
             if score >= 0.92 and (score - second_link) >= 0.07 and (strong_by_name or strong_by_date_amt):
                 try:
                     note = "auto_name_scan" if mode == "name" else "auto_amt_date"
-                    self.app.db.maas_odeme_link_bank(oid, bid, score=float(score), note=note)  # type: ignore
-                    used_bank_ids.add(bid)
+                    self.app.db.maas_odeme_link_bank(oid, int(bid), score=float(score), note=note)  # type: ignore
+                    used_bank_ids.add(int(bid))
                     auto_linked += 1
                 except Exception:
                     pass

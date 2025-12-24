@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import sqlite3
 from datetime import date
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 from ...utils import parse_date_smart, safe_float
 
@@ -180,7 +180,7 @@ class FaturaRepo:
                 _norm(header.get('durum') or 'Taslak'),
                 _norm(header.get('fatura_no')),
                 _norm(header.get('seri')),
-                int(header.get('cari_id') or 0) if header.get('cari_id') is not None else None,
+                int(header.get('cari_id') or 0) if header.get('cari_id') else None,
                 _norm(header.get('cari_ad')),
                 _norm(header.get('cari_vkn')),
                 _norm(header.get('cari_vergi_dairesi')),
@@ -195,7 +195,7 @@ class FaturaRepo:
                 _norm(header.get('etiket')),
             ),
         )
-        fid = int(cur.lastrowid or 0)
+        fid = int(cur.lastrowid)
 
         self._replace_kalemler(cur, fid, kalemler)
 
@@ -218,7 +218,7 @@ class FaturaRepo:
                 _norm(header.get('durum') or 'Taslak'),
                 _norm(header.get('fatura_no')),
                 _norm(header.get('seri')),
-                int(header.get('cari_id') or 0) if header.get('cari_id') is not None else None,
+                int(header.get('cari_id') or 0) if header.get('cari_id') else None,
                 _norm(header.get('cari_ad')),
                 _norm(header.get('cari_vkn')),
                 _norm(header.get('cari_vergi_dairesi')),
@@ -304,12 +304,12 @@ class FaturaRepo:
                 _norm(odeme),
                 _norm(aciklama),
                 _norm(ref),
-                int(kasa_hareket_id) if kasa_hareket_id is not None else None,
-                int(banka_hareket_id) if banka_hareket_id is not None else None,
+                int(kasa_hareket_id) if kasa_hareket_id else None,
+                int(banka_hareket_id) if banka_hareket_id else None,
             ),
         )
         self.conn.commit()
-        return int(cur.lastrowid or 0)
+        return int(cur.lastrowid)
 
     def odeme_delete(self, odeme_id: int) -> None:
         self.conn.execute("DELETE FROM fatura_odeme WHERE id=?", (int(odeme_id),))

@@ -519,6 +519,7 @@ class App:
         # Not: Maaş Eklentileri artık Maaş Takibi içine taşındığı için menü/ekran olarak yüklenmez.
         self.ui_plugins = [p for p in discover_ui_plugins() if p.key != "maas_eklentileri"]
         self._plugin_titles = {p.key: p.page_title for p in self.ui_plugins}
+        plugin_by_key = {p.key: p for p in self.ui_plugins}
 
         # "Çalışanlar" gibi bazı ekranları, var olan bir plugin ekranının sekmesine yönlendirebiliriz.
         if not hasattr(self, "_nav_routes") or not isinstance(getattr(self, "_nav_routes", None), dict):
@@ -949,12 +950,9 @@ class App:
         ws = wb.create_sheet("Ozet")
         totals = self.db.kasa_toplam()
         ws["A1"] = "Kasa Özet"
-        ws["A3"] = "Gelir"
-        ws["B3"] = totals["gelir"]
-        ws["A4"] = "Gider"
-        ws["B4"] = totals["gider"]
-        ws["A5"] = "Net"
-        ws["B5"] = totals["net"]
+        ws["A3"] = "Gelir"; ws["B3"] = totals["gelir"]
+        ws["A4"] = "Gider"; ws["B4"] = totals["gider"]
+        ws["A5"] = "Net"; ws["B5"] = totals["net"]
 
         base = APP_BASE_DIR
         out = os.path.join(base, f"kasa_pro_export_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx")

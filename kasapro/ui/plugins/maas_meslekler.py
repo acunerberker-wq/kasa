@@ -12,7 +12,7 @@ Bu eklenti iki ekran sağlar:
 
 from __future__ import annotations
 
-from typing import Optional, TYPE_CHECKING
+from typing import Optional
 
 import tkinter as tk
 from tkinter import ttk, messagebox
@@ -20,8 +20,6 @@ from tkinter import ttk, messagebox
 from ...config import APP_TITLE
 from ..widgets import LabeledEntry, LabeledCombo
 
-if TYPE_CHECKING:
-    from ...app import App
 
 PLUGIN_META = {
     "key": "maas_meslekler",

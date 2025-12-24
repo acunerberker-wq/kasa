@@ -8,7 +8,7 @@ işlemlerini sağlar. Kayıt ekleme/düzenleme formu ayrı eklentiye ayrılmış
 from __future__ import annotations
 
 from datetime import date, timedelta
-from typing import List, Optional, TYPE_CHECKING
+from typing import List, Optional
 
 import tkinter as tk
 from tkinter import ttk, messagebox
@@ -17,8 +17,6 @@ from ...config import APP_TITLE
 from ...utils import fmt_tr_date, fmt_amount
 from ..widgets import LabeledEntry, LabeledCombo
 
-if TYPE_CHECKING:
-    from ...app import App
 
 PLUGIN_META = {
     "key": "cari_hareketler",
@@ -39,18 +37,13 @@ class CariHareketlerFrame(ttk.Frame):
         mid = ttk.LabelFrame(self, text="Liste / Filtre")
         mid.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
 
-        f = ttk.Frame(mid)
-        f.pack(fill=tk.X, pady=4)
+        f = ttk.Frame(mid); f.pack(fill=tk.X, pady=4)
         self.btn_multi = ttk.Button(f, text="Çoklu Seçim: Kapalı", command=self.toggle_multi)
         self.btn_multi.pack(side=tk.LEFT, padx=6)
-        self.f_cari = LabeledCombo(f, "Cari:", ["(Tümü)"], 26)
-        self.f_cari.pack(side=tk.LEFT, padx=6)
-        self.f_q = LabeledEntry(f, "Ara:", 20)
-        self.f_q.pack(side=tk.LEFT, padx=6)
-        self.f_from = LabeledEntry(f, "Başlangıç:", 12)
-        self.f_from.pack(side=tk.LEFT, padx=6)
-        self.f_to = LabeledEntry(f, "Bitiş:", 12)
-        self.f_to.pack(side=tk.LEFT, padx=6)
+        self.f_cari = LabeledCombo(f, "Cari:", ["(Tümü)"], 26); self.f_cari.pack(side=tk.LEFT, padx=6)
+        self.f_q = LabeledEntry(f, "Ara:", 20); self.f_q.pack(side=tk.LEFT, padx=6)
+        self.f_from = LabeledEntry(f, "Başlangıç:", 12); self.f_from.pack(side=tk.LEFT, padx=6)
+        self.f_to = LabeledEntry(f, "Bitiş:", 12); self.f_to.pack(side=tk.LEFT, padx=6)
         ttk.Button(f, text="Son 30 gün", command=self.last30).pack(side=tk.LEFT, padx=6)
         ttk.Button(f, text="Yenile", command=self.refresh).pack(side=tk.LEFT, padx=6)
 
@@ -73,8 +66,7 @@ class CariHareketlerFrame(ttk.Frame):
         self.tree.bind("<Button-1>", self._on_tree_click)
         self.tree.bind("<Double-1>", lambda _e: self.edit_selected())
 
-        btm = ttk.Frame(mid)
-        btm.pack(fill=tk.X, pady=(0, 6))
+        btm = ttk.Frame(mid); btm.pack(fill=tk.X, pady=(0, 6))
         self.btn_edit = ttk.Button(btm, text="Seçili Kaydı Düzenle", command=self.edit_selected)
         self.btn_edit.pack(side=tk.LEFT, padx=6)
         self.btn_del = ttk.Button(btm, text="Seçili Kaydı Sil", command=self.delete_selected)

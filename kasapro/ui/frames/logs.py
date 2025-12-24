@@ -3,24 +3,36 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+import os
+import re
+from datetime import datetime, timedelta
+from typing import Any, Optional, List, Dict, Tuple
+
 import tkinter as tk
-from tkinter import ttk, messagebox, filedialog
+from tkinter import ttk, messagebox, filedialog, simpledialog
 
-from ...config import APP_TITLE
-
-if TYPE_CHECKING:
-    from ...app import App
+from ...config import APP_TITLE, HAS_OPENPYXL, HAS_REPORTLAB
+from ...utils import (
+    center_window,
+    today_iso,
+    now_iso,
+    fmt_tr_date,
+    parse_date_smart,
+    parse_number_smart,
+    safe_float,
+    fmt_amount,
+)
+from ..widgets import SimpleField, LabeledEntry, LabeledCombo, MoneyEntry
+from ..windows import ImportWizard, CariEkstreWindow
 
 class LogsFrame(ttk.Frame):
-    def __init__(self, master, app: "App"):
+    def __init__(self, master, app:"App"):
         super().__init__(master)
         self.app = app
         self._build()
 
     def _build(self):
-        top = ttk.Frame(self)
-        top.pack(fill=tk.X, padx=10, pady=10)
+        top = ttk.Frame(self); top.pack(fill=tk.X, padx=10, pady=10)
         ttk.Button(top, text="Yenile", command=self.refresh).pack(side=tk.LEFT)
         ttk.Button(top, text="Logu TXT Dışa Aktar", command=self.export_txt).pack(side=tk.LEFT, padx=6)
         self.txt = tk.Text(self, height=25)
@@ -49,3 +61,4 @@ class LogsFrame(ttk.Frame):
 # =========================
 # KULLANICILAR (Admin)
 # =========================
+

@@ -13,7 +13,7 @@ Teknik:
 from __future__ import annotations
 
 from datetime import date, timedelta
-from typing import Optional, TYPE_CHECKING
+from typing import Optional
 
 import tkinter as tk
 from tkinter import ttk, messagebox
@@ -22,8 +22,6 @@ from ...config import APP_TITLE
 from ...utils import today_iso, fmt_tr_date, fmt_amount
 from ..widgets import LabeledEntry, LabeledCombo, MoneyEntry, SimpleField
 
-if TYPE_CHECKING:
-    from ...app import App
 
 PLUGIN_META = {
     "key": "diger_giderler",
@@ -259,9 +257,7 @@ class DigerGiderlerFrame(ttk.Frame):
         win = getattr(self, "_aciklama_win", None)
         try:
             if win is not None and win.winfo_exists():
-                win.deiconify()
-                win.lift()
-                win.focus_force()
+                win.deiconify(); win.lift(); win.focus_force()
                 return
         except Exception:
             pass
@@ -610,8 +606,7 @@ class DigerGiderlerFrame(ttk.Frame):
         # ay: YYYY-MM
         try:
             y, m = ay.split("-", 1)
-            y = int(y)
-            m = int(m)
+            y = int(y); m = int(m)
             d_from = date(y, m, 1)
             # sonraki ayın 1'i - 1 gün
             if m == 12:

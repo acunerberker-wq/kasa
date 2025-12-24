@@ -11,17 +11,12 @@ aynı sayfada sekmeler halinde gösterir.
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
 import tkinter as tk
 from tkinter import ttk
 
 from .raporlar import RaporlarFrame
 from .global_search import GlobalSearchFrame
 from .logs import LogsFrame
-
-if TYPE_CHECKING:
-    from ...app import App
 
 
 class RaporAraclarHubFrame(ttk.Frame):

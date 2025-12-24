@@ -15,7 +15,7 @@ from __future__ import annotations
 import difflib
 import re
 from dataclasses import dataclass
-from typing import Sequence
+from typing import Iterable, List, Optional, Sequence, Tuple
 
 
 _TR_MAP = str.maketrans(

@@ -15,7 +15,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 import re
-from typing import Callable, Dict, List, Optional, Sequence, Tuple
+from typing import Any, Callable, Dict, Iterable, List, Optional, Sequence, Tuple
 
 
 # ==========================================================
@@ -141,39 +141,13 @@ DEFAULT_TAG_RULES: List[Dict[str, object]] = [
 def _strip_sign_suffix(tag: str) -> str:
     return re.sub(r"\s*\([+-]\)\s*$", "", (tag or "").strip())
 
-def _as_int(value: object, default: int = 0) -> int:
-    if isinstance(value, bool):
-        return int(value)
-    if isinstance(value, int):
-        return value
-    if isinstance(value, float):
-        return int(value)
-    if isinstance(value, str):
-        try:
-            return int(value)
-        except Exception:
-            return default
-    return default
-
-def _as_float(value: object, default: float = 0.0) -> float:
-    if isinstance(value, bool):
-        return float(value)
-    if isinstance(value, (int, float)):
-        return float(value)
-    if isinstance(value, str):
-        try:
-            return float(value)
-        except Exception:
-            return default
-    return default
-
 def compile_tag_rules(rules: Sequence[Dict[str, object]]) -> List[Tuple[int, str, re.Pattern]]:
     compiled: List[Tuple[int, str, re.Pattern]] = []
     for r in (rules or []):
         try:
             tag = str(r.get('tag') or '').strip()
             pat = str(r.get('pattern') or '').strip()
-            pr = _as_int(r.get('priority'), 100)
+            pr = int(r.get('priority') or 100)
             if not tag or not pat:
                 continue
             rx = re.compile(pat, re.IGNORECASE)
@@ -249,7 +223,7 @@ def build_tag_suggestions(
         if progress_cb and (i % 50 == 0 or i == total - 1):
             progress_cb('Kurallar/Öğrenen', i + 1, total)
 
-        rid = _as_int(r.get('id'), 0)
+        rid = int(r.get('id') or 0)
         if rid == 0:
             continue
         tip = str(r.get('tip') or '')
@@ -488,7 +462,7 @@ def group_rows_by_description(
         if progress_cb and (idx % 50 == 0 or idx == len(rows) - 1):
             progress_cb(idx + 1, len(rows))
 
-        rid = _as_int(r.get("id"), 0)
+        rid = int(r.get("id") or 0)
         if rid == 0:
             continue
         tip = str(r.get("tip") or "")
@@ -631,7 +605,7 @@ def compute_bank_analysis(
 
     for r in rows:
         try:
-            rid = _as_int(r.get("id"), 0)
+            rid = int(r.get("id") or 0)
             if rid <= 0:
                 continue
         except Exception:
@@ -639,17 +613,13 @@ def compute_bank_analysis(
 
         tip = str(r.get("tip") or "")
         # tutar DB'de +, yön tip'te. UI'de formatlı gelebilir; float parse eden taraf çağırmalı.
-        raw_amt = r.get("tutar")
-        if isinstance(raw_amt, str):
+        try:
+            amt = float(r.get("tutar") or 0.0)
+        except Exception:
             try:
-                amt = float(raw_amt)
+                amt = float(str(r.get("tutar") or "").replace(".", "").replace(",", "."))
             except Exception:
-                try:
-                    amt = float(raw_amt.replace(".", "").replace(",", "."))
-                except Exception:
-                    amt = 0.0
-        else:
-            amt = _as_float(raw_amt, 0.0)
+                amt = 0.0
         amt = abs(amt)
         signed = amt if tip == "Giriş" else -amt
         pos = amt if signed > 0 else 0.0
