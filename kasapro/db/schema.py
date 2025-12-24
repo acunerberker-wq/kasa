@@ -185,6 +185,135 @@ def init_schema(conn: sqlite3.Connection) -> None:
     );"""
     )
 
+    c.execute(
+        """
+    CREATE TABLE IF NOT EXISTS series_counters(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        company_id INTEGER NOT NULL,
+        series TEXT NOT NULL,
+        year INTEGER NOT NULL,
+        last_no INTEGER NOT NULL DEFAULT 0,
+        padding INTEGER NOT NULL DEFAULT 6,
+        format TEXT DEFAULT '{series}-{year}-{no_pad}',
+        updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(company_id, series, year)
+    );"""
+    )
+
+    c.execute(
+        """
+    CREATE TABLE IF NOT EXISTS docs(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        company_id INTEGER NOT NULL,
+        doc_no TEXT NOT NULL,
+        series TEXT DEFAULT '',
+        year INTEGER NOT NULL,
+        doc_date TEXT NOT NULL,
+        due_date TEXT DEFAULT '',
+        doc_type TEXT NOT NULL,
+        status TEXT NOT NULL DEFAULT 'POSTED',
+        is_proforma INTEGER NOT NULL DEFAULT 0,
+        customer_id INTEGER,
+        customer_name TEXT DEFAULT '',
+        currency TEXT DEFAULT 'TL',
+        vat_included INTEGER NOT NULL DEFAULT 0,
+        invoice_discount_type TEXT DEFAULT 'amount',
+        invoice_discount_value REAL DEFAULT 0,
+        subtotal REAL DEFAULT 0,
+        discount_total REAL DEFAULT 0,
+        vat_total REAL DEFAULT 0,
+        grand_total REAL DEFAULT 0,
+        notes TEXT DEFAULT '',
+        warehouse_id INTEGER,
+        created_by INTEGER,
+        created_by_name TEXT DEFAULT '',
+        reversed_doc_id INTEGER,
+        voided_at TEXT DEFAULT '',
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(company_id, doc_no)
+    );"""
+    )
+
+    c.execute(
+        """
+    CREATE TABLE IF NOT EXISTS doc_lines(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        doc_id INTEGER NOT NULL,
+        line_no INTEGER NOT NULL DEFAULT 1,
+        item_id INTEGER,
+        description TEXT DEFAULT '',
+        qty REAL DEFAULT 0,
+        unit TEXT DEFAULT '',
+        unit_price REAL DEFAULT 0,
+        vat_rate REAL DEFAULT 0,
+        line_discount_type TEXT DEFAULT 'amount',
+        line_discount_value REAL DEFAULT 0,
+        line_subtotal REAL DEFAULT 0,
+        line_discount REAL DEFAULT 0,
+        line_vat REAL DEFAULT 0,
+        line_total REAL DEFAULT 0,
+        FOREIGN KEY(doc_id) REFERENCES docs(id) ON DELETE CASCADE
+    );"""
+    )
+
+    c.execute(
+        """
+    CREATE TABLE IF NOT EXISTS payments(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        doc_id INTEGER NOT NULL,
+        pay_date TEXT NOT NULL,
+        amount REAL NOT NULL DEFAULT 0,
+        currency TEXT DEFAULT 'TL',
+        method TEXT DEFAULT '',
+        description TEXT DEFAULT '',
+        ref TEXT DEFAULT '',
+        kasa_hareket_id INTEGER,
+        banka_hareket_id INTEGER,
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY(doc_id) REFERENCES docs(id) ON DELETE CASCADE
+    );"""
+    )
+
+    c.execute(
+        """
+    CREATE TABLE IF NOT EXISTS stock_moves(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        company_id INTEGER NOT NULL,
+        doc_id INTEGER NOT NULL,
+        doc_line_id INTEGER,
+        item_id INTEGER,
+        warehouse_id INTEGER,
+        move_date TEXT NOT NULL,
+        direction TEXT NOT NULL,
+        qty REAL NOT NULL DEFAULT 0,
+        unit TEXT DEFAULT '',
+        description TEXT DEFAULT '',
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY(doc_id) REFERENCES docs(id) ON DELETE CASCADE
+    );"""
+    )
+
+    c.execute(
+        """
+    CREATE TABLE IF NOT EXISTS audit_log(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        company_id INTEGER NOT NULL,
+        user_id INTEGER,
+        username TEXT DEFAULT '',
+        action TEXT NOT NULL,
+        entity TEXT NOT NULL,
+        entity_id INTEGER,
+        message TEXT DEFAULT '',
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    );"""
+    )
+
+    c.execute("CREATE INDEX IF NOT EXISTS idx_docs_company_docno ON docs(company_id, doc_no)")
+    c.execute("CREATE INDEX IF NOT EXISTS idx_docs_company_date ON docs(company_id, doc_date)")
+    c.execute("CREATE INDEX IF NOT EXISTS idx_docs_customer ON docs(customer_id)")
+    c.execute("CREATE INDEX IF NOT EXISTS idx_docs_status ON docs(status)")
+
     # -----------------
     # Satış Siparişleri
     # -----------------
@@ -456,6 +585,166 @@ def init_schema(conn: sqlite3.Connection) -> None:
         FOREIGN KEY(is_id) REFERENCES nakliye_is(id) ON DELETE CASCADE
     );""")
 
+    # -----------------
+    # Ticari Modül (Gelişmiş Alış/Satış)
+    # -----------------
+    c.execute(
+        """
+    CREATE TABLE IF NOT EXISTS trade_docs(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        company_id INTEGER NOT NULL DEFAULT 0,
+        doc_type TEXT NOT NULL,
+        doc_no TEXT NOT NULL,
+        doc_date TEXT NOT NULL,
+        status TEXT NOT NULL DEFAULT 'posted',
+        cari_id INTEGER,
+        cari_name TEXT DEFAULT '',
+        currency TEXT DEFAULT 'TL',
+        subtotal REAL DEFAULT 0,
+        tax_total REAL DEFAULT 0,
+        discount_total REAL DEFAULT 0,
+        total REAL DEFAULT 0,
+        notes TEXT DEFAULT '',
+        related_doc_id INTEGER,
+        order_id INTEGER,
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(company_id, doc_no)
+    );"""
+    )
+
+    c.execute(
+        """
+    CREATE TABLE IF NOT EXISTS trade_doc_lines(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        doc_id INTEGER NOT NULL,
+        item TEXT DEFAULT '',
+        description TEXT DEFAULT '',
+        qty REAL DEFAULT 0,
+        unit TEXT DEFAULT 'Adet',
+        unit_price REAL DEFAULT 0,
+        tax_rate REAL DEFAULT 0,
+        line_total REAL DEFAULT 0,
+        tax_total REAL DEFAULT 0,
+        FOREIGN KEY(doc_id) REFERENCES trade_docs(id) ON DELETE CASCADE
+    );"""
+    )
+
+    c.execute(
+        """
+    CREATE TABLE IF NOT EXISTS trade_warehouses(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        company_id INTEGER NOT NULL DEFAULT 0,
+        name TEXT NOT NULL,
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(company_id, name)
+    );"""
+    )
+
+    c.execute(
+        """
+    CREATE TABLE IF NOT EXISTS trade_stock_moves(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        company_id INTEGER NOT NULL DEFAULT 0,
+        doc_id INTEGER,
+        line_id INTEGER,
+        item TEXT NOT NULL,
+        qty REAL NOT NULL,
+        unit TEXT DEFAULT 'Adet',
+        direction TEXT NOT NULL,
+        warehouse_id INTEGER,
+        move_type TEXT DEFAULT '',
+        note TEXT DEFAULT '',
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY(doc_id) REFERENCES trade_docs(id) ON DELETE SET NULL,
+        FOREIGN KEY(warehouse_id) REFERENCES trade_warehouses(id) ON DELETE SET NULL
+    );"""
+    )
+
+    c.execute(
+        """
+    CREATE TABLE IF NOT EXISTS trade_payments(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        company_id INTEGER NOT NULL DEFAULT 0,
+        doc_id INTEGER,
+        pay_date TEXT NOT NULL,
+        direction TEXT NOT NULL,
+        amount REAL NOT NULL,
+        currency TEXT DEFAULT 'TL',
+        method TEXT DEFAULT '',
+        reference TEXT DEFAULT '',
+        kasa_hareket_id INTEGER,
+        banka_hareket_id INTEGER,
+        notes TEXT DEFAULT '',
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY(doc_id) REFERENCES trade_docs(id) ON DELETE SET NULL,
+        FOREIGN KEY(kasa_hareket_id) REFERENCES kasa_hareket(id) ON DELETE SET NULL,
+        FOREIGN KEY(banka_hareket_id) REFERENCES banka_hareket(id) ON DELETE SET NULL
+    );"""
+    )
+
+    c.execute(
+        """
+    CREATE TABLE IF NOT EXISTS trade_audit_log(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        company_id INTEGER NOT NULL DEFAULT 0,
+        user_id INTEGER,
+        username TEXT DEFAULT '',
+        action TEXT NOT NULL,
+        entity TEXT NOT NULL,
+        entity_id INTEGER,
+        detail TEXT DEFAULT '',
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    );"""
+    )
+
+    c.execute(
+        """
+    CREATE TABLE IF NOT EXISTS trade_user_roles(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        company_id INTEGER NOT NULL DEFAULT 0,
+        user_id INTEGER NOT NULL,
+        username TEXT DEFAULT '',
+        role TEXT NOT NULL DEFAULT 'read-only',
+        UNIQUE(company_id, user_id)
+    );"""
+    )
+
+    c.execute(
+        """
+    CREATE TABLE IF NOT EXISTS trade_orders(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        company_id INTEGER NOT NULL DEFAULT 0,
+        order_type TEXT NOT NULL,
+        order_no TEXT NOT NULL,
+        order_date TEXT NOT NULL,
+        status TEXT NOT NULL DEFAULT 'Açık',
+        cari_id INTEGER,
+        cari_name TEXT DEFAULT '',
+        currency TEXT DEFAULT 'TL',
+        total REAL DEFAULT 0,
+        notes TEXT DEFAULT '',
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(company_id, order_no)
+    );"""
+    )
+
+    c.execute(
+        """
+    CREATE TABLE IF NOT EXISTS trade_order_lines(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        order_id INTEGER NOT NULL,
+        item TEXT DEFAULT '',
+        qty REAL DEFAULT 0,
+        fulfilled_qty REAL DEFAULT 0,
+        unit TEXT DEFAULT 'Adet',
+        unit_price REAL DEFAULT 0,
+        line_total REAL DEFAULT 0,
+        FOREIGN KEY(order_id) REFERENCES trade_orders(id) ON DELETE CASCADE
+    );"""
+    )
+
     conn.commit()
 
 
@@ -719,6 +1008,135 @@ def migrate_schema(conn: sqlite3.Connection, log_fn: Optional[Callable[[str, str
     # Maaş çalışan: meslek alanı
     _ensure_column(conn, "maas_calisan", "meslek_id", "INTEGER", log_fn)
 
+    # -----------------
+    # Advanced Invoice Module
+    # -----------------
+    try:
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS series_counters(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                company_id INTEGER NOT NULL,
+                series TEXT NOT NULL,
+                year INTEGER NOT NULL,
+                last_no INTEGER NOT NULL DEFAULT 0,
+                padding INTEGER NOT NULL DEFAULT 6,
+                format TEXT DEFAULT '{series}-{year}-{no_pad}',
+                updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                UNIQUE(company_id, series, year)
+            );"""
+        )
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS docs(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                company_id INTEGER NOT NULL,
+                doc_no TEXT NOT NULL,
+                series TEXT DEFAULT '',
+                year INTEGER NOT NULL,
+                doc_date TEXT NOT NULL,
+                due_date TEXT DEFAULT '',
+                doc_type TEXT NOT NULL,
+                status TEXT NOT NULL DEFAULT 'POSTED',
+                is_proforma INTEGER NOT NULL DEFAULT 0,
+                customer_id INTEGER,
+                customer_name TEXT DEFAULT '',
+                currency TEXT DEFAULT 'TL',
+                vat_included INTEGER NOT NULL DEFAULT 0,
+                invoice_discount_type TEXT DEFAULT 'amount',
+                invoice_discount_value REAL DEFAULT 0,
+                subtotal REAL DEFAULT 0,
+                discount_total REAL DEFAULT 0,
+                vat_total REAL DEFAULT 0,
+                grand_total REAL DEFAULT 0,
+                notes TEXT DEFAULT '',
+                warehouse_id INTEGER,
+                created_by INTEGER,
+                created_by_name TEXT DEFAULT '',
+                reversed_doc_id INTEGER,
+                voided_at TEXT DEFAULT '',
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                UNIQUE(company_id, doc_no)
+            );"""
+        )
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS doc_lines(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                doc_id INTEGER NOT NULL,
+                line_no INTEGER NOT NULL DEFAULT 1,
+                item_id INTEGER,
+                description TEXT DEFAULT '',
+                qty REAL DEFAULT 0,
+                unit TEXT DEFAULT '',
+                unit_price REAL DEFAULT 0,
+                vat_rate REAL DEFAULT 0,
+                line_discount_type TEXT DEFAULT 'amount',
+                line_discount_value REAL DEFAULT 0,
+                line_subtotal REAL DEFAULT 0,
+                line_discount REAL DEFAULT 0,
+                line_vat REAL DEFAULT 0,
+                line_total REAL DEFAULT 0,
+                FOREIGN KEY(doc_id) REFERENCES docs(id) ON DELETE CASCADE
+            );"""
+        )
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS payments(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                doc_id INTEGER NOT NULL,
+                pay_date TEXT NOT NULL,
+                amount REAL NOT NULL DEFAULT 0,
+                currency TEXT DEFAULT 'TL',
+                method TEXT DEFAULT '',
+                description TEXT DEFAULT '',
+                ref TEXT DEFAULT '',
+                kasa_hareket_id INTEGER,
+                banka_hareket_id INTEGER,
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY(doc_id) REFERENCES docs(id) ON DELETE CASCADE
+            );"""
+        )
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS stock_moves(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                company_id INTEGER NOT NULL,
+                doc_id INTEGER NOT NULL,
+                doc_line_id INTEGER,
+                item_id INTEGER,
+                warehouse_id INTEGER,
+                move_date TEXT NOT NULL,
+                direction TEXT NOT NULL,
+                qty REAL NOT NULL DEFAULT 0,
+                unit TEXT DEFAULT '',
+                description TEXT DEFAULT '',
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY(doc_id) REFERENCES docs(id) ON DELETE CASCADE
+            );"""
+        )
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS audit_log(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                company_id INTEGER NOT NULL,
+                user_id INTEGER,
+                username TEXT DEFAULT '',
+                action TEXT NOT NULL,
+                entity TEXT NOT NULL,
+                entity_id INTEGER,
+                message TEXT DEFAULT '',
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+            );"""
+        )
+        conn.commit()
+    except Exception as e:
+        if log_fn:
+            try:
+                log_fn("Schema Migration Error", f"advanced invoice tables: {e}")
+            except Exception:
+                pass
+
+    _ensure_index(conn, "idx_docs_company_docno", "docs", "company_id, doc_no", log_fn)
+    _ensure_index(conn, "idx_docs_company_date", "docs", "company_id, doc_date", log_fn)
+    _ensure_index(conn, "idx_docs_customer", "docs", "customer_id", log_fn)
+    _ensure_index(conn, "idx_docs_status", "docs", "status", log_fn)
+
     # users (eski DB'ler için kolon garantisi)
     _ensure_column(conn, "users", "role", "TEXT NOT NULL DEFAULT 'user'", log_fn)
     _ensure_column(conn, "users", "created_at", "TEXT DEFAULT ''", log_fn)
@@ -834,6 +1252,13 @@ def migrate_schema(conn: sqlite3.Connection, log_fn: Optional[Callable[[str, str
     _ensure_index(conn, "idx_stok_hareket_urun_id", "stok_hareket", "urun_id", log_fn)
     _ensure_index(conn, "idx_stok_hareket_tarih", "stok_hareket", "tarih", log_fn)
     _ensure_index(conn, "idx_kasa_hareket_tip_tarih", "kasa_hareket", "tip, tarih", log_fn)
+    _ensure_index(conn, "idx_trade_docs_company_type_date", "trade_docs", "company_id, doc_type, doc_date", log_fn)
+    _ensure_index(conn, "idx_trade_docs_status", "trade_docs", "status", log_fn)
+    _ensure_index(conn, "idx_trade_doc_lines_doc", "trade_doc_lines", "doc_id", log_fn)
+    _ensure_index(conn, "idx_trade_stock_moves_company_item", "trade_stock_moves", "company_id, item", log_fn)
+    _ensure_index(conn, "idx_trade_payments_doc", "trade_payments", "doc_id", log_fn)
+    _ensure_index(conn, "idx_trade_orders_company_status", "trade_orders", "company_id, status", log_fn)
+    _ensure_index(conn, "idx_trade_audit_company_time", "trade_audit_log", "company_id, created_at", log_fn)
 
 
 def seed_defaults(conn: sqlite3.Connection, log_fn: Optional[Callable[[str, str], None]] = None) -> None:
