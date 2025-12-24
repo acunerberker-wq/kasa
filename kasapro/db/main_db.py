@@ -24,6 +24,14 @@ from .repos import (
     FaturaRepo,
     StokRepo,
     NakliyeRepo,
+<<<<<<< ours
+<<<<<<< ours
+    PurchaseReportRepo,
+=======
+    MessagesRepo,
+>>>>>>> theirs
+=======
+>>>>>>> theirs
 )
 
 
@@ -48,6 +56,14 @@ class DB:
         self.fatura = FaturaRepo(self.conn)
         self.stok = StokRepo(self.conn)
         self.nakliye = NakliyeRepo(self.conn)
+<<<<<<< ours
+<<<<<<< ours
+        self.purchase_reports = PurchaseReportRepo(self.conn)
+=======
+        self.messages = MessagesRepo(self.conn)
+>>>>>>> theirs
+=======
+>>>>>>> theirs
 
         migrate_schema(self.conn, log_fn=self._safe_log)
         seed_defaults(self.conn, log_fn=self._safe_log)
@@ -358,6 +374,27 @@ class DB:
 
     def stok_hareket_delete(self, hid: int) -> None:
         return self.stok.hareket_delete(hid)
+
+    # -----------------
+    # Satın Alma Raporları
+    # -----------------
+    def purchase_report_suppliers(self):
+        return self.purchase_reports.list_suppliers()
+
+    def purchase_report_products(self) -> List[str]:
+        return self.purchase_reports.list_products()
+
+    def purchase_report_categories(self) -> List[str]:
+        return self.purchase_reports.list_categories()
+
+    def purchase_report_locations(self):
+        return self.purchase_reports.list_locations()
+
+    def purchase_report_users(self):
+        return self.purchase_reports.list_users()
+
+    def purchase_report_fetch(self, **kwargs):
+        return self.purchase_reports.fetch_report(**kwargs)
 
     # -----------------
     # Banka

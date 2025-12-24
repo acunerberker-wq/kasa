@@ -700,9 +700,22 @@ def migrate_schema(conn: sqlite3.Connection, log_fn: Optional[Callable[[str, str
     _ensure_index(conn, "idx_banka_hareket_tarih", "banka_hareket", "tarih", log_fn)
     _ensure_index(conn, "idx_banka_hareket_import_grup", "banka_hareket", "import_grup", log_fn)
     _ensure_index(conn, "idx_fatura_cari_tarih", "fatura", "cari_id, tarih", log_fn)
+    _ensure_index(conn, "idx_fatura_tur_tarih", "fatura", "tur, tarih", log_fn)
     _ensure_index(conn, "idx_fatura_kalem_fatura_id", "fatura_kalem", "fatura_id", log_fn)
+    _ensure_index(conn, "idx_fatura_kalem_urun", "fatura_kalem", "urun", log_fn)
     _ensure_index(conn, "idx_fatura_odeme_fatura_id", "fatura_odeme", "fatura_id", log_fn)
+    _ensure_index(conn, "idx_fatura_odeme_tarih", "fatura_odeme", "tarih", log_fn)
     _ensure_index(conn, "idx_stok_hareket_urun_id", "stok_hareket", "urun_id", log_fn)
+<<<<<<< ours
+<<<<<<< ours
+    _ensure_index(conn, "idx_stok_hareket_tarih", "stok_hareket", "tarih", log_fn)
+    _ensure_index(conn, "idx_kasa_hareket_tip_tarih", "kasa_hareket", "tip, tarih", log_fn)
+=======
+    _ensure_index(conn, "idx_messages_created_at", "messages", "created_at", log_fn)
+    _ensure_index(conn, "idx_message_recipients_recipient_created", "message_recipients", "recipient_id, created_at", log_fn)
+>>>>>>> theirs
+=======
+>>>>>>> theirs
 
 
 def seed_defaults(conn: sqlite3.Connection, log_fn: Optional[Callable[[str, str], None]] = None) -> None:
