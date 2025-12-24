@@ -17,6 +17,7 @@ from .satis_siparis_repo import SatisSiparisRepo
 from .satin_alma_repo import SatinAlmaRepo
 from .messages_repo import MessagesRepo
 from .purchase_report_repo import PurchaseReportRepo
+from .purchase_report_repo import PurchaseReportRepo
 
 __all__ = [
     "LogsRepo",
@@ -31,4 +32,5 @@ __all__ = [
     "FaturaRepo",
     "StokRepo",
     "NakliyeRepo",
+    "PurchaseReportRepo",
 ]
