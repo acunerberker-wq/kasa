@@ -589,8 +589,7 @@ def migrate_schema(conn: sqlite3.Connection, log_fn: Optional[Callable[[str, str
     _ensure_column(conn, "kasa_hareket", "etiket", "TEXT DEFAULT ''", log_fn)
 
     # -----------------
-<<<<<<< ours
-    # Stok Yönetimi (eski DB'ler için)
+    # Stok Y?netimi (eski DB'ler i?in)
     # -----------------
     try:
         conn.execute(
@@ -647,8 +646,48 @@ def migrate_schema(conn: sqlite3.Connection, log_fn: Optional[Callable[[str, str
                 maliyet REAL DEFAULT 0,
                 aciklama TEXT DEFAULT '',
                 created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
-=======
-    # Nakliye Sistemi (eski DB'ler için)
+            );"""
+        )
+        conn.commit()
+    except Exception as e:
+        if log_fn:
+            try:
+                log_fn("Schema Migration Error", f"stok tables: {e}")
+            except Exception:
+                pass
+
+    _ensure_column(conn, "stok_urun", "kategori", "TEXT DEFAULT ''", log_fn)
+    _ensure_column(conn, "stok_urun", "birim", "TEXT DEFAULT 'Adet'", log_fn)
+    _ensure_column(conn, "stok_urun", "min_stok", "REAL DEFAULT 0", log_fn)
+    _ensure_column(conn, "stok_urun", "max_stok", "REAL DEFAULT 0", log_fn)
+    _ensure_column(conn, "stok_urun", "kritik_stok", "REAL DEFAULT 0", log_fn)
+    _ensure_column(conn, "stok_urun", "raf", "TEXT DEFAULT ''", log_fn)
+    _ensure_column(conn, "stok_urun", "tedarikci_id", "INTEGER", log_fn)
+    _ensure_column(conn, "stok_urun", "barkod", "TEXT DEFAULT ''", log_fn)
+    _ensure_column(conn, "stok_urun", "aktif", "INTEGER NOT NULL DEFAULT 1", log_fn)
+    _ensure_column(conn, "stok_urun", "aciklama", "TEXT DEFAULT ''", log_fn)
+    _ensure_column(conn, "stok_urun", "created_at", "TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP", log_fn)
+    _ensure_column(conn, "stok_urun", "updated_at", "TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP", log_fn)
+
+    _ensure_column(conn, "stok_lokasyon", "aciklama", "TEXT DEFAULT ''", log_fn)
+    _ensure_column(conn, "stok_lokasyon", "aktif", "INTEGER NOT NULL DEFAULT 1", log_fn)
+
+    _ensure_column(conn, "stok_parti", "skt", "TEXT DEFAULT ''", log_fn)
+    _ensure_column(conn, "stok_parti", "uretim_tarih", "TEXT DEFAULT ''", log_fn)
+    _ensure_column(conn, "stok_parti", "aciklama", "TEXT DEFAULT ''", log_fn)
+
+    _ensure_column(conn, "stok_hareket", "birim", "TEXT DEFAULT 'Adet'", log_fn)
+    _ensure_column(conn, "stok_hareket", "kaynak_lokasyon_id", "INTEGER", log_fn)
+    _ensure_column(conn, "stok_hareket", "hedef_lokasyon_id", "INTEGER", log_fn)
+    _ensure_column(conn, "stok_hareket", "parti_id", "INTEGER", log_fn)
+    _ensure_column(conn, "stok_hareket", "referans_tipi", "TEXT DEFAULT ''", log_fn)
+    _ensure_column(conn, "stok_hareket", "referans_id", "INTEGER", log_fn)
+    _ensure_column(conn, "stok_hareket", "maliyet", "REAL DEFAULT 0", log_fn)
+    _ensure_column(conn, "stok_hareket", "aciklama", "TEXT DEFAULT ''", log_fn)
+    _ensure_column(conn, "stok_hareket", "created_at", "TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP", log_fn)
+
+    # -----------------
+    # Nakliye Sistemi (eski DB'ler i?in)
     # -----------------
     try:
         conn.execute(
@@ -704,7 +743,7 @@ def migrate_schema(conn: sqlite3.Connection, log_fn: Optional[Callable[[str, str
                 cikis TEXT DEFAULT '',
                 varis TEXT DEFAULT '',
                 yuk TEXT DEFAULT '',
-                durum TEXT DEFAULT 'Planlandı',
+                durum TEXT DEFAULT 'Planland?',
                 ucret REAL DEFAULT 0,
                 para TEXT DEFAULT 'TL',
                 notlar TEXT DEFAULT '',
@@ -724,54 +763,15 @@ def migrate_schema(conn: sqlite3.Connection, log_fn: Optional[Callable[[str, str
                 tip TEXT NOT NULL,
                 aciklama TEXT DEFAULT '',
                 FOREIGN KEY(is_id) REFERENCES nakliye_is(id) ON DELETE CASCADE
->>>>>>> theirs
             );"""
         )
         conn.commit()
     except Exception as e:
         if log_fn:
             try:
-<<<<<<< ours
-                log_fn("Schema Migration Error", f"stok tables: {e}")
-            except Exception:
-                pass
-
-    _ensure_column(conn, "stok_urun", "kategori", "TEXT DEFAULT ''", log_fn)
-    _ensure_column(conn, "stok_urun", "birim", "TEXT DEFAULT 'Adet'", log_fn)
-    _ensure_column(conn, "stok_urun", "min_stok", "REAL DEFAULT 0", log_fn)
-    _ensure_column(conn, "stok_urun", "max_stok", "REAL DEFAULT 0", log_fn)
-    _ensure_column(conn, "stok_urun", "kritik_stok", "REAL DEFAULT 0", log_fn)
-    _ensure_column(conn, "stok_urun", "raf", "TEXT DEFAULT ''", log_fn)
-    _ensure_column(conn, "stok_urun", "tedarikci_id", "INTEGER", log_fn)
-    _ensure_column(conn, "stok_urun", "barkod", "TEXT DEFAULT ''", log_fn)
-    _ensure_column(conn, "stok_urun", "aktif", "INTEGER NOT NULL DEFAULT 1", log_fn)
-    _ensure_column(conn, "stok_urun", "aciklama", "TEXT DEFAULT ''", log_fn)
-    _ensure_column(conn, "stok_urun", "created_at", "TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP", log_fn)
-    _ensure_column(conn, "stok_urun", "updated_at", "TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP", log_fn)
-
-    _ensure_column(conn, "stok_lokasyon", "aciklama", "TEXT DEFAULT ''", log_fn)
-    _ensure_column(conn, "stok_lokasyon", "aktif", "INTEGER NOT NULL DEFAULT 1", log_fn)
-
-    _ensure_column(conn, "stok_parti", "skt", "TEXT DEFAULT ''", log_fn)
-    _ensure_column(conn, "stok_parti", "uretim_tarih", "TEXT DEFAULT ''", log_fn)
-    _ensure_column(conn, "stok_parti", "aciklama", "TEXT DEFAULT ''", log_fn)
-
-    _ensure_column(conn, "stok_hareket", "birim", "TEXT DEFAULT 'Adet'", log_fn)
-    _ensure_column(conn, "stok_hareket", "kaynak_lokasyon_id", "INTEGER", log_fn)
-    _ensure_column(conn, "stok_hareket", "hedef_lokasyon_id", "INTEGER", log_fn)
-    _ensure_column(conn, "stok_hareket", "parti_id", "INTEGER", log_fn)
-    _ensure_column(conn, "stok_hareket", "referans_tipi", "TEXT DEFAULT ''", log_fn)
-    _ensure_column(conn, "stok_hareket", "referans_id", "INTEGER", log_fn)
-    _ensure_column(conn, "stok_hareket", "maliyet", "REAL DEFAULT 0", log_fn)
-    _ensure_column(conn, "stok_hareket", "aciklama", "TEXT DEFAULT ''", log_fn)
-    _ensure_column(conn, "stok_hareket", "created_at", "TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP", log_fn)
-
-=======
                 log_fn("Schema Migration Error", f"nakliye tables: {e}")
             except Exception:
                 pass
-
->>>>>>> theirs
 
 def seed_defaults(conn: sqlite3.Connection, log_fn: Optional[Callable[[str, str], None]] = None) -> None:
     """DB ilk kurulum: kullanıcı + settings seed."""
