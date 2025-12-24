@@ -13,14 +13,13 @@ Not:
 
 from __future__ import annotations
 
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple, TYPE_CHECKING
 
 import json
 import threading
 import queue
 
 import os
-import tempfile
 import time
 import subprocess
 import sys
@@ -34,6 +33,8 @@ from ...core.banka_macros import build_tag_suggestions, DEFAULT_TAG_RULES
 from ...core.fuzzy import best_substring_similarity, amount_score, combine_scores
 from .banka_analysis import BankaAnalizWindow
 
+if TYPE_CHECKING:
+    from ...app import App
 
 _COLS: Tuple[str, ...] = (
     "id",
@@ -433,7 +434,9 @@ class BankaWorkspaceWindow(tk.Toplevel):
     def _window_is_active(self) -> bool:
         try:
             w = self.focus_get()
-            return bool(w) and (w.winfo_toplevel() == self)
+            if w is None:
+                return False
+            return w.winfo_toplevel() == self
         except Exception:
             return False
 
@@ -1277,8 +1280,6 @@ class BankaWorkspaceWindow(tk.Toplevel):
         threading.Thread(target=worker, daemon=True).start()
 
         updated = 0
-        state = {"phase": "calc"}
-
         def apply_tags(tag_map: Dict[int, str], group_count: int):
             nonlocal updated
             items = list(tag_map.items())

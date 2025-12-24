@@ -12,12 +12,15 @@ Not:
 
 from __future__ import annotations
 
-from typing import Optional
+from typing import Optional, TYPE_CHECKING
 
 import tkinter as tk
 from tkinter import ttk
 
 from .cariler import CarilerFrame
+
+if TYPE_CHECKING:
+    from ...app import App
 
 
 def _find_first_notebook(root: tk.Misc) -> Optional[ttk.Notebook]:

@@ -22,17 +22,8 @@ from .repos import (
     MaasRepo,
     BankaRepo,
     FaturaRepo,
-<<<<<<< ours
-<<<<<<< ours
-<<<<<<< ours
-=======
     StokRepo,
->>>>>>> theirs
     NakliyeRepo,
-=======
->>>>>>> theirs
-=======
->>>>>>> theirs
 )
 
 
@@ -55,17 +46,8 @@ class DB:
         self.maas = MaasRepo(self.conn)
         self.banka = BankaRepo(self.conn)
         self.fatura = FaturaRepo(self.conn)
-<<<<<<< ours
-<<<<<<< ours
-<<<<<<< ours
-=======
         self.stok = StokRepo(self.conn)
->>>>>>> theirs
         self.nakliye = NakliyeRepo(self.conn)
-=======
->>>>>>> theirs
-=======
->>>>>>> theirs
 
         migrate_schema(self.conn, log_fn=self._safe_log)
         seed_defaults(self.conn, log_fn=self._safe_log)

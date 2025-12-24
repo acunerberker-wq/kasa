@@ -11,7 +11,7 @@ analize yansır.
 
 from __future__ import annotations
 
-from typing import Dict, List, Sequence
+from typing import Dict, List, Sequence, TYPE_CHECKING
 
 import tkinter as tk
 from tkinter import ttk, messagebox, filedialog
@@ -20,6 +20,8 @@ from ...config import APP_TITLE, HAS_OPENPYXL
 from ...utils import fmt_amount, center_window
 from ...core.banka_macros import SummaryRow, compute_bank_analysis
 
+if TYPE_CHECKING:
+    from ...app import App
 
 class BankaAnalizWindow(tk.Toplevel):
     def __init__(self, app: "App", rows: Sequence[Dict[str, object]], *, title_suffix: str = ""):
@@ -129,12 +131,13 @@ class BankaAnalizWindow(tk.Toplevel):
         box.rowconfigure(0, weight=1)
 
         for c in cols:
-            tree.heading(c, text=str(c).upper())
+            col = str(c)
+            tree.heading(col, text=col.upper())
             w = int(widths.get(c, 140))
-            anchor = "e" if c in ("pos", "neg", "net", "avg", "max_pos", "min_neg") else "w"
-            if c in ("count",):
+            anchor = "e" if col in ("pos", "neg", "net", "avg", "max_pos", "min_neg") else "w"
+            if col in ("count",):
                 anchor = "center"
-            tree.column(c, width=w, anchor=anchor)
+            tree.column(col, width=w, anchor=anchor)  # type: ignore[call-overload]
         return tree
 
     # -----------------

@@ -5,7 +5,7 @@ from __future__ import annotations
 import sqlite3
 from typing import Any, List, Optional
 
-from ...utils import parse_date_smart, safe_float
+from ...utils import parse_date_smart
 
 
 class MaasRepo:
@@ -47,10 +47,10 @@ class MaasRepo:
     ) -> int:
         cur = self.conn.execute(
             "INSERT INTO maas_calisan(ad,aylik_tutar,para,meslek_id,aktif,notlar) VALUES(?,?,?,?,?,?)",
-            (str(ad).strip(), float(aylik_tutar), para or "TL", int(meslek_id) if meslek_id else None, int(aktif), notlar or ""),
+            (str(ad).strip(), float(aylik_tutar), para or "TL", int(meslek_id) if meslek_id is not None else None, int(aktif), notlar or ""),
         )
         self.conn.commit()
-        return int(cur.lastrowid)
+        return int(cur.lastrowid or 0)
 
     def calisan_get_by_name(self, ad: str) -> Optional[sqlite3.Row]:
         ad = (ad or "").strip()
@@ -84,7 +84,7 @@ class MaasRepo:
                 str(ad).strip(),
                 float(aylik_tutar),
                 para or "TL",
-                int(meslek_id) if meslek_id else None,
+                int(meslek_id) if meslek_id is not None else None,
                 int(aktif),
                 notlar or "",
                 int(cid),
@@ -119,7 +119,7 @@ class MaasRepo:
             (str(ad).strip(), int(aktif), notlar or ""),
         )
         self.conn.commit()
-        return int(cur.lastrowid)
+        return int(cur.lastrowid or 0)
 
     def meslek_update(self, mid: int, ad: str, aktif: int = 1, notlar: str = "") -> None:
         self.conn.execute(

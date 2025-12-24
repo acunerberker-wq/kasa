@@ -11,10 +11,10 @@ import re
 import hashlib
 import secrets
 from datetime import datetime, date, timedelta
-from typing import Any, Optional, List, Dict, Tuple, TYPE_CHECKING
+from typing import Any, Optional, TYPE_CHECKING
 
 if TYPE_CHECKING:  # pragma: no cover
-    import tkinter as tk
+    pass
 
 def today_iso() -> str:
     return date.today().isoformat()
@@ -127,7 +127,6 @@ def parse_number_smart(v: Any) -> float:
             s = s[1:-1].strip()
 
         mult = 1.0
-        sl = s.lower()
 
         # Para birimleri / semboller (yoksay)
         s = re.sub(r"(?i)\b(tl|try|usd|eur)\b", "", s)
@@ -332,7 +331,6 @@ def ensure_pdf_fonts():
     if cached:
         return cached
 
-    import os
 
     def _try_register(font_base, regular_path, bold_path=None):
         try:

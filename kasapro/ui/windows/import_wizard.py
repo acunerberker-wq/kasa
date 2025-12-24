@@ -6,26 +6,25 @@ from __future__ import annotations
 import os
 import re
 from datetime import datetime, date
-from typing import Any, Optional, List, Dict
+from typing import Any, Optional, List, Dict, Tuple, TYPE_CHECKING, Callable
 
 import tkinter as tk
 from tkinter import ttk, messagebox
 
-from ...config import APP_TITLE, HAS_OPENPYXL
+from ...config import APP_TITLE
 from ...utils import (
     center_window,
-    today_iso,
     now_iso,
-    fmt_tr_date,
     parse_date_smart,
-    parse_number_smart,
     safe_float,
-    fmt_amount,
     norm_header,
 )
 
 # Maaş/isim eşleştirme için fuzzy yardımcılar
 from ...core.fuzzy import best_substring_similarity, normalize_text, similarity
+
+if TYPE_CHECKING:
+    from ...app import App
 
 # IMPORT WIZARD (Excel mapping)
 # =========================
@@ -68,7 +67,7 @@ def _suggest_col(headers: List[str], keys: List[str]) -> int:
     return -1
 
 class ImportWizard(tk.Toplevel):
-    def __init__(self, app:"App", xlsx_path: str, mode: str = "full", context: Optional[Dict[str, Any]] = None):
+    def __init__(self, app: "App", xlsx_path: str, mode: str = "full", context: Optional[Dict[str, Any]] = None):
         super().__init__(app.root)
         self.app = app
         self.db = app.db
@@ -251,7 +250,8 @@ class ImportWizard(tk.Toplevel):
         tab = ttk.Frame(self.nb)
         self.nb.add(tab, text=name)
 
-        top = ttk.Frame(tab); top.pack(fill=tk.X, padx=10, pady=10)
+        top = ttk.Frame(tab)
+        top.pack(fill=tk.X, padx=10, pady=10)
         ttk.Label(top, text="Sayfa:", width=8).pack(side=tk.LEFT)
 
         guess = self._guess_sheet(name)
@@ -295,7 +295,6 @@ class ImportWizard(tk.Toplevel):
         maas_only_selected_rows_var: Optional[tk.BooleanVar] = None
         maas_rowmatch_rows: List[int] = []
         maas_calisan_emp_cmb: Optional[ttk.Combobox] = None
-        maas_calisan_excel_cmb: Optional[ttk.Combobox] = None
         maas_calisan_find_btn: Optional[ttk.Button] = None
 
         mapping_vars: Dict[str, tk.StringVar] = {}
@@ -329,7 +328,7 @@ class ImportWizard(tk.Toplevel):
                 maas_calisan_find_btn = ttk.Button(
                     cont,
                     text="Excel'de Ara (Satırı/Satırları Getir)",
-                    command=lambda n=name: self._find_employee_rows(n),
+                    command=self._make_find_employee_rows_command(name),
                 )
                 maas_calisan_find_btn.grid(row=0, column=2, sticky="w", padx=8)
 
@@ -433,7 +432,7 @@ class ImportWizard(tk.Toplevel):
             # Maaş "sabit çalışan" modunda çalışan kolonunu otomatik önermeye çalışma
             if tab_name == "MaasOdeme" and key == "calisan":
                 try:
-                    if bool(info.get("maas_fixed_mode_var").get() if info.get("maas_fixed_mode_var") else False):
+                    if self._get_info_bool(info, "maas_fixed_mode_var"):
                         continue
                 except Exception:
                     pass
@@ -445,21 +444,21 @@ class ImportWizard(tk.Toplevel):
                 h = headers[idx0] if idx0 < len(headers) else ""
                 var.set(f"{col_letter}: {h}" if h else f"{col_letter}: (boş)")
 
-        for i in tree.get_children():
-            tree.delete(i)
+        for item_id in tree.get_children():
+            tree.delete(item_id)
 
         max_col = min(ws.max_column or 1, max(1, len(headers)))
         cols = [f"C{c}" for c in range(1, max_col + 1)]
         tree["columns"] = cols
-        for i, c in enumerate(cols, start=1):
-            h = headers[i-1] if i-1 < len(headers) else ""
-            col_letter = self.openpyxl.utils.get_column_letter(i)
+        for col_index, c in enumerate(cols, start=1):
+            h = headers[col_index - 1] if col_index - 1 < len(headers) else ""
+            col_letter = self.openpyxl.utils.get_column_letter(col_index)
             tree.heading(c, text=f"{col_letter} {h}".strip())
             tree.column(c, width=140, anchor="w")
 
         # Maaş tabında "sabit çalışan" modu ile satır filtreleme varsa, sadece o satırları göster.
         preview_rows: List[int] = []
-        if tab_name == "MaasOdeme" and bool(info.get("maas_fixed_mode_var").get() if info.get("maas_fixed_mode_var") else False):
+        if tab_name == "MaasOdeme" and self._get_info_bool(info, "maas_fixed_mode_var"):
             rlist = list(info.get("maas_rowmatch_rows") or [])
             if rlist:
                 preview_rows = [int(x) for x in rlist if int(x) > header_row]
@@ -473,8 +472,8 @@ class ImportWizard(tk.Toplevel):
         info["preview_row_map"] = []
         for r in preview_rows[:200]:
             vals = []
-            for c in range(1, max_col + 1):
-                v = ws.cell(r, c).value
+            for col_idx in range(1, max_col + 1):
+                v = ws.cell(r, col_idx).value
                 if isinstance(v, (datetime, date)):
                     vals.append(v.strftime("%Y-%m-%d"))
                 else:
@@ -489,7 +488,7 @@ class ImportWizard(tk.Toplevel):
 
         # Önizleme başlığına bilgi ekle
         try:
-            if tab_name == "MaasOdeme" and bool(info.get("maas_fixed_mode_var").get() if info.get("maas_fixed_mode_var") else False):
+            if tab_name == "MaasOdeme" and self._get_info_bool(info, "maas_fixed_mode_var"):
                 cnt = len(list(info.get("maas_rowmatch_rows") or []))
                 prev_title = f"Önizleme (Bulunan satırlar: {cnt})" if cnt else "Önizleme"
             else:
@@ -528,7 +527,7 @@ class ImportWizard(tk.Toplevel):
             messagebox.showinfo(APP_TITLE, "Önce Maaş > Çalışanlar bölümüne çalışan ekleyin ve burada seçin.")
             return
 
-        sheet_name = str(info.get("sheet_var").get() if info.get("sheet_var") else "")
+        sheet_name = self._get_info_str(info, "sheet_var")
         if not sheet_name or sheet_name == "(Atla)":
             messagebox.showinfo(APP_TITLE, "Önce bir Excel sayfası seç.")
             return
@@ -620,8 +619,8 @@ class ImportWizard(tk.Toplevel):
 
         # Varsayılan seçim: en iyi eşleşen 1 satır.
         try:
-            tree: ttk.Treeview = info.get("tree")
-            if tree is not None and rows:
+            tree = info.get("tree")
+            if isinstance(tree, ttk.Treeview) and rows:
                 iid = str(rows[0])
                 tree.selection_set(iid)
                 tree.see(iid)
@@ -647,7 +646,7 @@ class ImportWizard(tk.Toplevel):
             messagebox.showinfo(APP_TITLE, "Bir çalışan seç.")
             return
 
-        sheet_name = str(info.get("sheet_var").get() if info.get("sheet_var") else "")
+        sheet_name = self._get_info_str(info, "sheet_var")
         if not sheet_name or sheet_name == "(Atla)":
             messagebox.showinfo(APP_TITLE, "Önce bir Excel sayfası seç.")
             return
@@ -778,6 +777,19 @@ class ImportWizard(tk.Toplevel):
             return None
         return self.openpyxl.utils.column_index_from_string(m.group(1))
 
+    def _make_find_employee_rows_command(self, tab_name: str) -> Callable[[], None]:
+        return lambda: self._find_employee_rows(tab_name)
+
+    @staticmethod
+    def _get_info_bool(info: Dict[str, Any], key: str) -> bool:
+        var = info.get(key)
+        return bool(var.get()) if isinstance(var, tk.BooleanVar) else False
+
+    @staticmethod
+    def _get_info_str(info: Dict[str, Any], key: str) -> str:
+        var = info.get(key)
+        return str(var.get() or "") if isinstance(var, tk.StringVar) else ""
+
     def _cancel(self):
         self.result_counts = None
         self.destroy()
@@ -792,7 +804,7 @@ class ImportWizard(tk.Toplevel):
 
             # Maaş: sabit çalışan + satır seçimi modundan gelen bilgileri plana ekle
             if tab_name == "MaasOdeme":
-                fixed_on = bool(info.get("maas_fixed_mode_var").get() if info.get("maas_fixed_mode_var") else False)
+                fixed_on = self._get_info_bool(info, "maas_fixed_mode_var")
                 tab_plan["fixed_mode"] = fixed_on
                 tab_plan["fixed_employee"] = str(info.get("maas_fixed_emp_var").get() if info.get("maas_fixed_emp_var") else "").strip()
                 tab_plan["rowmatch_rows"] = list(info.get("maas_rowmatch_rows") or [])
@@ -1140,4 +1152,3 @@ class ImportWizard(tk.Toplevel):
 # =========================
 # CARİ EKSTRE WINDOW
 # =========================
-

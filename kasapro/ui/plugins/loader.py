@@ -64,7 +64,11 @@ def discover_ui_plugins() -> List[UIPlugin]:
             key = str(meta.get("key") or "").strip()
             nav_text = str(meta.get("nav_text") or "").strip()
             page_title = str(meta.get("page_title") or key).strip()
-            order = int(meta.get("order") or 100)
+            order_value = meta.get("order")
+            if isinstance(order_value, (int, float, str)):
+                order = int(order_value)
+            else:
+                order = 100
         except Exception:
             continue
         if not key or not nav_text:

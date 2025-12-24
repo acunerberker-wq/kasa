@@ -4,7 +4,7 @@
 from __future__ import annotations
 
 import sqlite3
-from typing import Optional, List, Tuple
+from typing import Optional, TYPE_CHECKING
 
 import tkinter as tk
 from tkinter import ttk, messagebox
@@ -14,6 +14,8 @@ from ...utils import parse_number_smart, safe_float, fmt_amount
 from ..widgets import LabeledEntry, LabeledCombo
 from ..windows import CariEkstreWindow
 
+if TYPE_CHECKING:
+    from ...app import App
 
 class CarilerFrame(ttk.Frame):
     def __init__(self, master, app: "App"):

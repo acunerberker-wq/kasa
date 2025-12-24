@@ -3,30 +3,20 @@
 
 from __future__ import annotations
 
-import os
-import re
-from datetime import datetime, timedelta
-from typing import Any, Optional, List, Dict, Tuple
-
+from typing import TYPE_CHECKING
 import tkinter as tk
-from tkinter import ttk, messagebox, filedialog, simpledialog
+from tkinter import ttk
 
-from ...config import APP_TITLE, HAS_OPENPYXL, HAS_REPORTLAB
 from ...utils import (
-    center_window,
-    today_iso,
-    now_iso,
     fmt_tr_date,
-    parse_date_smart,
-    parse_number_smart,
-    safe_float,
-    fmt_amount,
 )
-from ..widgets import SimpleField, LabeledEntry, LabeledCombo, MoneyEntry
-from ..windows import ImportWizard, CariEkstreWindow
+from ..widgets import LabeledEntry
+
+if TYPE_CHECKING:
+    from ...app import App
 
 class GlobalSearchFrame(ttk.Frame):
-    def __init__(self, master, app:"App"):
+    def __init__(self, master, app: "App"):
         super().__init__(master)
         self.app = app
         self._build()
@@ -35,8 +25,10 @@ class GlobalSearchFrame(ttk.Frame):
         top = ttk.LabelFrame(self, text="Global Arama (Cari + Kasa + Stok)")
         top.pack(fill=tk.X, padx=10, pady=10)
 
-        r = ttk.Frame(top); r.pack(fill=tk.X, pady=6)
-        self.q = LabeledEntry(r, "Ara:", 30); self.q.pack(side=tk.LEFT, padx=6)
+        r = ttk.Frame(top)
+        r.pack(fill=tk.X, pady=6)
+        self.q = LabeledEntry(r, "Ara:", 30)
+        self.q.pack(side=tk.LEFT, padx=6)
         ttk.Button(r, text="Ara", command=self.search).pack(side=tk.LEFT, padx=6)
 
         self.txt = tk.Text(self)
@@ -63,4 +55,3 @@ class GlobalSearchFrame(ttk.Frame):
         self.txt.insert(tk.END, f"\nSTOK HAREKET ({len(res['stok_hareket'])})\n" + "-"*80 + "\n")
         for r in res["stok_hareket"]:
             self.txt.insert(tk.END, f"{r['id']} | {fmt_tr_date(r['tarih'])} | {r['urun_kod']} | {r['urun_ad']} | {r['tip']} | {r['miktar']}\n")
-

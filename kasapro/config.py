@@ -13,7 +13,6 @@ import os
 import sys
 from configparser import ConfigParser
 
-from .core.version import __version__ as APP_VERSION
 
 # -----------------
 # Uygulama
