@@ -6,7 +6,7 @@ from .company_users_service import CompanyUsersService
 from .cari_service import CariService
 from .export_service import ExportService
 from .messages_service import MessagesService
-from ..modules.notes_reminders.service import NotesRemindersService
+from ..modules.dms.service import DmsService
 
 __all__ = [
     "Services",
@@ -15,5 +15,5 @@ __all__ = [
     "CariService",
     "ExportService",
     "MessagesService",
-    "NotesRemindersService",
+    "DmsService",
 ]

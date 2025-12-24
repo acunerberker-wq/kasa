@@ -185,134 +185,163 @@ def init_schema(conn: sqlite3.Connection) -> None:
     );"""
     )
 
+    # -----------------
+    # Doküman & Süreç Yönetimi (DMS)
+    # -----------------
     c.execute(
         """
-    CREATE TABLE IF NOT EXISTS series_counters(
+    CREATE TABLE IF NOT EXISTS documents(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         company_id INTEGER NOT NULL,
-        series TEXT NOT NULL,
-        year INTEGER NOT NULL,
-        last_no INTEGER NOT NULL DEFAULT 0,
-        padding INTEGER NOT NULL DEFAULT 6,
-        format TEXT DEFAULT '{series}-{year}-{no_pad}',
-        updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        UNIQUE(company_id, series, year)
-    );"""
-    )
-
-    c.execute(
-        """
-    CREATE TABLE IF NOT EXISTS docs(
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        company_id INTEGER NOT NULL,
-        doc_no TEXT NOT NULL,
-        series TEXT DEFAULT '',
-        year INTEGER NOT NULL,
-        doc_date TEXT NOT NULL,
-        due_date TEXT DEFAULT '',
+        title TEXT NOT NULL,
         doc_type TEXT NOT NULL,
-        status TEXT NOT NULL DEFAULT 'POSTED',
-        is_proforma INTEGER NOT NULL DEFAULT 0,
-        customer_id INTEGER,
-        customer_name TEXT DEFAULT '',
-        currency TEXT DEFAULT 'TL',
-        vat_included INTEGER NOT NULL DEFAULT 0,
-        invoice_discount_type TEXT DEFAULT 'amount',
-        invoice_discount_value REAL DEFAULT 0,
-        subtotal REAL DEFAULT 0,
-        discount_total REAL DEFAULT 0,
-        vat_total REAL DEFAULT 0,
-        grand_total REAL DEFAULT 0,
-        notes TEXT DEFAULT '',
-        warehouse_id INTEGER,
-        created_by INTEGER,
-        created_by_name TEXT DEFAULT '',
-        reversed_doc_id INTEGER,
-        voided_at TEXT DEFAULT '',
+        status TEXT NOT NULL DEFAULT 'ACTIVE',
+        current_version_id INTEGER,
         created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        UNIQUE(company_id, doc_no)
+        updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
     );"""
     )
-
     c.execute(
         """
-    CREATE TABLE IF NOT EXISTS doc_lines(
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        doc_id INTEGER NOT NULL,
-        line_no INTEGER NOT NULL DEFAULT 1,
-        item_id INTEGER,
-        description TEXT DEFAULT '',
-        qty REAL DEFAULT 0,
-        unit TEXT DEFAULT '',
-        unit_price REAL DEFAULT 0,
-        vat_rate REAL DEFAULT 0,
-        line_discount_type TEXT DEFAULT 'amount',
-        line_discount_value REAL DEFAULT 0,
-        line_subtotal REAL DEFAULT 0,
-        line_discount REAL DEFAULT 0,
-        line_vat REAL DEFAULT 0,
-        line_total REAL DEFAULT 0,
-        FOREIGN KEY(doc_id) REFERENCES docs(id) ON DELETE CASCADE
-    );"""
-    )
-
-    c.execute(
-        """
-    CREATE TABLE IF NOT EXISTS payments(
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        doc_id INTEGER NOT NULL,
-        pay_date TEXT NOT NULL,
-        amount REAL NOT NULL DEFAULT 0,
-        currency TEXT DEFAULT 'TL',
-        method TEXT DEFAULT '',
-        description TEXT DEFAULT '',
-        ref TEXT DEFAULT '',
-        kasa_hareket_id INTEGER,
-        banka_hareket_id INTEGER,
-        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY(doc_id) REFERENCES docs(id) ON DELETE CASCADE
-    );"""
-    )
-
-    c.execute(
-        """
-    CREATE TABLE IF NOT EXISTS stock_moves(
+    CREATE TABLE IF NOT EXISTS document_tags(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         company_id INTEGER NOT NULL,
-        doc_id INTEGER NOT NULL,
-        doc_line_id INTEGER,
-        item_id INTEGER,
-        warehouse_id INTEGER,
-        move_date TEXT NOT NULL,
-        direction TEXT NOT NULL,
-        qty REAL NOT NULL DEFAULT 0,
-        unit TEXT DEFAULT '',
-        description TEXT DEFAULT '',
-        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY(doc_id) REFERENCES docs(id) ON DELETE CASCADE
+        document_id INTEGER NOT NULL,
+        tag TEXT NOT NULL,
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
     );"""
     )
-
+    c.execute(
+        """
+    CREATE TABLE IF NOT EXISTS document_links(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        company_id INTEGER NOT NULL,
+        document_id INTEGER NOT NULL,
+        entity_type TEXT NOT NULL,
+        entity_id TEXT NOT NULL,
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    );"""
+    )
+    c.execute(
+        """
+    CREATE TABLE IF NOT EXISTS document_versions(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        company_id INTEGER NOT NULL,
+        document_id INTEGER NOT NULL,
+        version_no INTEGER NOT NULL,
+        file_path TEXT NOT NULL,
+        original_name TEXT NOT NULL,
+        mime TEXT NOT NULL,
+        size INTEGER NOT NULL,
+        sha256 TEXT NOT NULL,
+        change_note TEXT DEFAULT '',
+        status TEXT NOT NULL DEFAULT 'DRAFT',
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    );"""
+    )
+    c.execute(
+        """
+    CREATE TABLE IF NOT EXISTS workflow_templates(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        company_id INTEGER NOT NULL,
+        name TEXT NOT NULL,
+        entity_type TEXT NOT NULL,
+        is_active INTEGER NOT NULL DEFAULT 1,
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    );"""
+    )
+    c.execute(
+        """
+    CREATE TABLE IF NOT EXISTS workflow_steps(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        company_id INTEGER NOT NULL,
+        template_id INTEGER NOT NULL,
+        step_no INTEGER NOT NULL,
+        name TEXT NOT NULL,
+        approver_role TEXT NOT NULL,
+        approver_user_id INTEGER,
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    );"""
+    )
+    c.execute(
+        """
+    CREATE TABLE IF NOT EXISTS workflow_instances(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        company_id INTEGER NOT NULL,
+        template_id INTEGER NOT NULL,
+        document_id INTEGER NOT NULL,
+        status TEXT NOT NULL DEFAULT 'NOT_STARTED',
+        current_step_no INTEGER,
+        started_by INTEGER,
+        started_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    );"""
+    )
+    c.execute(
+        """
+    CREATE TABLE IF NOT EXISTS workflow_actions(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        company_id INTEGER NOT NULL,
+        instance_id INTEGER NOT NULL,
+        step_no INTEGER NOT NULL,
+        action TEXT NOT NULL,
+        comment TEXT DEFAULT '',
+        actor_id INTEGER,
+        acted_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    );"""
+    )
+    c.execute(
+        """
+    CREATE TABLE IF NOT EXISTS tasks(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        company_id INTEGER NOT NULL,
+        document_id INTEGER NOT NULL,
+        title TEXT NOT NULL,
+        description TEXT DEFAULT '',
+        assignee_id INTEGER NOT NULL,
+        due_at TEXT NOT NULL,
+        status TEXT NOT NULL DEFAULT 'OPEN',
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        completed_at TEXT
+    );"""
+    )
+    c.execute(
+        """
+    CREATE TABLE IF NOT EXISTS reminders(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        company_id INTEGER NOT NULL,
+        document_id INTEGER NOT NULL,
+        task_id INTEGER,
+        remind_at TEXT NOT NULL,
+        snooze_until TEXT DEFAULT '',
+        status TEXT NOT NULL DEFAULT 'PENDING',
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    );"""
+    )
     c.execute(
         """
     CREATE TABLE IF NOT EXISTS audit_log(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         company_id INTEGER NOT NULL,
-        user_id INTEGER,
-        username TEXT DEFAULT '',
+        entity_type TEXT NOT NULL,
+        entity_id INTEGER NOT NULL,
         action TEXT NOT NULL,
-        entity TEXT NOT NULL,
-        entity_id INTEGER,
-        message TEXT DEFAULT '',
+        actor_id INTEGER,
+        details TEXT DEFAULT '',
         created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
     );"""
     )
 
-    c.execute("CREATE INDEX IF NOT EXISTS idx_docs_company_docno ON docs(company_id, doc_no)")
-    c.execute("CREATE INDEX IF NOT EXISTS idx_docs_company_date ON docs(company_id, doc_date)")
-    c.execute("CREATE INDEX IF NOT EXISTS idx_docs_customer ON docs(customer_id)")
-    c.execute("CREATE INDEX IF NOT EXISTS idx_docs_status ON docs(status)")
+    c.execute("CREATE INDEX IF NOT EXISTS idx_documents_status ON documents(status, updated_at)")
+    c.execute("CREATE INDEX IF NOT EXISTS idx_documents_company ON documents(company_id)")
+    c.execute("CREATE INDEX IF NOT EXISTS idx_document_tags_tag ON document_tags(tag)")
+    c.execute("CREATE INDEX IF NOT EXISTS idx_document_links_entity ON document_links(entity_type, entity_id)")
+    c.execute("CREATE INDEX IF NOT EXISTS idx_document_versions_doc ON document_versions(document_id, version_no)")
+    c.execute("CREATE INDEX IF NOT EXISTS idx_workflow_instances_status ON workflow_instances(status, updated_at)")
+    c.execute("CREATE INDEX IF NOT EXISTS idx_tasks_due ON tasks(due_at, status)")
+    c.execute("CREATE INDEX IF NOT EXISTS idx_reminders_due ON reminders(remind_at, status)")
+    c.execute("CREATE INDEX IF NOT EXISTS idx_audit_entity ON audit_log(entity_type, entity_id)")
 
     # -----------------
     # Satış Siparişleri
@@ -1251,118 +1280,139 @@ def migrate_schema(conn: sqlite3.Connection, log_fn: Optional[Callable[[str, str
     _ensure_column(conn, "maas_calisan", "meslek_id", "INTEGER", log_fn)
 
     # -----------------
-    # Advanced Invoice Module
+    # Doküman & Süreç Yönetimi (DMS)
     # -----------------
     try:
         conn.execute(
-            """CREATE TABLE IF NOT EXISTS series_counters(
+            """CREATE TABLE IF NOT EXISTS documents(
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 company_id INTEGER NOT NULL,
-                series TEXT NOT NULL,
-                year INTEGER NOT NULL,
-                last_no INTEGER NOT NULL DEFAULT 0,
-                padding INTEGER NOT NULL DEFAULT 6,
-                format TEXT DEFAULT '{series}-{year}-{no_pad}',
-                updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                UNIQUE(company_id, series, year)
-            );"""
-        )
-        conn.execute(
-            """CREATE TABLE IF NOT EXISTS docs(
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                company_id INTEGER NOT NULL,
-                doc_no TEXT NOT NULL,
-                series TEXT DEFAULT '',
-                year INTEGER NOT NULL,
-                doc_date TEXT NOT NULL,
-                due_date TEXT DEFAULT '',
+                title TEXT NOT NULL,
                 doc_type TEXT NOT NULL,
-                status TEXT NOT NULL DEFAULT 'POSTED',
-                is_proforma INTEGER NOT NULL DEFAULT 0,
-                customer_id INTEGER,
-                customer_name TEXT DEFAULT '',
-                currency TEXT DEFAULT 'TL',
-                vat_included INTEGER NOT NULL DEFAULT 0,
-                invoice_discount_type TEXT DEFAULT 'amount',
-                invoice_discount_value REAL DEFAULT 0,
-                subtotal REAL DEFAULT 0,
-                discount_total REAL DEFAULT 0,
-                vat_total REAL DEFAULT 0,
-                grand_total REAL DEFAULT 0,
-                notes TEXT DEFAULT '',
-                warehouse_id INTEGER,
-                created_by INTEGER,
-                created_by_name TEXT DEFAULT '',
-                reversed_doc_id INTEGER,
-                voided_at TEXT DEFAULT '',
+                status TEXT NOT NULL DEFAULT 'ACTIVE',
+                current_version_id INTEGER,
                 created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                UNIQUE(company_id, doc_no)
+                updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
             );"""
         )
         conn.execute(
-            """CREATE TABLE IF NOT EXISTS doc_lines(
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                doc_id INTEGER NOT NULL,
-                line_no INTEGER NOT NULL DEFAULT 1,
-                item_id INTEGER,
-                description TEXT DEFAULT '',
-                qty REAL DEFAULT 0,
-                unit TEXT DEFAULT '',
-                unit_price REAL DEFAULT 0,
-                vat_rate REAL DEFAULT 0,
-                line_discount_type TEXT DEFAULT 'amount',
-                line_discount_value REAL DEFAULT 0,
-                line_subtotal REAL DEFAULT 0,
-                line_discount REAL DEFAULT 0,
-                line_vat REAL DEFAULT 0,
-                line_total REAL DEFAULT 0,
-                FOREIGN KEY(doc_id) REFERENCES docs(id) ON DELETE CASCADE
-            );"""
-        )
-        conn.execute(
-            """CREATE TABLE IF NOT EXISTS payments(
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                doc_id INTEGER NOT NULL,
-                pay_date TEXT NOT NULL,
-                amount REAL NOT NULL DEFAULT 0,
-                currency TEXT DEFAULT 'TL',
-                method TEXT DEFAULT '',
-                description TEXT DEFAULT '',
-                ref TEXT DEFAULT '',
-                kasa_hareket_id INTEGER,
-                banka_hareket_id INTEGER,
-                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                FOREIGN KEY(doc_id) REFERENCES docs(id) ON DELETE CASCADE
-            );"""
-        )
-        conn.execute(
-            """CREATE TABLE IF NOT EXISTS stock_moves(
+            """CREATE TABLE IF NOT EXISTS document_tags(
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 company_id INTEGER NOT NULL,
-                doc_id INTEGER NOT NULL,
-                doc_line_id INTEGER,
-                item_id INTEGER,
-                warehouse_id INTEGER,
-                move_date TEXT NOT NULL,
-                direction TEXT NOT NULL,
-                qty REAL NOT NULL DEFAULT 0,
-                unit TEXT DEFAULT '',
-                description TEXT DEFAULT '',
+                document_id INTEGER NOT NULL,
+                tag TEXT NOT NULL,
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+            );"""
+        )
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS document_links(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                company_id INTEGER NOT NULL,
+                document_id INTEGER NOT NULL,
+                entity_type TEXT NOT NULL,
+                entity_id TEXT NOT NULL,
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+            );"""
+        )
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS document_versions(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                company_id INTEGER NOT NULL,
+                document_id INTEGER NOT NULL,
+                version_no INTEGER NOT NULL,
+                file_path TEXT NOT NULL,
+                original_name TEXT NOT NULL,
+                mime TEXT NOT NULL,
+                size INTEGER NOT NULL,
+                sha256 TEXT NOT NULL,
+                change_note TEXT DEFAULT '',
+                status TEXT NOT NULL DEFAULT 'DRAFT',
                 created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                FOREIGN KEY(doc_id) REFERENCES docs(id) ON DELETE CASCADE
+                updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+            );"""
+        )
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS workflow_templates(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                company_id INTEGER NOT NULL,
+                name TEXT NOT NULL,
+                entity_type TEXT NOT NULL,
+                is_active INTEGER NOT NULL DEFAULT 1,
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+            );"""
+        )
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS workflow_steps(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                company_id INTEGER NOT NULL,
+                template_id INTEGER NOT NULL,
+                step_no INTEGER NOT NULL,
+                name TEXT NOT NULL,
+                approver_role TEXT NOT NULL,
+                approver_user_id INTEGER,
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+            );"""
+        )
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS workflow_instances(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                company_id INTEGER NOT NULL,
+                template_id INTEGER NOT NULL,
+                document_id INTEGER NOT NULL,
+                status TEXT NOT NULL DEFAULT 'NOT_STARTED',
+                current_step_no INTEGER,
+                started_by INTEGER,
+                started_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+            );"""
+        )
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS workflow_actions(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                company_id INTEGER NOT NULL,
+                instance_id INTEGER NOT NULL,
+                step_no INTEGER NOT NULL,
+                action TEXT NOT NULL,
+                comment TEXT DEFAULT '',
+                actor_id INTEGER,
+                acted_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+            );"""
+        )
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS tasks(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                company_id INTEGER NOT NULL,
+                document_id INTEGER NOT NULL,
+                title TEXT NOT NULL,
+                description TEXT DEFAULT '',
+                assignee_id INTEGER NOT NULL,
+                due_at TEXT NOT NULL,
+                status TEXT NOT NULL DEFAULT 'OPEN',
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                completed_at TEXT
+            );"""
+        )
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS reminders(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                company_id INTEGER NOT NULL,
+                document_id INTEGER NOT NULL,
+                task_id INTEGER,
+                remind_at TEXT NOT NULL,
+                snooze_until TEXT DEFAULT '',
+                status TEXT NOT NULL DEFAULT 'PENDING',
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
             );"""
         )
         conn.execute(
             """CREATE TABLE IF NOT EXISTS audit_log(
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 company_id INTEGER NOT NULL,
-                user_id INTEGER,
-                username TEXT DEFAULT '',
+                entity_type TEXT NOT NULL,
+                entity_id INTEGER NOT NULL,
                 action TEXT NOT NULL,
-                entity TEXT NOT NULL,
-                entity_id INTEGER,
-                message TEXT DEFAULT '',
+                actor_id INTEGER,
+                details TEXT DEFAULT '',
                 created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
             );"""
         )
@@ -1370,14 +1420,19 @@ def migrate_schema(conn: sqlite3.Connection, log_fn: Optional[Callable[[str, str
     except Exception as e:
         if log_fn:
             try:
-                log_fn("Schema Migration Error", f"advanced invoice tables: {e}")
+                log_fn("Schema Migration Error", f"dms tables: {e}")
             except Exception:
                 pass
 
-    _ensure_index(conn, "idx_docs_company_docno", "docs", "company_id, doc_no", log_fn)
-    _ensure_index(conn, "idx_docs_company_date", "docs", "company_id, doc_date", log_fn)
-    _ensure_index(conn, "idx_docs_customer", "docs", "customer_id", log_fn)
-    _ensure_index(conn, "idx_docs_status", "docs", "status", log_fn)
+    _ensure_index(conn, "idx_documents_status", "documents", "status, updated_at", log_fn)
+    _ensure_index(conn, "idx_documents_company", "documents", "company_id", log_fn)
+    _ensure_index(conn, "idx_document_tags_tag", "document_tags", "tag", log_fn)
+    _ensure_index(conn, "idx_document_links_entity", "document_links", "entity_type, entity_id", log_fn)
+    _ensure_index(conn, "idx_document_versions_doc", "document_versions", "document_id, version_no", log_fn)
+    _ensure_index(conn, "idx_workflow_instances_status", "workflow_instances", "status, updated_at", log_fn)
+    _ensure_index(conn, "idx_tasks_due", "tasks", "due_at, status", log_fn)
+    _ensure_index(conn, "idx_reminders_due", "reminders", "remind_at, status", log_fn)
+    _ensure_index(conn, "idx_audit_entity", "audit_log", "entity_type, entity_id", log_fn)
 
     # users (eski DB'ler için kolon garantisi)
     _ensure_column(conn, "users", "role", "TEXT NOT NULL DEFAULT 'user'", log_fn)
