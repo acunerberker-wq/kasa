@@ -34,7 +34,8 @@ class UsersDB:
         self.data_dir = os.path.join(base_dir, DATA_DIRNAME)
         _ensure_dir(self.data_dir)
 
-        self.conn = sqlite3.connect(self.users_db_path)
+        # Allow using this connection from worker threads if needed.
+        self.conn = sqlite3.connect(self.users_db_path, check_same_thread=False)
         self.conn.row_factory = sqlite3.Row
         try:
             self.conn.execute("PRAGMA foreign_keys = ON;")
