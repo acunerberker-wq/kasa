@@ -459,6 +459,27 @@ class DB:
         )
 
     # -----------------
+    # Satın Alma Raporları
+    # -----------------
+    def purchase_report_suppliers(self):
+        return self.purchase_reports.list_suppliers()
+
+    def purchase_report_products(self) -> List[str]:
+        return self.purchase_reports.list_products()
+
+    def purchase_report_categories(self) -> List[str]:
+        return self.purchase_reports.list_categories()
+
+    def purchase_report_locations(self):
+        return self.purchase_reports.list_locations()
+
+    def purchase_report_users(self):
+        return self.purchase_reports.list_users()
+
+    def purchase_report_fetch(self, **kwargs):
+        return self.purchase_reports.fetch_report(**kwargs)
+
+    # -----------------
     # Banka
     # -----------------
     def banka_add(self, tarih: Any, banka: str, hesap: str, tip: str, tutar: float, para: str,

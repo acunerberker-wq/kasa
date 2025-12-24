@@ -48,3 +48,9 @@ Traceback (most recent call last):
     return self.purchase_reports.fetch_report(**kwargs)
            ^^^^^^^^^^^^^^^^^^^^^
 AttributeError: 'DB' object has no attribute 'purchase_reports'. Did you mean: 'purchase_report_users'?
+2025-12-24 20:38:11,244 [ERROR] kasapro.ui.frames.purchase_report: Satın alma raporu oluşturulamadı
+Traceback (most recent call last):
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\frames\purchase_report.py", line 300, in worker
+    data = self.app.db.purchase_report_fetch(**filters)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'DB' object has no attribute 'purchase_report_fetch'. Did you mean: 'purchase_reports'?
