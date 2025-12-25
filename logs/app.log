@@ -3731,3 +3731,12 @@ ValueError: boom
 2025-12-25 23:10:14,403 INFO kasapro.ui.plugins UI plugin loaded: satis_siparis_rapor (satis_siparis_rapor v0.1.0)
 2025-12-25 23:10:14,415 INFO kasapro.ui.plugins UI plugin loaded: stok (stok v0.1.0)
 2025-12-25 23:10:14,442 INFO kasapro.ui.plugins UI plugin loaded: trade_module (trade_module v0.1.0)
+2025-12-26 02:21:46,889 [ERROR] kasapro.app: Uygulama başlatma hatası
+Traceback (most recent call last):
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\app.py", line 1292, in main
+    App().run()
+    ~~~^^
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\app.py", line 132, in __init__
+    self.integrations_worker = IntegrationWorker(self.services.integrations)
+                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'Services' object has no attribute 'integrations'
