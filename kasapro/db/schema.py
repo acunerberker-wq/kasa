@@ -696,6 +696,264 @@ def init_schema(conn: sqlite3.Connection) -> None:
     );""")
 
     # -----------------
+    # Entegrasyonlar (Core)
+    # -----------------
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS event_outbox(
+        event_id INTEGER PRIMARY KEY AUTOINCREMENT,
+        company_id INTEGER NOT NULL,
+        event_type TEXT NOT NULL,
+        payload_json TEXT NOT NULL,
+        idempotency_key TEXT,
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        processed_at TEXT,
+        UNIQUE(company_id, idempotency_key)
+    );""")
+
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS jobs(
+        job_id INTEGER PRIMARY KEY AUTOINCREMENT,
+        company_id INTEGER NOT NULL,
+        job_type TEXT NOT NULL,
+        payload_json TEXT NOT NULL,
+        status TEXT NOT NULL DEFAULT 'pending',
+        attempts INTEGER NOT NULL DEFAULT 0,
+        next_retry_at TEXT,
+        last_error TEXT DEFAULT '',
+        idempotency_key TEXT,
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at TEXT,
+        UNIQUE(company_id, idempotency_key)
+    );""")
+
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS dead_letter_jobs(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        company_id INTEGER NOT NULL,
+        job_type TEXT NOT NULL,
+        payload_json TEXT NOT NULL,
+        attempts INTEGER NOT NULL DEFAULT 0,
+        last_error TEXT DEFAULT '',
+        idempotency_key TEXT,
+        failed_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    );""")
+
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS integration_settings(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        company_id INTEGER NOT NULL,
+        setting_key TEXT NOT NULL,
+        value_encrypted TEXT NOT NULL,
+        updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(company_id, setting_key)
+    );""")
+
+    # -----------------
+    # Entegrasyonlar (Notifications)
+    # -----------------
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS notification_templates(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        company_id INTEGER NOT NULL,
+        name TEXT NOT NULL,
+        channel TEXT NOT NULL,
+        subject TEXT DEFAULT '',
+        body TEXT DEFAULT '',
+        variables_json TEXT DEFAULT '',
+        active INTEGER NOT NULL DEFAULT 1
+    );""")
+
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS notification_rules(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        company_id INTEGER NOT NULL,
+        event_type TEXT NOT NULL,
+        channel TEXT NOT NULL,
+        recipient TEXT NOT NULL,
+        template_id INTEGER NOT NULL,
+        active INTEGER NOT NULL DEFAULT 1,
+        FOREIGN KEY(template_id) REFERENCES notification_templates(id)
+    );""")
+
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS notification_outbox(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        company_id INTEGER NOT NULL,
+        channel TEXT NOT NULL,
+        recipient TEXT NOT NULL,
+        subject TEXT DEFAULT '',
+        body TEXT DEFAULT '',
+        status TEXT NOT NULL DEFAULT 'pending',
+        attempts INTEGER NOT NULL DEFAULT 0,
+        idempotency_key TEXT,
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at TEXT
+    );""")
+
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS delivery_log(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        notification_id INTEGER NOT NULL,
+        provider TEXT NOT NULL,
+        status TEXT NOT NULL,
+        detail TEXT DEFAULT '',
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY(notification_id) REFERENCES notification_outbox(id)
+    );""")
+
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS contact_consents(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        company_id INTEGER NOT NULL,
+        contact TEXT NOT NULL,
+        channel TEXT NOT NULL,
+        opt_in INTEGER NOT NULL DEFAULT 1,
+        updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(company_id, contact, channel)
+    );""")
+
+    # -----------------
+    # Entegrasyonlar (External Systems)
+    # -----------------
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS external_mappings(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        company_id INTEGER NOT NULL,
+        system TEXT NOT NULL,
+        entity_type TEXT NOT NULL,
+        internal_id INTEGER NOT NULL,
+        external_id TEXT NOT NULL,
+        updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(company_id, system, entity_type, internal_id)
+    );""")
+
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS export_jobs(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        company_id INTEGER NOT NULL,
+        job_type TEXT NOT NULL,
+        status TEXT NOT NULL DEFAULT 'pending',
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    );""")
+
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS export_items(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        job_id INTEGER NOT NULL,
+        entity_type TEXT NOT NULL,
+        payload_json TEXT NOT NULL,
+        status TEXT NOT NULL DEFAULT 'pending',
+        FOREIGN KEY(job_id) REFERENCES export_jobs(id) ON DELETE CASCADE
+    );""")
+
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS import_jobs(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        company_id INTEGER NOT NULL,
+        job_type TEXT NOT NULL,
+        status TEXT NOT NULL DEFAULT 'pending',
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    );""")
+
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS import_items(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        job_id INTEGER NOT NULL,
+        entity_type TEXT NOT NULL,
+        payload_json TEXT NOT NULL,
+        status TEXT NOT NULL DEFAULT 'pending',
+        error TEXT DEFAULT '',
+        FOREIGN KEY(job_id) REFERENCES import_jobs(id) ON DELETE CASCADE
+    );""")
+
+    # -----------------
+    # Entegrasyonlar (Bank)
+    # -----------------
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS bank_statements(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        company_id INTEGER NOT NULL,
+        source_name TEXT NOT NULL,
+        period_start TEXT NOT NULL,
+        period_end TEXT NOT NULL,
+        imported_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    );""")
+
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS bank_transactions(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        company_id INTEGER NOT NULL,
+        statement_id INTEGER NOT NULL,
+        transaction_date TEXT NOT NULL,
+        amount REAL NOT NULL,
+        description TEXT DEFAULT '',
+        unique_hash TEXT NOT NULL,
+        matched INTEGER NOT NULL DEFAULT 0,
+        matched_ref TEXT DEFAULT '',
+        matched_at TEXT,
+        FOREIGN KEY(statement_id) REFERENCES bank_statements(id),
+        UNIQUE(company_id, unique_hash)
+    );""")
+
+    # -----------------
+    # Entegrasyonlar (API & Webhook)
+    # -----------------
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS api_tokens(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        company_id INTEGER NOT NULL,
+        name TEXT NOT NULL,
+        token_hash TEXT NOT NULL,
+        scopes_json TEXT DEFAULT '',
+        active INTEGER NOT NULL DEFAULT 1,
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        last_used_at TEXT,
+        UNIQUE(company_id, token_hash)
+    );""")
+
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS webhook_subscriptions(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        company_id INTEGER NOT NULL,
+        url TEXT NOT NULL,
+        secret TEXT NOT NULL,
+        events_json TEXT NOT NULL,
+        active INTEGER NOT NULL DEFAULT 1,
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    );""")
+
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS webhook_deliveries(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        company_id INTEGER NOT NULL,
+        subscription_id INTEGER NOT NULL,
+        event_type TEXT NOT NULL,
+        payload_json TEXT NOT NULL,
+        status TEXT NOT NULL DEFAULT 'pending',
+        attempts INTEGER NOT NULL DEFAULT 0,
+        next_retry_at TEXT,
+        last_error TEXT DEFAULT '',
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at TEXT,
+        FOREIGN KEY(subscription_id) REFERENCES webhook_subscriptions(id)
+    );""")
+
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS idempotency_keys(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        company_id INTEGER NOT NULL,
+        idempotency_key TEXT NOT NULL,
+        request_hash TEXT NOT NULL,
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(company_id, idempotency_key)
+    );""")
+
+    c.execute("CREATE INDEX IF NOT EXISTS idx_event_outbox_company_processed ON event_outbox(company_id, processed_at)")
+    c.execute("CREATE INDEX IF NOT EXISTS idx_jobs_company_status ON jobs(company_id, status, next_retry_at)")
+    c.execute("CREATE INDEX IF NOT EXISTS idx_notification_rules_event ON notification_rules(company_id, event_type)")
+    c.execute("CREATE INDEX IF NOT EXISTS idx_bank_transactions_company ON bank_transactions(company_id, matched)")
+
+    # -----------------
     # İnsan Kaynakları (İK)
     # -----------------
     c.execute("""
@@ -1719,6 +1977,267 @@ def migrate_schema(conn: sqlite3.Connection, log_fn: Optional[Callable[[str, str
                 log_fn("Schema Migration Error", f"dms tables: {e}")
             except Exception:
                 pass
+
+    # Entegrasyonlar - tablolar
+    try:
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS event_outbox(
+                event_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                company_id INTEGER NOT NULL,
+                event_type TEXT NOT NULL,
+                payload_json TEXT NOT NULL,
+                idempotency_key TEXT,
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                processed_at TEXT,
+                UNIQUE(company_id, idempotency_key)
+            );"""
+        )
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS jobs(
+                job_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                company_id INTEGER NOT NULL,
+                job_type TEXT NOT NULL,
+                payload_json TEXT NOT NULL,
+                status TEXT NOT NULL DEFAULT 'pending',
+                attempts INTEGER NOT NULL DEFAULT 0,
+                next_retry_at TEXT,
+                last_error TEXT DEFAULT '',
+                idempotency_key TEXT,
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                updated_at TEXT,
+                UNIQUE(company_id, idempotency_key)
+            );"""
+        )
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS dead_letter_jobs(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                company_id INTEGER NOT NULL,
+                job_type TEXT NOT NULL,
+                payload_json TEXT NOT NULL,
+                attempts INTEGER NOT NULL DEFAULT 0,
+                last_error TEXT DEFAULT '',
+                idempotency_key TEXT,
+                failed_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+            );"""
+        )
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS integration_settings(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                company_id INTEGER NOT NULL,
+                setting_key TEXT NOT NULL,
+                value_encrypted TEXT NOT NULL,
+                updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                UNIQUE(company_id, setting_key)
+            );"""
+        )
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS notification_templates(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                company_id INTEGER NOT NULL,
+                name TEXT NOT NULL,
+                channel TEXT NOT NULL,
+                subject TEXT DEFAULT '',
+                body TEXT DEFAULT '',
+                variables_json TEXT DEFAULT '',
+                active INTEGER NOT NULL DEFAULT 1
+            );"""
+        )
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS notification_rules(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                company_id INTEGER NOT NULL,
+                event_type TEXT NOT NULL,
+                channel TEXT NOT NULL,
+                recipient TEXT NOT NULL,
+                template_id INTEGER NOT NULL,
+                active INTEGER NOT NULL DEFAULT 1,
+                FOREIGN KEY(template_id) REFERENCES notification_templates(id)
+            );"""
+        )
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS notification_outbox(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                company_id INTEGER NOT NULL,
+                channel TEXT NOT NULL,
+                recipient TEXT NOT NULL,
+                subject TEXT DEFAULT '',
+                body TEXT DEFAULT '',
+                status TEXT NOT NULL DEFAULT 'pending',
+                attempts INTEGER NOT NULL DEFAULT 0,
+                idempotency_key TEXT,
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                updated_at TEXT
+            );"""
+        )
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS delivery_log(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                notification_id INTEGER NOT NULL,
+                provider TEXT NOT NULL,
+                status TEXT NOT NULL,
+                detail TEXT DEFAULT '',
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY(notification_id) REFERENCES notification_outbox(id)
+            );"""
+        )
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS contact_consents(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                company_id INTEGER NOT NULL,
+                contact TEXT NOT NULL,
+                channel TEXT NOT NULL,
+                opt_in INTEGER NOT NULL DEFAULT 1,
+                updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                UNIQUE(company_id, contact, channel)
+            );"""
+        )
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS external_mappings(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                company_id INTEGER NOT NULL,
+                system TEXT NOT NULL,
+                entity_type TEXT NOT NULL,
+                internal_id INTEGER NOT NULL,
+                external_id TEXT NOT NULL,
+                updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                UNIQUE(company_id, system, entity_type, internal_id)
+            );"""
+        )
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS export_jobs(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                company_id INTEGER NOT NULL,
+                job_type TEXT NOT NULL,
+                status TEXT NOT NULL DEFAULT 'pending',
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+            );"""
+        )
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS export_items(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                job_id INTEGER NOT NULL,
+                entity_type TEXT NOT NULL,
+                payload_json TEXT NOT NULL,
+                status TEXT NOT NULL DEFAULT 'pending',
+                FOREIGN KEY(job_id) REFERENCES export_jobs(id) ON DELETE CASCADE
+            );"""
+        )
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS import_jobs(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                company_id INTEGER NOT NULL,
+                job_type TEXT NOT NULL,
+                status TEXT NOT NULL DEFAULT 'pending',
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+            );"""
+        )
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS import_items(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                job_id INTEGER NOT NULL,
+                entity_type TEXT NOT NULL,
+                payload_json TEXT NOT NULL,
+                status TEXT NOT NULL DEFAULT 'pending',
+                error TEXT DEFAULT '',
+                FOREIGN KEY(job_id) REFERENCES import_jobs(id) ON DELETE CASCADE
+            );"""
+        )
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS bank_statements(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                company_id INTEGER NOT NULL,
+                source_name TEXT NOT NULL,
+                period_start TEXT NOT NULL,
+                period_end TEXT NOT NULL,
+                imported_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+            );"""
+        )
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS bank_transactions(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                company_id INTEGER NOT NULL,
+                statement_id INTEGER NOT NULL,
+                transaction_date TEXT NOT NULL,
+                amount REAL NOT NULL,
+                description TEXT DEFAULT '',
+                unique_hash TEXT NOT NULL,
+                matched INTEGER NOT NULL DEFAULT 0,
+                matched_ref TEXT DEFAULT '',
+                matched_at TEXT,
+                FOREIGN KEY(statement_id) REFERENCES bank_statements(id),
+                UNIQUE(company_id, unique_hash)
+            );"""
+        )
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS api_tokens(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                company_id INTEGER NOT NULL,
+                name TEXT NOT NULL,
+                token_hash TEXT NOT NULL,
+                scopes_json TEXT DEFAULT '',
+                active INTEGER NOT NULL DEFAULT 1,
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                last_used_at TEXT,
+                UNIQUE(company_id, token_hash)
+            );"""
+        )
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS webhook_subscriptions(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                company_id INTEGER NOT NULL,
+                url TEXT NOT NULL,
+                secret TEXT NOT NULL,
+                events_json TEXT NOT NULL,
+                active INTEGER NOT NULL DEFAULT 1,
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+            );"""
+        )
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS webhook_deliveries(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                company_id INTEGER NOT NULL,
+                subscription_id INTEGER NOT NULL,
+                event_type TEXT NOT NULL,
+                payload_json TEXT NOT NULL,
+                status TEXT NOT NULL DEFAULT 'pending',
+                attempts INTEGER NOT NULL DEFAULT 0,
+                next_retry_at TEXT,
+                last_error TEXT DEFAULT '',
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                updated_at TEXT,
+                FOREIGN KEY(subscription_id) REFERENCES webhook_subscriptions(id)
+            );"""
+        )
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS idempotency_keys(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                company_id INTEGER NOT NULL,
+                idempotency_key TEXT NOT NULL,
+                request_hash TEXT NOT NULL,
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                UNIQUE(company_id, idempotency_key)
+            );"""
+        )
+        conn.commit()
+    except Exception as e:
+        if log_fn:
+            try:
+                log_fn("Schema Migration Error", f"integrations tables: {e}")
+            except Exception:
+                pass
+
+    _ensure_index(conn, "idx_event_outbox_company_processed", "event_outbox", "company_id, processed_at", log_fn)
+    _ensure_index(conn, "idx_jobs_company_status", "jobs", "company_id, status, next_retry_at", log_fn)
+    _ensure_index(conn, "idx_jobs_idem", "jobs", "company_id, idempotency_key", log_fn)
+    _ensure_index(conn, "idx_outbox_idem", "event_outbox", "company_id, idempotency_key", log_fn)
+    try:
+        conn.execute("CREATE UNIQUE INDEX IF NOT EXISTS idx_jobs_idem_unique ON jobs(company_id, idempotency_key)")
+        conn.execute("CREATE UNIQUE INDEX IF NOT EXISTS idx_outbox_idem_unique ON event_outbox(company_id, idempotency_key)")
+        conn.commit()
+    except Exception:
+        pass
+    _ensure_index(conn, "idx_notification_rules_event", "notification_rules", "company_id, event_type", log_fn)
+    _ensure_index(conn, "idx_bank_transactions_company", "bank_transactions", "company_id, matched", log_fn)
 
     _ensure_index(conn, "idx_documents_status", "documents", "status, updated_at", log_fn)
     _ensure_index(conn, "idx_documents_company", "documents", "company_id", log_fn)

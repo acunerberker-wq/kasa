@@ -31,9 +31,11 @@ from .ui.frames import (
     RaporAraclarHubFrame,
     KullanicilarFrame,
     MessagesFrame,
+    IntegrationsHubFrame,
 )
 from .ui.plugins.loader import discover_ui_plugins
 from .modules.notes_reminders.scheduler import ReminderScheduler
+from .modules.integrations.worker import IntegrationWorker
 
 class App:
     def __init__(self, base_dir: Optional[str] = None, test_mode: bool = False):
@@ -111,6 +113,7 @@ class App:
         self.db = DB(db_path)
         # Servis katmanı (UI -> services -> DB)
         self.services = Services.build(self.db, self.usersdb, context_provider=self._hr_context)
+        self.integrations_worker = IntegrationWorker(self.services.integrations)
         try:
             cname = getattr(self, "active_company_name", "")
             if cname:
@@ -751,6 +754,9 @@ class App:
                 continue
             nav_btn(p.nav_text, p.key)
 
+        nav_section("🔌 ENTEGRASYONLAR")
+        nav_btn("🔌 Entegrasyonlar", "entegrasyonlar")
+
         nav_section("📈 RAPOR & ARAÇLAR")
         nav_btn("📈 Rapor & Araçlar", "rapor_araclar")
         nav_btn("💹 Satış Raporları", "satis_raporlari")
@@ -787,6 +793,7 @@ class App:
         self.frames["mesajlar"] = MessagesFrame(body, self)
         self.frames["tanimlar"] = TanimlarHubFrame(body, self)
         self.frames["rapor_araclar"] = RaporAraclarHubFrame(body, self)
+        self.frames["entegrasyonlar"] = IntegrationsHubFrame(body, self)
 
         # Plugin ekranları
         for p in getattr(self, "ui_plugins", []) or []:
@@ -833,6 +840,11 @@ class App:
         # Başlangıç ekranı
         self.show("kasa")
 
+        try:
+            self.integrations_worker.start(self.root)
+        except Exception:
+            pass
+
         self.root.protocol("WM_DELETE_WINDOW", self.on_close)
 
     def _ui_on_show(self, key: str, active_nav_key: Optional[str] = None):
@@ -848,6 +860,7 @@ class App:
             "loglar": "Log",
             "kullanicilar": "Kullanıcılar",
             "mesajlar": "Mesajlar",
+            "entegrasyonlar": "Entegrasyonlar",
         }
 
         # Plugin başlıkları
