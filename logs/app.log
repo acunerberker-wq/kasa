@@ -3740,3 +3740,15 @@ Traceback (most recent call last):
     self.integrations_worker = IntegrationWorker(self.services.integrations)
                                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^
 AttributeError: 'Services' object has no attribute 'integrations'
+2025-12-26 02:50:18,748 [ERROR] kasapro.app: Uygulama başlatma hatası
+Traceback (most recent call last):
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\app.py", line 1292, in main
+    App().run()
+    ~~~^^
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\app.py", line 131, in __init__
+    self.services = Services.build(self.db, self.usersdb, context_provider=self._hr_context)
+                    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\services\context.py", line 67, in build
+    integrations=IntegrationService(db),
+                 ~~~~~~~~~~~~~~~~~~^^^^
+TypeError: IntegrationService.__init__() missing 1 required positional argument: 'context_provider'
