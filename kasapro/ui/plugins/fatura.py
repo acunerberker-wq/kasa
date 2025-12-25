@@ -198,9 +198,8 @@ class FaturaFrame(BaseView):
     # Tab: Editor
     # -----------------
     def _build_edit_tab(self):
-        try:
-            header = ttk.LabelFrame(self.tab_edit, text="Fatura Bilgileri")
-            header.pack(fill=tk.X, padx=8, pady=8)
+        header = ttk.LabelFrame(self.tab_edit, text="Fatura Bilgileri")
+        header.pack(fill=tk.X, padx=8, pady=8)
 
         row1 = ttk.Frame(header)
         row1.pack(fill=tk.X, pady=(6, 2))

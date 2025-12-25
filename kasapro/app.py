@@ -66,9 +66,11 @@ class App:
         self.usersdb = UsersDB(self.base_dir)
 
         if self._test_mode:
-            self.user = self._load_test_user()
+            user_row = self._load_test_user()
+            self.user = dict(user_row) if user_row else None
         else:
-            self.user = self._login()
+            user_row = self._login()
+            self.user = dict(user_row) if user_row else None
         if not self.user:
             try:
                 self.usersdb.close()
@@ -872,12 +874,12 @@ class App:
         # Kısayollar
         try:
             self.root.bind("<F1>", wrap_callback("shortcut_help", lambda _e: self.open_help()))
-            log_ui_event("callback_bound", target="root", event="<F1>", handler="open_help")
+            log_ui_event("callback_bound", target="root", tk_event="<F1>", handler="open_help")
         except Exception:
             pass
         try:
             self.root.bind("<Control-f>", wrap_callback("shortcut_search", lambda _e: self.show("search")))
-            log_ui_event("callback_bound", target="root", event="<Control-f>", handler="show(search)")
+            log_ui_event("callback_bound", target="root", tk_event="<Control-f>", handler="show(search)")
         except Exception:
             pass
 
@@ -885,7 +887,7 @@ class App:
         self.show("kasa")
 
         self.root.protocol("WM_DELETE_WINDOW", wrap_callback("on_close", self.on_close))
-        log_ui_event("callback_bound", target="root", event="WM_DELETE_WINDOW", handler="on_close")
+        log_ui_event("callback_bound", target="root", tk_event="WM_DELETE_WINDOW", handler="on_close")
 
     def _ui_on_show(self, key: str, active_nav_key: Optional[str] = None):
         """Ekran değişince sol menü + başlık gibi UI parçalarını günceller."""

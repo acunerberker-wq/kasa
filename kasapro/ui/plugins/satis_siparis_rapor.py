@@ -328,10 +328,12 @@ class SatisSiparisRaporFrame(BaseView):
             if status == "err":
                 messagebox.showerror(APP_TITLE, f"Rapor oluşturulamadı: {payload}")
                 self._set_status("Rapor hatası.")
-                return            elif status == "warn":
+                return
+            elif status == "warn":
                 messagebox.showwarning(APP_TITLE, str(payload))
                 self._set_status("Rapor yok.")
-                return            self._render_report(key, payload)
+                return
+            self._render_report(key, payload)
 
         self.after(60, poll)
 
