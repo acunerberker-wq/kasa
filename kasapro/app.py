@@ -78,11 +78,9 @@ class App:
         self.usersdb = UsersDB(self.base_dir)
 
         if self._test_mode:
-            user_row = self._load_test_user()
-            self.user = dict(user_row) if user_row else None
+            self.user = self._load_test_user()
         else:
-            user_row = self._login()
-            self.user = dict(user_row) if user_row else None
+            self.user = self._login()
         if not self.user:
             try:
                 self.usersdb.close()
@@ -194,14 +192,6 @@ class App:
 
         threading.Thread(target=worker, daemon=True).start()
 
-    def _hr_context(self) -> HRContext:
-        company_id = int(getattr(self, "active_company_id", None) or 1)
-        return HRContext(
-            company_id=company_id,
-            actor_username=str(self.user["username"]),
-            actor_role=str(self.user["role"]),
-        )
-
     def _install_exception_handlers(self) -> None:
         logger = logging.getLogger(__name__)
 
@@ -221,7 +211,6 @@ class App:
 
         sys.excepthook = handle_exception
         self.root.report_callback_exception = handle_tk_exception
-        log_ui_event("exception_handlers_installed")
 
     def _load_test_user(self) -> sqlite3.Row:
         user = self.usersdb.get_user_by_username("admin")

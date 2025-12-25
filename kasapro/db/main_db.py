@@ -29,8 +29,6 @@ from .repos import (
     SatinAlmaRepo,
     SatisSiparisRepo,
     MessagesRepo,
-    DmsRepo,
-    NotesRemindersRepo,
 )
 from ..modules.hakedis.repo import HakedisRepo
 
@@ -60,10 +58,6 @@ class DB:
         self.satin_alma = SatinAlmaRepo(self.conn)
         self.satis_siparis = SatisSiparisRepo(self.conn)
         self.messages = MessagesRepo(self.conn)
-        self.dms = DmsRepo(self.conn)
-        self.notes_reminders = NotesRemindersRepo(self.conn)
-        self.hakedis = HakedisRepo(self.conn, log_fn=self._safe_log)
-        self.invoice_adv = AdvancedInvoiceRepo(self.conn)
 
         migrate_schema(self.conn, log_fn=self._safe_log)
         seed_defaults(self.conn, log_fn=self._safe_log)

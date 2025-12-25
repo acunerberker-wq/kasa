@@ -283,6 +283,7 @@ class AdvancedInvoiceRepo:
             return
         amount_value = abs(float(safe_float(amount)))
         tip = self._cari_tip_for_doc(doc_type, header)
+        aciklama = str(header.get("notes") or "").strip() or DOC_TYPES.get(doc_type, {}).get("label", "Fatura")
         cur.execute(
             """
             INSERT INTO cari_hareket(tarih, cari_id, tip, tutar, para, aciklama, belge, etiket)
@@ -294,7 +295,7 @@ class AdvancedInvoiceRepo:
                 tip,
                 amount_value,
                 str(header.get("currency") or "TL"),
-                DOC_TYPES.get(doc_type, {}).get("label", "Fatura"),
+                aciklama,
                 doc_no,
                 "invoice",
             ),
@@ -379,6 +380,7 @@ class AdvancedInvoiceRepo:
             payment_id = int(cur.lastrowid or 0)
             if header and header["customer_id"]:
                 tip = self._cari_tip_for_payment(str(header["doc_type"] or ""))
+                payment_label = "Tahsilat" if header["doc_type"] in ("sales", "sales_return") else "Ödeme"
                 cur.execute(
                     """
                     INSERT INTO cari_hareket(tarih, cari_id, tip, tutar, para, aciklama, odeme, belge, etiket)
@@ -390,7 +392,7 @@ class AdvancedInvoiceRepo:
                         tip,
                         float(safe_float(amount)),
                         str(currency or header["currency"] or "TL"),
-                        "Tahsilat" if header["doc_type"] in ("sales", "sales_return") else "Ödeme",
+                        str(description or "").strip() or payment_label,
                         str(method or ""),
                         str(header["doc_no"] or ""),
                         "invoice_payment",
