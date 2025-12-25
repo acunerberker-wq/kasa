@@ -22,6 +22,7 @@ class InvoiceModuleTests(unittest.TestCase):
         self.db_path = os.path.join(self.tmpdir.name, "invoice.db")
         self.db = DB(self.db_path)
         self.repo = self.db.invoice_adv
+        self.customer_id = self.db.cari_upsert("Test Cari")
 
     def tearDown(self) -> None:
         try:
@@ -76,6 +77,17 @@ class InvoiceModuleTests(unittest.TestCase):
         self.assertAlmostEqual(totals.discount_total, 40.0)
         self.assertAlmostEqual(totals.grand_total, 192.0)
 
+    def test_discount_recalculates_vat(self) -> None:
+        totals = calculate_totals(
+            [{"description": "Satır", "qty": 1, "unit_price": 100, "vat_rate": 20}],
+            invoice_discount_value=50,
+            invoice_discount_type="percent",
+            vat_included=False,
+            sign=1,
+        )
+        self.assertAlmostEqual(totals.vat_total, 10.0)
+        self.assertAlmostEqual(totals.grand_total, 60.0)
+
     def test_vat_included(self) -> None:
         totals = calculate_totals(
             [{"description": "KDV dahil", "qty": 1, "unit_price": 118, "vat_rate": 18}],
@@ -87,9 +99,27 @@ class InvoiceModuleTests(unittest.TestCase):
 
     def test_return_invoice_negative(self) -> None:
         lines = [{"description": "İade", "qty": 1, "unit_price": 100, "vat_rate": 20}]
-        doc_id = self.repo.create_doc(self._basic_header("sales_return"), lines)
+        header = self._basic_header("sales_return")
+        header["customer_id"] = self.customer_id
+        header["customer_name"] = "Müşteri"
+        doc_id = self.repo.create_doc(header, lines)
         header = self.repo.get_doc(doc_id)["header"]
         self.assertLess(header["grand_total"], 0)
+        hareket = list(self.db.cari_hareket.list(cari_id=header["customer_id"]))
+        self.assertTrue(hareket)
+        self.assertEqual(hareket[0]["tip"], "Borç")
+
+    def test_purchase_invoice_cari_tip(self) -> None:
+        header = self._basic_header("purchase")
+        header["customer_id"] = self.customer_id
+        header["customer_name"] = "Tedarikci"
+        lines = [{"description": "Alış", "qty": 1, "unit_price": 100, "vat_rate": 20}]
+        doc_id = self.repo.create_doc(header, lines)
+        data = self.repo.get_doc(doc_id)
+        hareket = list(self.db.cari_hareket.list(cari_id=header["customer_id"]))
+        self.assertTrue(hareket)
+        self.assertEqual(hareket[0]["tip"], "Borç")
+        self.assertAlmostEqual(hareket[0]["tutar"], abs(data["header"]["grand_total"]))
 
     def test_void_creates_reversal(self) -> None:
         lines = [{"description": "Test", "qty": 1, "unit_price": 100, "vat_rate": 20}]
@@ -102,10 +132,43 @@ class InvoiceModuleTests(unittest.TestCase):
 
     def test_partial_payment(self) -> None:
         lines = [{"description": "Test", "qty": 1, "unit_price": 100, "vat_rate": 20}]
-        doc_id = self.repo.create_doc(self._basic_header("sales"), lines)
+        header = self._basic_header("sales")
+        header["customer_id"] = self.customer_id
+        header["customer_name"] = "Musteri"
+        doc_id = self.repo.create_doc(header, lines)
         self.repo.add_payment(doc_id, "2025-01-10", 50, "TL", "Kasa")
         remaining = self.repo.remaining_balance(doc_id)
         self.assertAlmostEqual(remaining, 70.0)
+        updated = self.repo.get_doc(doc_id)["header"]
+        self.assertEqual(updated["payment_status"], "PART_PAID")
+
+    def test_overpayment_rejected_on_zero_due(self) -> None:
+        header = self._basic_header("sales")
+        header["customer_id"] = self.customer_id
+        header["customer_name"] = "Musteri"
+        lines = [{"description": "Test", "qty": 0, "unit_price": 100, "vat_rate": 20}]
+        doc_id = self.repo.create_doc(header, lines)
+        with self.assertRaises(ValueError):
+            self.repo.add_payment(doc_id, "2025-01-10", 10, "TL", "Kasa")
+
+    def test_full_payment_status(self) -> None:
+        lines = [{"description": "Test", "qty": 1, "unit_price": 100, "vat_rate": 20}]
+        header = self._basic_header("sales")
+        header["customer_id"] = self.customer_id
+        header["customer_name"] = "Musteri"
+        doc_id = self.repo.create_doc(header, lines)
+        self.repo.add_payment(doc_id, "2025-01-10", 120, "TL", "Kasa")
+        updated = self.repo.get_doc(doc_id)["header"]
+        self.assertEqual(updated["payment_status"], "PAID")
+
+    def test_payment_rejects_overpayment(self) -> None:
+        lines = [{"description": "Test", "qty": 1, "unit_price": 100, "vat_rate": 20}]
+        header = self._basic_header("sales")
+        header["customer_id"] = self.customer_id
+        header["customer_name"] = "Musteri"
+        doc_id = self.repo.create_doc(header, lines)
+        with self.assertRaises(ValueError):
+            self.repo.add_payment(doc_id, "2025-01-10", 200, "TL", "Kasa")
 
     def test_number_collision(self) -> None:
         def worker(result_list):

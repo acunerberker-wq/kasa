@@ -402,6 +402,7 @@ def init_schema(conn: sqlite3.Connection) -> None:
         grand_total REAL NOT NULL DEFAULT 0,
         notes TEXT DEFAULT '',
         warehouse_id INTEGER,
+        payment_status TEXT NOT NULL DEFAULT 'UNPAID',
         created_by INTEGER,
         created_by_name TEXT DEFAULT '',
         created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -2252,6 +2253,7 @@ def migrate_schema(conn: sqlite3.Connection, log_fn: Optional[Callable[[str, str
     _ensure_index(conn, "idx_trade_docs_company", "trade_docs", "company_id, doc_type, status", log_fn)
     _ensure_index(conn, "idx_trade_doc_lines_doc", "trade_doc_lines", "doc_id", log_fn)
     _ensure_index(conn, "idx_trade_stock_moves_company", "trade_stock_moves", "company_id, item", log_fn)
+    _ensure_index(conn, "idx_stock_moves_doc", "stock_moves", "doc_id", log_fn)
     _ensure_index(conn, "idx_trade_payments_doc", "trade_payments", "doc_id", log_fn)
     _ensure_index(conn, "idx_trade_orders_company", "trade_orders", "company_id, order_type, status", log_fn)
     _ensure_index(conn, "idx_trade_order_lines_order", "trade_order_lines", "order_id", log_fn)
@@ -2297,6 +2299,7 @@ def migrate_schema(conn: sqlite3.Connection, log_fn: Optional[Callable[[str, str
     # invoice docs
     _ensure_column(conn, "docs", "voided_at", "TEXT", log_fn)
     _ensure_column(conn, "docs", "reversed_doc_id", "INTEGER", log_fn)
+    _ensure_column(conn, "docs", "payment_status", "TEXT NOT NULL DEFAULT 'UNPAID'", log_fn)
 
     # cari_hareket
     _ensure_column(conn, "cari_hareket", "para", "TEXT DEFAULT 'TL'", log_fn)

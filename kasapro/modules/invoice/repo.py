@@ -70,6 +70,25 @@ class AdvancedInvoiceRepo:
     def _doc_type_sign(self, doc_type: str) -> int:
         return DOC_TYPES.get(doc_type, {}).get("sign", 1)
 
+    def _invert_tip(self, tip: str) -> str:
+        return "Borç" if tip == "Alacak" else "Alacak"
+
+    def _cari_tip_for_doc(self, doc_type: str, header: Dict[str, Any]) -> str:
+        mapping = {
+            "sales": "Alacak",
+            "purchase": "Borç",
+            "sales_return": "Borç",
+            "purchase_return": "Alacak",
+        }
+        if doc_type == "void":
+            original_type = str(header.get("reversal_of_type") or "")
+            if original_type in mapping:
+                return self._invert_tip(mapping[original_type])
+        return mapping.get(doc_type, "Alacak")
+
+    def _cari_tip_for_payment(self, doc_type: str) -> str:
+        return "Borç" if doc_type in ("sales", "sales_return") else "Alacak"
+
     def list_docs(
         self,
         company_id: int,
@@ -164,6 +183,7 @@ class AdvancedInvoiceRepo:
             cur.execute("BEGIN IMMEDIATE")
             doc_no = self._reserve_doc_no(cur, company_id, series, year)
 
+            payment_status = "PAID" if abs(totals.grand_total) < 0.01 else "UNPAID"
             cur.execute(
                 """
                 INSERT INTO docs(
@@ -171,8 +191,8 @@ class AdvancedInvoiceRepo:
                     is_proforma, customer_id, customer_name, currency, vat_included,
                     invoice_discount_type, invoice_discount_value,
                     subtotal, discount_total, vat_total, grand_total, notes, warehouse_id,
-                    created_by, created_by_name
-                ) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+                    payment_status, created_by, created_by_name
+                ) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
                 """,
                 (
                     company_id,
@@ -196,6 +216,7 @@ class AdvancedInvoiceRepo:
                     totals.grand_total,
                     str(header.get("notes") or ""),
                     header.get("warehouse_id"),
+                    payment_status,
                     int(user_id) if user_id is not None else None,
                     str(username or ""),
                 ),
@@ -230,10 +251,21 @@ class AdvancedInvoiceRepo:
                 )
 
                 if status == "POSTED" and not is_proforma:
-                    self._create_stock_move(cur, company_id, doc_id, line, doc_type, doc_date, header.get("warehouse_id"))
+                    self._create_stock_move(
+                        cur,
+                        doc_id,
+                        line,
+                        doc_type,
+                        doc_no,
+                        doc_date,
+                        header.get("warehouse_id"),
+                    )
 
             if status == "POSTED" and not is_proforma:
-                self._create_cari_hareket(cur, header, totals.grand_total, doc_no, doc_type, doc_date)
+                header_for_ledger = dict(header)
+                if "reversal_of_type" in header:
+                    header_for_ledger["reversal_of_type"] = header["reversal_of_type"]
+                self._create_cari_hareket(cur, header_for_ledger, totals.grand_total, doc_no, doc_type, doc_date)
 
             self._audit(cur, company_id, user_id, username, "create", "doc", doc_id, f"{doc_type} #{doc_no}")
             self.conn.commit()
@@ -249,6 +281,8 @@ class AdvancedInvoiceRepo:
     def _create_cari_hareket(self, cur, header: Dict[str, Any], amount: float, doc_no: str, doc_type: str, doc_date: str) -> None:
         if not header.get("customer_id"):
             return
+        amount_value = abs(float(safe_float(amount)))
+        tip = self._cari_tip_for_doc(doc_type, header)
         cur.execute(
             """
             INSERT INTO cari_hareket(tarih, cari_id, tip, tutar, para, aciklama, belge, etiket)
@@ -257,10 +291,10 @@ class AdvancedInvoiceRepo:
             (
                 doc_date,
                 int(header.get("customer_id")),
-                DOC_TYPES.get(doc_type, {}).get("label", "Fatura"),
-                float(safe_float(amount)),
+                tip,
+                amount_value,
                 str(header.get("currency") or "TL"),
-                str(header.get("notes") or ""),
+                DOC_TYPES.get(doc_type, {}).get("label", "Fatura"),
                 doc_no,
                 "invoice",
             ),
@@ -269,35 +303,35 @@ class AdvancedInvoiceRepo:
     def _create_stock_move(
         self,
         cur,
-        company_id: int,
         doc_id: int,
         line: Dict[str, Any],
         doc_type: str,
+        doc_no: str,
         doc_date: str,
         warehouse_id: Any,
     ) -> None:
         item_id = line.get("item_id")
         if not item_id:
             return
-        direction = DOC_TYPES.get(doc_type, {}).get("direction", "OUT")
+        direction = line.get("move_direction") or DOC_TYPES.get(doc_type, {}).get("direction", "OUT")
         cur.execute(
             """
             INSERT INTO stock_moves(
-                company_id, doc_id, doc_line_id, item_id, warehouse_id, move_date,
-                direction, qty, unit, description
+                doc_id, line_id, item_id, qty, unit, direction, move_date,
+                warehouse_id, doc_type, doc_no
             ) VALUES(?,?,?,?,?,?,?,?,?,?)
             """,
             (
-                int(company_id),
                 int(doc_id),
                 None,
                 int(item_id),
-                warehouse_id,
-                doc_date,
-                direction,
                 float(safe_float(line.get("qty") or 0)),
                 str(line.get("unit") or ""),
-                str(line.get("description") or ""),
+                str(direction or ""),
+                doc_date,
+                warehouse_id,
+                str(doc_type or ""),
+                str(doc_no or ""),
             ),
         )
 
@@ -316,6 +350,17 @@ class AdvancedInvoiceRepo:
         cur = self.conn.cursor()
         try:
             cur.execute("BEGIN")
+            header = self.conn.execute("SELECT * FROM docs WHERE id=?", (int(doc_id),)).fetchone()
+            if not header:
+                raise ValueError("Belge bulunamadı")
+            if header["status"] == "VOID":
+                raise ValueError("İptal edilen belgeye ödeme eklenemez")
+            remaining = self.remaining_balance(int(doc_id))
+            amount_value = float(safe_float(amount))
+            if remaining <= 0 and amount_value > 0:
+                raise ValueError("Ödeme tutarı kalan bakiyeyi aşamaz")
+            if remaining > 0 and amount_value - remaining > 0.009:
+                raise ValueError("Ödeme tutarı kalan bakiyeyi aşamaz")
             cur.execute(
                 """
                 INSERT INTO payments(doc_id, pay_date, amount, currency, method, description, ref)
@@ -332,9 +377,8 @@ class AdvancedInvoiceRepo:
                 ),
             )
             payment_id = int(cur.lastrowid or 0)
-
-            header = self.conn.execute("SELECT * FROM docs WHERE id=?", (int(doc_id),)).fetchone()
             if header and header["customer_id"]:
+                tip = self._cari_tip_for_payment(str(header["doc_type"] or ""))
                 cur.execute(
                     """
                     INSERT INTO cari_hareket(tarih, cari_id, tip, tutar, para, aciklama, odeme, belge, etiket)
@@ -343,15 +387,34 @@ class AdvancedInvoiceRepo:
                     (
                         parse_date_smart(pay_date),
                         int(header["customer_id"]),
-                        "Tahsilat" if header["doc_type"] in ("sales", "sales_return") else "Ödeme",
+                        tip,
                         float(safe_float(amount)),
                         str(currency or header["currency"] or "TL"),
-                        str(description or ""),
+                        "Tahsilat" if header["doc_type"] in ("sales", "sales_return") else "Ödeme",
                         str(method or ""),
                         str(header["doc_no"] or ""),
                         "invoice_payment",
                     ),
                 )
+
+            total_due = abs(float(safe_float(header["grand_total"]))) if header else 0.0
+            paid_total = float(
+                safe_float(
+                    self.conn.execute(
+                        "SELECT COALESCE(SUM(amount),0) FROM payments WHERE doc_id=?",
+                        (int(doc_id),),
+                    ).fetchone()[0]
+                )
+            )
+            if total_due <= 0.01:
+                payment_status = "PAID"
+            elif paid_total <= 0.01:
+                payment_status = "UNPAID"
+            elif paid_total + 0.009 < total_due:
+                payment_status = "PART_PAID"
+            else:
+                payment_status = "PAID"
+            cur.execute("UPDATE docs SET payment_status=? WHERE id=?", (payment_status, int(doc_id)))
 
             self._audit(cur, int(header["company_id"]) if header else 1, user_id, username, "payment", "doc", doc_id, f"{amount}")
             self.conn.commit()
@@ -375,7 +438,7 @@ class AdvancedInvoiceRepo:
             cur = self.conn.cursor()
             cur.execute("BEGIN IMMEDIATE")
             cur.execute(
-                "UPDATE docs SET status='VOID', voided_at=CURRENT_TIMESTAMP WHERE id=?",
+                "UPDATE docs SET status='VOID', payment_status='VOID', voided_at=CURRENT_TIMESTAMP WHERE id=?",
                 (int(doc_id),),
             )
             self._audit(cur, int(header["company_id"]), user_id, username, "void", "doc", doc_id, "voided")
@@ -383,20 +446,22 @@ class AdvancedInvoiceRepo:
 
             lines = list(self.conn.execute("SELECT * FROM doc_lines WHERE doc_id=?", (int(doc_id),)))
             reverse_lines = []
+            direction = "IN" if DOC_TYPES.get(header["doc_type"], {}).get("direction") == "OUT" else "OUT"
             for line in lines:
                 reverse_lines.append(
                     {
                         "line_no": line["line_no"],
                         "item_id": line["item_id"],
                         "description": line["description"],
-                        "qty": -float(safe_float(line["qty"] or 0)),
+                        "qty": abs(float(safe_float(line["qty"] or 0))),
                         "unit": line["unit"],
                         "unit_price": float(safe_float(line["unit_price"] or 0)),
                         "vat_rate": float(safe_float(line["vat_rate"] or 0)),
                         "line_discount_type": line["line_discount_type"],
                         "line_discount_value": float(safe_float(line["line_discount_value"] or 0)),
-                }
-            )
+                        "move_direction": direction,
+                    }
+                )
 
             reverse_header = {
                 "company_id": header["company_id"],
@@ -414,6 +479,7 @@ class AdvancedInvoiceRepo:
                 "is_proforma": 0,
                 "notes": f"{header['doc_no']} iptali",
                 "warehouse_id": header["warehouse_id"],
+                "reversal_of_type": header["doc_type"],
             }
 
             reverse_id = self.create_doc(reverse_header, reverse_lines, user_id=user_id, username=username)
@@ -429,12 +495,13 @@ class AdvancedInvoiceRepo:
             raise
 
     def remaining_balance(self, doc_id: int) -> float:
-        header = self.conn.execute("SELECT grand_total FROM docs WHERE id=?", (int(doc_id),)).fetchone()
-        if not header:
+        header = self.conn.execute("SELECT grand_total, status FROM docs WHERE id=?", (int(doc_id),)).fetchone()
+        if not header or header["status"] == "VOID":
             return 0.0
         paid = self.conn.execute("SELECT COALESCE(SUM(amount),0) FROM payments WHERE doc_id=?", (int(doc_id),)).fetchone()
         paid_amount = float(safe_float(paid[0] if paid else 0))
-        return float(safe_float(header["grand_total"])) - paid_amount
+        total_due = abs(float(safe_float(header["grand_total"])))
+        return max(0.0, total_due - paid_amount)
 
     def _audit(
         self,
