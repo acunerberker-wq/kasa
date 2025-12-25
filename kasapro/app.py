@@ -23,7 +23,9 @@ from .utils import _safe_slug, fmt_amount
 from .db.main_db import DB
 from .db.users_db import UsersDB
 from .services import Services
+from .ui.navigation import ScreenRegistry
 from .ui.style import apply_modern_style
+from .ui.ui_logging import log_ui_event, wrap_callback
 from .ui.windows import LoginWindow, SettingsWindow, HelpWindow, ImportWizard
 from .ui.frames import (
     KasaFrame,
@@ -204,6 +206,7 @@ class App:
 
         sys.excepthook = handle_exception
         self.root.report_callback_exception = handle_tk_exception
+        log_ui_event("exception_handlers_installed")
 
     def _load_test_user(self) -> sqlite3.Row:
         user = self.usersdb.get_user_by_username("admin")
@@ -621,6 +624,7 @@ class App:
 
         container = ttk.Frame(self.root, style="TFrame")
         container.pack(fill=tk.BOTH, expand=True)
+        log_ui_event("container_created", view="root_container")
 
         # Sol menü
         nav = ttk.Frame(container, style="Sidebar.TFrame", width=270)
@@ -645,12 +649,24 @@ class App:
         self.lbl_page_sub.pack(side=tk.LEFT, pady=10)
 
         # Hızlı butonlar
-        ttk.Button(topbar, text="❓", width=3, command=self.open_help).pack(side=tk.RIGHT, padx=(6, 10), pady=8)
-        ttk.Button(topbar, text="⚙️", width=3, command=self.open_settings).pack(side=tk.RIGHT, padx=6, pady=8)
+        ttk.Button(
+            topbar,
+            text="❓",
+            width=3,
+            command=wrap_callback("open_help", self.open_help),
+        ).pack(side=tk.RIGHT, padx=(6, 10), pady=8)
+        ttk.Button(
+            topbar,
+            text="⚙️",
+            width=3,
+            command=wrap_callback("open_settings", self.open_settings),
+        ).pack(side=tk.RIGHT, padx=6, pady=8)
 
         # İçerik gövdesi (ekranlar buraya gelecek)
         body = ttk.Frame(content, style="TFrame")
         body.pack(fill=tk.BOTH, expand=True, padx=12, pady=(0, 12))
+        self.screen_registry = ScreenRegistry(body, self)
+        self.frames = self.screen_registry.frames
 
         # Status bar
         self.status_var = tk.StringVar(value="F1: Yardım  •  Ctrl+F: Global Arama  •  Çift tık: Düzenle")
@@ -697,7 +713,13 @@ class App:
         menu.pack(fill=tk.BOTH, expand=True, padx=8, pady=(0, 8))
 
         def nav_btn(text, key):
-            b = ttk.Button(menu, text=text, style="Sidebar.TButton", command=lambda k=key: self.show(k))
+            log_ui_event("menu_added", key=key, text=text)
+            b = ttk.Button(
+                menu,
+                text=text,
+                style="Sidebar.TButton",
+                command=wrap_callback(f"nav:{key}", lambda k=key: self.show(k)),
+            )
             b.pack(fill=tk.X, padx=4, pady=2)
             self.nav_buttons[key] = b
             return b
@@ -707,6 +729,7 @@ class App:
             try:
                 ttk.Label(menu, text=title, style="SidebarSection.TLabel").pack(fill=tk.X, padx=4, pady=(10, 2))
                 ttk.Separator(menu, orient="horizontal").pack(fill=tk.X, padx=10, pady=(0, 6))
+                log_ui_event("menu_section_added", title=title)
             except Exception:
                 ttk.Label(menu, text=title, style="SidebarSub.TLabel").pack(fill=tk.X, padx=8, pady=(10, 4))
 
@@ -770,10 +793,20 @@ class App:
 
         ttk.Separator(actions, orient="horizontal").pack(fill=tk.X, padx=4, pady=(4, 8))
 
-        self.btn_import_excel = ttk.Button(actions, text="📥 Excel İçe Aktar", command=self.import_excel)
+        self.btn_import_excel = ttk.Button(
+            actions,
+            text="📥 Excel İçe Aktar",
+            style="Primary.TButton",
+            command=wrap_callback("import_excel", self.import_excel),
+        )
         self.btn_import_excel.pack(fill=tk.X, padx=4, pady=2)
 
-        self.btn_export_excel = ttk.Button(actions, text="📤 Excel Export", command=self.export_excel)
+        self.btn_export_excel = ttk.Button(
+            actions,
+            text="📤 Excel Export",
+            style="Secondary.TButton",
+            command=wrap_callback("export_excel", self.export_excel),
+        )
         self.btn_export_excel.pack(fill=tk.X, padx=4, pady=2)
 
         # openpyxl yoksa Excel import/export devre dışı
@@ -786,25 +819,29 @@ class App:
 
         # DB yedek/geri yükle işlemleri artık ⚙️ Ayarlar > DB sekmelerine taşındı.
 
-        ttk.Button(actions, text="🚪 Çıkış", command=self.on_close).pack(fill=tk.X, padx=4, pady=(8, 2))
+        ttk.Button(
+            actions,
+            text="🚪 Çıkış",
+            style="Danger.TButton",
+            command=wrap_callback("on_close", self.on_close),
+        ).pack(fill=tk.X, padx=4, pady=(8, 2))
 
         # Ekranlar
-        self.frames["kasa"] = KasaFrame(body, self)
-        self.frames["mesajlar"] = MessagesFrame(body, self)
-        self.frames["tanimlar"] = TanimlarHubFrame(body, self)
-        self.frames["rapor_araclar"] = RaporAraclarHubFrame(body, self)
-        self.frames["entegrasyonlar"] = IntegrationsHubFrame(body, self)
+        self.screen_registry.register("kasa", lambda parent, app: KasaFrame(parent, app), title="Kasa")
+        self.screen_registry.register("mesajlar", lambda parent, app: MessagesFrame(parent, app), title="Mesajlar")
+        self.screen_registry.register("tanimlar", lambda parent, app: TanimlarHubFrame(parent, app), title="Tanımlar")
+        self.screen_registry.register(
+            "rapor_araclar",
+            lambda parent, app: RaporAraclarHubFrame(parent, app),
+            title="Rapor & Araçlar",
+        )
 
         # Plugin ekranları
         for p in getattr(self, "ui_plugins", []) or []:
-            try:
-                self.frames[p.key] = p.build(body, self)
-            except Exception:
-                # hatalı eklenti uygulamayı düşürmesin
-                pass
+            self.screen_registry.register(p.key, p.build, title=p.page_title)
 
         if self.is_admin:
-            self.frames["kullanicilar"] = KullanicilarFrame(body, self)
+            self.screen_registry.register("kullanicilar", lambda parent, app: KullanicilarFrame(parent, app), title="Kullanıcılar")
 
         # İlk yüklemeler
         try:
@@ -829,23 +866,21 @@ class App:
 
         # Kısayollar
         try:
-            self.root.bind("<F1>", lambda _e: self.open_help())
+            self.root.bind("<F1>", wrap_callback("shortcut_help", lambda _e: self.open_help()))
+            log_ui_event("callback_bound", target="root", event="<F1>", handler="open_help")
         except Exception:
             pass
         try:
-            self.root.bind("<Control-f>", lambda _e: self.show("search"))
+            self.root.bind("<Control-f>", wrap_callback("shortcut_search", lambda _e: self.show("search")))
+            log_ui_event("callback_bound", target="root", event="<Control-f>", handler="show(search)")
         except Exception:
             pass
 
         # Başlangıç ekranı
         self.show("kasa")
 
-        try:
-            self.integrations_worker.start(self.root)
-        except Exception:
-            pass
-
-        self.root.protocol("WM_DELETE_WINDOW", self.on_close)
+        self.root.protocol("WM_DELETE_WINDOW", wrap_callback("on_close", self.on_close))
+        log_ui_event("callback_bound", target="root", event="WM_DELETE_WINDOW", handler="on_close")
 
     def _ui_on_show(self, key: str, active_nav_key: Optional[str] = None):
         """Ekran değişince sol menü + başlık gibi UI parçalarını günceller."""
@@ -910,11 +945,9 @@ class App:
             except Exception:
                 target_key = key
 
-        for k, f in self.frames.items():
-            if k == target_key:
-                f.pack(fill=tk.BOTH, expand=True)
-            else:
-                f.pack_forget()
+        if target_key not in self.frames:
+            log_ui_event("screen_missing", key=target_key, source=key)
+        self.screen_registry.show(target_key)
 
         # Route sonrası aksiyonlar
         if isinstance(route, dict):

@@ -16,6 +16,7 @@ from tkinter import ttk, messagebox, filedialog
 from ...config import APP_TITLE, HAS_OPENPYXL, HAS_REPORTLAB
 from ...db.main_db import DB
 from ...utils import fmt_amount, fmt_tr_date, parse_date_smart, ensure_pdf_fonts
+from ..base import BaseView
 from ..widgets import LabeledCombo, LabeledEntry
 
 if TYPE_CHECKING:
@@ -92,10 +93,10 @@ REPORTS = {
 }
 
 
-class SatinAlmaRaporlarFrame(ttk.Frame):
+class SatinAlmaRaporlarFrame(BaseView):
     def __init__(self, master, app: "App"):
-        super().__init__(master)
         self.app = app
+        super().__init__(master, app)
         self.report_trees: Dict[str, ttk.Treeview] = {}
         self.report_labels: Dict[str, ttk.Label] = {}
         self.report_rows: Dict[str, List[Dict[str, Any]]] = {}
@@ -103,6 +104,9 @@ class SatinAlmaRaporlarFrame(ttk.Frame):
         self.report_keys: Dict[str, List[str]] = {}
         self._queue: "queue.Queue[Tuple[str, Any]]" = queue.Queue()
         self._worker_active = False
+        self.build_ui()
+
+    def build_ui(self) -> None:
         self._build()
 
     def _build(self):
@@ -152,7 +156,7 @@ class SatinAlmaRaporlarFrame(ttk.Frame):
         self._reload_filters()
         self._refresh_summary()
 
-    def refresh(self):
+    def refresh(self, data=None):
         self._reload_filters()
         self._refresh_summary()
 

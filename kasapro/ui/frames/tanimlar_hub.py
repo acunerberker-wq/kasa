@@ -17,6 +17,8 @@ from typing import Optional, TYPE_CHECKING
 import tkinter as tk
 from tkinter import ttk
 
+from ..base import BaseView
+from ..ui_logging import log_ui_event, wrap_callback
 from .cariler import CarilerFrame
 
 if TYPE_CHECKING:
@@ -40,13 +42,16 @@ def _find_first_notebook(root: tk.Misc) -> Optional[ttk.Notebook]:
     return None
 
 
-class TanimlarHubFrame(ttk.Frame):
+class TanimlarHubFrame(BaseView):
     """Tanımlar tek ekranda: Cariler / Çalışanlar / Meslekler."""
 
     def __init__(self, master, app: "App"):
-        super().__init__(master)
         self.app = app
+        super().__init__(master, app)
 
+        self.build_ui()
+
+    def build_ui(self) -> None:
         self.nb = ttk.Notebook(self)
         self.nb.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
 
@@ -56,8 +61,11 @@ class TanimlarHubFrame(ttk.Frame):
         self.tab_meslekler = ttk.Frame(self.nb)
 
         self.nb.add(self.tab_cariler, text="👥 Cariler")
+        log_ui_event("tab_added", tab="cariler", container="tanimlar")
         self.nb.add(self.tab_calisanlar, text="👷 Çalışanlar")
+        log_ui_event("tab_added", tab="calisanlar", container="tanimlar")
         self.nb.add(self.tab_meslekler, text="🧑‍🏭 Meslekler")
+        log_ui_event("tab_added", tab="meslekler", container="tanimlar")
 
         # İçerikler
         self._build_cariler()
@@ -65,7 +73,10 @@ class TanimlarHubFrame(ttk.Frame):
         self._build_meslekler()
 
         try:
-            self.nb.bind("<<NotebookTabChanged>>", lambda _e: self._on_tab_change())
+            self.nb.bind(
+                "<<NotebookTabChanged>>",
+                wrap_callback("tanimlar_tab_change", lambda _e: self._on_tab_change()),
+            )
         except Exception:
             pass
 
@@ -172,7 +183,7 @@ class TanimlarHubFrame(ttk.Frame):
         # Sekme seçilince iç sekmeleri de doğru konuma al
         self._on_tab_change()
 
-    def refresh(self):
+    def refresh(self, data=None):
         """Tanımlar ekranındaki alt ekranları tazeler."""
         try:
             if hasattr(self, "cariler_frame") and hasattr(self.cariler_frame, "refresh"):

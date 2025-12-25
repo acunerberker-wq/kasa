@@ -10,6 +10,7 @@ from tkinter import ttk, messagebox
 
 from ...config import APP_TITLE
 from ...utils import today_iso, fmt_tr_date, parse_number_smart, safe_float, fmt_amount
+from ..base import BaseView
 from ..widgets import LabeledEntry, LabeledCombo
 
 if TYPE_CHECKING:
@@ -23,11 +24,14 @@ PLUGIN_META = {
 }
 
 
-class StokFrame(ttk.Frame):
+class StokFrame(BaseView):
     def __init__(self, master, app: "App"):
-        super().__init__(master)
         self.app = app
+        super().__init__(master, app)
         self.edit_urun_id: Optional[int] = None
+        self.build_ui()
+
+    def build_ui(self) -> None:
         self._build()
 
     # -----------------
@@ -866,7 +870,7 @@ class StokFrame(ttk.Frame):
     # -----------------
     # Genel refresh
     # -----------------
-    def refresh(self):
+    def refresh(self, data=None):
         self._reload_tedarikci_combo()
         self._reload_urun_combo()
         self._reload_parti_urun_combo()

@@ -17,6 +17,9 @@ from typing import Callable, List, Tuple, TYPE_CHECKING
 import tkinter as tk
 from tkinter import ttk, messagebox
 
+from ..base import BaseView
+from ..ui_logging import wrap_callback
+
 from ...config import (
     APP_BASE_DIR,
     APP_TITLE,
@@ -47,11 +50,14 @@ class CheckResult:
     detail: str
 
 
-class DiagnosticsFrame(ttk.Frame):
+class DiagnosticsFrame(BaseView):
     def __init__(self, master, app: "App"):
-        super().__init__(master)
         self.app = app
+        super().__init__(master, app)
         self.status_var = tk.StringVar(value="Hazır")
+        self.build_ui()
+
+    def build_ui(self) -> None:
         self._build()
 
     def _build(self):
@@ -75,9 +81,15 @@ class DiagnosticsFrame(ttk.Frame):
 
         actions = ttk.Frame(self)
         actions.pack(fill=tk.X, padx=10, pady=6)
-        ttk.Button(actions, text="Testleri Çalıştır", command=self.run_checks).pack(side=tk.LEFT)
-        ttk.Button(actions, text="Temizle", command=self.clear_results).pack(side=tk.LEFT, padx=6)
-        ttk.Button(actions, text="Raporu Kopyala", command=self.copy_report).pack(side=tk.LEFT)
+        ttk.Button(actions, text="Testleri Çalıştır", command=wrap_callback("diagnostics_run", self.run_checks)).pack(
+            side=tk.LEFT
+        )
+        ttk.Button(actions, text="Temizle", command=wrap_callback("diagnostics_clear", self.clear_results)).pack(
+            side=tk.LEFT, padx=6
+        )
+        ttk.Button(actions, text="Raporu Kopyala", command=wrap_callback("diagnostics_copy", self.copy_report)).pack(
+            side=tk.LEFT
+        )
 
         table_wrap = ttk.Frame(self)
         table_wrap.pack(fill=tk.BOTH, expand=True, padx=10, pady=(0, 10))

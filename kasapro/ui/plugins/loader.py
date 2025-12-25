@@ -18,6 +18,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from importlib import import_module
+import logging
 import pkgutil
 from typing import Callable, Dict, List, Optional
 
@@ -38,10 +39,12 @@ def discover_ui_plugins() -> List[UIPlugin]:
 
     Hatalı/eksik eklentiler uygulamayı düşürmez; sessizce atlanır.
     """
+    logger = logging.getLogger("kasapro.ui.plugins")
     plugins: List[UIPlugin] = []
     try:
         pkg = import_module("kasapro.ui.plugins")
     except Exception:
+        logger.exception("UI plugin package import failed")
         return []
 
     for modinfo in pkgutil.iter_modules(getattr(pkg, "__path__", []), pkg.__name__ + "."):
@@ -52,6 +55,7 @@ def discover_ui_plugins() -> List[UIPlugin]:
         try:
             mod = import_module(name)
         except Exception:
+            logger.exception("UI plugin import failed: %s", name)
             continue
 
         meta: Optional[Dict[str, object]] = getattr(mod, "PLUGIN_META", None)
@@ -70,6 +74,7 @@ def discover_ui_plugins() -> List[UIPlugin]:
             else:
                 order = 100
         except Exception:
+            logger.exception("UI plugin metadata invalid: %s", name)
             continue
         if not key or not nav_text:
             continue

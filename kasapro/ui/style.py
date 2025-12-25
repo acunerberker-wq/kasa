@@ -113,6 +113,26 @@ def apply_modern_style(root: tk.Tk):
     style.configure("TButton", padding=(12, 8))
     style.map("TButton", foreground=[("disabled", "#9CA3AF")])
 
+    # Buton varyantları
+    style.configure("Primary.TButton", padding=(12, 8), background=colors["accent"], foreground="#ffffff")
+    style.map(
+        "Primary.TButton",
+        background=[("active", "#1D4ED8"), ("!active", colors["accent"])],
+        foreground=[("disabled", "#E5E7EB"), ("!disabled", "#ffffff")],
+    )
+    style.configure("Secondary.TButton", padding=(12, 8), background=colors["panel"], foreground=colors["text"])
+    style.map(
+        "Secondary.TButton",
+        background=[("active", "#F3F4F6"), ("!active", colors["panel"])],
+        foreground=[("disabled", "#9CA3AF"), ("!disabled", colors["text"])],
+    )
+    style.configure("Danger.TButton", padding=(12, 8), background=colors["danger"], foreground="#ffffff")
+    style.map(
+        "Danger.TButton",
+        background=[("active", "#B91C1C"), ("!active", colors["danger"])],
+        foreground=[("disabled", "#FCA5A5"), ("!disabled", "#ffffff")],
+    )
+
     # Giriş alanları
     style.configure("TEntry", padding=6)
     style.configure("TCombobox", padding=4)

@@ -16,18 +16,22 @@ from ...utils import (
     fmt_tr_date,
     fmt_amount,
 )
+from ..base import BaseView
 from ..widgets import SimpleField, LabeledEntry, LabeledCombo, MoneyEntry
 
 if TYPE_CHECKING:
     from ...app import App
-class CariHareketFrame(ttk.Frame):
+class CariHareketFrame(BaseView):
     def __init__(self, master, app: "App"):
-        super().__init__(master)
         self.app = app
+        super().__init__(master, app)
         self.edit_id: Optional[int] = None
         self._aciklama_win = None
         self._aciklama_txt = None
         self.multi_mode = tk.BooleanVar(value=False)
+        self.build_ui()
+
+    def build_ui(self) -> None:
         self._build()
 
     def _build(self):
@@ -382,7 +386,7 @@ class CariHareketFrame(ttk.Frame):
         self.in_belge.set("")
         self.in_tutar.set("")
 
-    def refresh(self):
+    def refresh(self, data=None):
         for i in self.tree.get_children():
             self.tree.delete(i)
         cid = self._selected_cari_id(self.f_cari.get())

@@ -14,15 +14,20 @@ from ...utils import (
     safe_float,
     fmt_amount,
 )
+from ..base import BaseView
+from ..ui_logging import wrap_callback
 from ..widgets import LabeledEntry
 
 if TYPE_CHECKING:
     from ...app import App
 
-class RaporlarFrame(ttk.Frame):
+class RaporlarFrame(BaseView):
     def __init__(self, master, app: "App"):
-        super().__init__(master)
         self.app = app
+        super().__init__(master, app)
+        self.build_ui()
+
+    def build_ui(self) -> None:
         self._build()
 
     def _build(self):
@@ -35,8 +40,10 @@ class RaporlarFrame(ttk.Frame):
         self.d_from.pack(side=tk.LEFT, padx=6)
         self.d_to = LabeledEntry(r, "Bitiş:", 12)
         self.d_to.pack(side=tk.LEFT, padx=6)
-        ttk.Button(r, text="Son 30 gün", command=self.last30).pack(side=tk.LEFT, padx=6)
-        ttk.Button(r, text="Yenile", command=self.refresh).pack(side=tk.LEFT, padx=6)
+        ttk.Button(r, text="Son 30 gün", command=wrap_callback("raporlar_last30", self.last30)).pack(
+            side=tk.LEFT, padx=6
+        )
+        ttk.Button(r, text="Yenile", command=wrap_callback("raporlar_refresh", self.refresh)).pack(side=tk.LEFT, padx=6)
 
         self.lbl_kasa = ttk.Label(top, text="")
         self.lbl_kasa.pack(anchor="w", padx=10, pady=(0,10))
@@ -52,7 +59,10 @@ class RaporlarFrame(ttk.Frame):
         self.canvas = tk.Canvas(left, highlightthickness=0)
         self.scroll = ttk.Scrollbar(left, orient="vertical", command=self.canvas.yview)
         self.inner = ttk.Frame(self.canvas)
-        self.inner.bind("<Configure>", lambda e: self.canvas.configure(scrollregion=self.canvas.bbox("all")))
+        self.inner.bind(
+            "<Configure>",
+            wrap_callback("raporlar_canvas_config", lambda e: self.canvas.configure(scrollregion=self.canvas.bbox("all"))),
+        )
         self.canvas.create_window((0,0), window=self.inner, anchor="nw")
         self.canvas.configure(yscrollcommand=self.scroll.set)
         self.canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=6, pady=6)
@@ -60,9 +70,17 @@ class RaporlarFrame(ttk.Frame):
 
         btmL = ttk.Frame(left)
         btmL.pack(fill=tk.X, padx=6, pady=6)
-        ttk.Button(btmL, text="Tümünü Seç", command=lambda: self.set_all(True)).pack(side=tk.LEFT, padx=6)
-        ttk.Button(btmL, text="Tümünü Kaldır", command=lambda: self.set_all(False)).pack(side=tk.LEFT, padx=6)
-        ttk.Button(btmL, text="Hesapla", command=self.calc_selected).pack(side=tk.LEFT, padx=6)
+        ttk.Button(btmL, text="Tümünü Seç", command=wrap_callback("raporlar_select_all", lambda: self.set_all(True))).pack(
+            side=tk.LEFT, padx=6
+        )
+        ttk.Button(
+            btmL,
+            text="Tümünü Kaldır",
+            command=wrap_callback("raporlar_clear_all", lambda: self.set_all(False)),
+        ).pack(side=tk.LEFT, padx=6)
+        ttk.Button(btmL, text="Hesapla", command=wrap_callback("raporlar_calc", self.calc_selected)).pack(
+            side=tk.LEFT, padx=6
+        )
         self.lbl_sel = ttk.Label(btmL, text="", justify="left")
         self.lbl_sel.pack(side=tk.RIGHT, padx=6)
 
@@ -78,7 +96,7 @@ class RaporlarFrame(ttk.Frame):
         self.d_to.set(d_to.strftime("%d.%m.%Y"))
         self.refresh()
 
-    def refresh(self):
+    def refresh(self, data=None):
         totals = self.app.db.kasa_toplam(self.d_from.get(), self.d_to.get())
         self.lbl_kasa.config(text=f"KASA → Gelir: {fmt_amount(totals['gelir'])} | Gider: {fmt_amount(totals['gider'])} | Net: {fmt_amount(totals['net'])}")
 
@@ -126,4 +144,3 @@ class RaporlarFrame(ttk.Frame):
             gelir = safe_float(r["gelir"])
             gider = safe_float(r["gider"])
             self.txt_kasa.insert(tk.END, f"{fmt_tr_date(r['tarih'])} | gelir={fmt_amount(gelir)} | gider={fmt_amount(gider)} | net={fmt_amount((gelir-gider))}\n")
-

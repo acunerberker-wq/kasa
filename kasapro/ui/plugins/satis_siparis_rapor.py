@@ -14,6 +14,7 @@ from tkinter import ttk, messagebox, filedialog
 from ...config import APP_TITLE, HAS_OPENPYXL
 from ...db.main_db import DB
 from ...utils import fmt_amount, fmt_tr_date, safe_float
+from ..base import BaseView
 from ..widgets import LabeledEntry, LabeledCombo
 
 if TYPE_CHECKING:
@@ -34,14 +35,17 @@ def build(master, app: "App") -> ttk.Frame:
     return SatisSiparisRaporFrame(master, app)
 
 
-class SatisSiparisRaporFrame(ttk.Frame):
+class SatisSiparisRaporFrame(BaseView):
     def __init__(self, master, app: "App"):
-        super().__init__(master)
         self.app = app
+        super().__init__(master, app)
         self.company_map: Dict[str, int] = {}
         self.depo_map: Dict[str, Optional[int]] = {}
         self._report_data: Dict[str, Dict[str, Any]] = {}
         self._running = False
+        self.build_ui()
+
+    def build_ui(self) -> None:
         self._build()
 
     def _build(self):
@@ -513,6 +517,6 @@ class SatisSiparisRaporFrame(ttk.Frame):
         except Exception as exc:
             messagebox.showerror(APP_TITLE, f"Excel yazılamadı: {exc}")
 
-    def refresh(self):
+    def refresh(self, data=None):
         self.reload_filters()
         self.run_active_report()

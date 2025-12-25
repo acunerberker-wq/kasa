@@ -9,15 +9,20 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 
 from ...config import APP_TITLE
+from ..base import BaseView
+from ..ui_logging import wrap_callback
 from ..dialogs import simple_input, simple_choice
 
 if TYPE_CHECKING:
     from ...app import App
 
-class KullanicilarFrame(ttk.Frame):
+class KullanicilarFrame(BaseView):
     def __init__(self, master, app: "App"):
-        super().__init__(master)
         self.app = app
+        super().__init__(master, app)
+        self.build_ui()
+
+    def build_ui(self) -> None:
         self._build()
 
     def _build(self):
@@ -27,10 +32,12 @@ class KullanicilarFrame(ttk.Frame):
 
         btns = ttk.Frame(top)
         btns.pack(side=tk.RIGHT)
-        ttk.Button(btns, text="➕ Yeni", command=self.add_user).pack(side=tk.LEFT, padx=4)
-        ttk.Button(btns, text="🔑 Şifre", command=self.reset_password).pack(side=tk.LEFT, padx=4)
-        ttk.Button(btns, text="🗑 Sil", command=self.delete_user).pack(side=tk.LEFT, padx=4)
-        ttk.Button(btns, text="🔄 Yenile", command=self.refresh).pack(side=tk.LEFT, padx=4)
+        ttk.Button(btns, text="➕ Yeni", command=wrap_callback("users_add", self.add_user)).pack(side=tk.LEFT, padx=4)
+        ttk.Button(btns, text="🔑 Şifre", command=wrap_callback("users_reset", self.reset_password)).pack(
+            side=tk.LEFT, padx=4
+        )
+        ttk.Button(btns, text="🗑 Sil", command=wrap_callback("users_delete", self.delete_user)).pack(side=tk.LEFT, padx=4)
+        ttk.Button(btns, text="🔄 Yenile", command=wrap_callback("users_refresh", self.refresh)).pack(side=tk.LEFT, padx=4)
 
         cols = ("username", "role", "created_at", "last_login", "db_file")
         self.tree = ttk.Treeview(self, columns=cols, show="headings", height=18)
@@ -47,7 +54,7 @@ class KullanicilarFrame(ttk.Frame):
         self.tree.column("db_file", width=220, anchor="w")
 
         self.tree.pack(fill=tk.BOTH, expand=True, padx=12, pady=(0,12))
-        self.tree.bind("<Double-1>", lambda _e: self.reset_password())
+        self.tree.bind("<Double-1>", wrap_callback("users_reset_double", lambda _e: self.reset_password()))
         self.refresh()
 
     def _selected_username(self) -> Optional[str]:
@@ -60,7 +67,7 @@ class KullanicilarFrame(ttk.Frame):
             return None
         return str(vals[0])
 
-    def refresh(self):
+    def refresh(self, data=None):
         try:
             for i in self.tree.get_children():
                 self.tree.delete(i)

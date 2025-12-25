@@ -10,6 +10,7 @@ from tkinter import ttk, messagebox
 
 from ...config import APP_TITLE
 from ...utils import today_iso, fmt_tr_date, parse_date_smart, safe_float
+from ..base import BaseView
 from ..widgets import LabeledEntry, LabeledCombo, MoneyEntry, SimpleField
 
 
@@ -21,10 +22,10 @@ PLUGIN_META = {
 }
 
 
-class NakliyeFrame(ttk.Frame):
+class NakliyeFrame(BaseView):
     def __init__(self, master, app: "App"):
-        super().__init__(master)
         self.app = app
+        super().__init__(master, app)
 
         self.edit_firma_id: Optional[int] = None
         self.edit_arac_id: Optional[int] = None
@@ -37,6 +38,9 @@ class NakliyeFrame(ttk.Frame):
         self.rota_map: Dict[str, Optional[int]] = {}
         self.is_map: Dict[str, Optional[int]] = {}
 
+        self.build_ui()
+
+    def build_ui(self) -> None:
         self._build()
 
     # -----------------

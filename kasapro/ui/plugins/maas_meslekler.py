@@ -18,6 +18,7 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 
 from ...config import APP_TITLE
+from ..base import BaseView
 from ..widgets import LabeledEntry, LabeledCombo
 
 if TYPE_CHECKING:
@@ -31,11 +32,14 @@ PLUGIN_META = {
 }
 
 
-class MaasMesleklerFrame(ttk.Frame):
+class MaasMesleklerFrame(BaseView):
     def __init__(self, master, app: "App"):
-        super().__init__(master)
         self.app = app
+        super().__init__(master, app)
         self._selected_meslek_id: Optional[int] = None
+        self.build_ui()
+
+    def build_ui(self) -> None:
         self._build()
 
     def _build(self):

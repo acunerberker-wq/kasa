@@ -9,6 +9,8 @@ from typing import Callable, Dict, Optional
 import tkinter as tk
 from tkinter import ttk, messagebox, filedialog
 
+from ..base import BaseView
+
 from kasapro.config import APP_TITLE
 from kasapro.utils import today_iso
 
@@ -20,11 +22,14 @@ PLUGIN_META = {
 }
 
 
-class HRFrame(ttk.Frame):
+class HRFrame(BaseView):
     def __init__(self, master: ttk.Frame, app):
-        super().__init__(master)
         self.app = app
+        super().__init__(master, app)
         self.hr = app.services.hr
+        self.build_ui()
+
+    def build_ui(self) -> None:
         self._init_ui()
 
     def _init_ui(self) -> None:

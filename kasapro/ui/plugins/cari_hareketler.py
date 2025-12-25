@@ -15,6 +15,7 @@ from tkinter import ttk, messagebox
 
 from ...config import APP_TITLE
 from ...utils import fmt_tr_date, fmt_amount
+from ..base import BaseView
 from ..widgets import LabeledEntry, LabeledCombo
 
 if TYPE_CHECKING:
@@ -28,11 +29,14 @@ PLUGIN_META = {
 }
 
 
-class CariHareketlerFrame(ttk.Frame):
+class CariHareketlerFrame(BaseView):
     def __init__(self, master, app: "App"):
-        super().__init__(master)
         self.app = app
+        super().__init__(master, app)
         self.multi_mode = tk.BooleanVar(value=False)
+        self.build_ui()
+
+    def build_ui(self) -> None:
         self._build()
 
     def _build(self):
@@ -124,7 +128,7 @@ class CariHareketlerFrame(ttk.Frame):
         except Exception:
             pass
 
-    def refresh(self):
+    def refresh(self, data=None):
         for i in self.tree.get_children():
             self.tree.delete(i)
 

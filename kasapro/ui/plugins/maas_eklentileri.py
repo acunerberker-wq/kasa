@@ -21,6 +21,7 @@ from tkinter import ttk, messagebox, filedialog
 from ...config import APP_TITLE, HAS_OPENPYXL
 from ...utils import safe_float, fmt_amount
 from ...core.fuzzy import best_substring_similarity, amount_score, combine_scores, combine3_scores, normalize_text
+from ..base import BaseView
 from ..widgets import LabeledEntry, LabeledCombo
 from ..windows import ImportWizard, BankaWorkspaceWindow
 
@@ -39,10 +40,13 @@ def _current_period() -> str:
     return date.today().strftime("%Y-%m")
 
 
-class MaasEklentileriFrame(ttk.Frame):
+class MaasEklentileriFrame(BaseView):
     def __init__(self, master, app: "App"):
-        super().__init__(master)
         self.app = app
+        super().__init__(master, app)
+        self.build_ui()
+
+    def build_ui(self) -> None:
         self._build()
 
     # -----------------

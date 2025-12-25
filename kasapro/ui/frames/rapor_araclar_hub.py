@@ -16,6 +16,8 @@ from typing import TYPE_CHECKING
 import tkinter as tk
 from tkinter import ttk
 
+from ..base import BaseView
+from ..ui_logging import log_ui_event, wrap_callback
 from .raporlar import RaporlarFrame
 from .global_search import GlobalSearchFrame
 from .logs import LogsFrame
@@ -29,13 +31,16 @@ if TYPE_CHECKING:
     from ...app import App
 
 
-class RaporAraclarHubFrame(ttk.Frame):
+class RaporAraclarHubFrame(BaseView):
     """Rapor & Araçlar tek ekranda: Raporlar / Global Arama / Log."""
 
     def __init__(self, master, app: "App"):
-        super().__init__(master)
         self.app = app
+        super().__init__(master, app)
 
+        self.build_ui()
+
+    def build_ui(self) -> None:
         self.nb = ttk.Notebook(self)
         self.nb.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
 
@@ -47,11 +52,16 @@ class RaporAraclarHubFrame(ttk.Frame):
         self.tab_notes_reminders = ttk.Frame(self.nb)
 
         self.nb.add(self.tab_raporlar, text="📊 Raporlar")
+        log_ui_event("tab_added", tab="raporlar", container="rapor_araclar")
         self.nb.add(self.tab_search, text="🔎 Global Arama")
+        log_ui_event("tab_added", tab="search", container="rapor_araclar")
         self.nb.add(self.tab_loglar, text="🧾 Log")
+        log_ui_event("tab_added", tab="loglar", container="rapor_araclar")
         self.nb.add(self.tab_satin_alma, text="📦 Satın Alma Sipariş Raporları")
+        log_ui_event("tab_added", tab="satin_alma", container="rapor_araclar")
         self._notes_tab_base_text = "🗒️ Notlar & Hatırlatmalar"
         self.nb.add(self.tab_notes_reminders, text=self._notes_tab_base_text)
+        log_ui_event("tab_added", tab="notlar_hatirlatmalar", container="rapor_araclar")
 
         # İçerikler
         self.raporlar_frame = RaporlarFrame(self.tab_raporlar, self.app)
@@ -70,7 +80,10 @@ class RaporAraclarHubFrame(ttk.Frame):
         self.notes_reminders_frame.pack(fill=tk.BOTH, expand=True)
 
         try:
-            self.nb.bind("<<NotebookTabChanged>>", lambda _e: self._on_tab_change())
+            self.nb.bind(
+                "<<NotebookTabChanged>>",
+                wrap_callback("rapor_araclar_tab_change", lambda _e: self._on_tab_change()),
+            )
         except Exception:
             pass
 
@@ -101,7 +114,7 @@ class RaporAraclarHubFrame(ttk.Frame):
 
         self._on_tab_change()
 
-    def refresh(self):
+    def refresh(self, data=None):
         """Alt ekranları tazeler."""
         try:
             if hasattr(self, "raporlar_frame") and hasattr(self.raporlar_frame, "refresh"):

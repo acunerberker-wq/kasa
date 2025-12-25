@@ -8,12 +8,14 @@ from typing import Optional, TYPE_CHECKING
 import tkinter as tk
 from tkinter import ttk, messagebox, simpledialog
 
+from ..base import BaseView
+from ..ui_logging import wrap_callback
 from ...config import APP_TITLE
 
 if TYPE_CHECKING:
     from ...app import App
 
-class SirketlerFrame(ttk.Frame):
+class SirketlerFrame(BaseView):
     """Kullanıcı girişinden sonra birden fazla şirket (firma) yönetimi.
 
     Her şirketin kendi SQLite DB dosyası vardır
@@ -21,8 +23,11 @@ class SirketlerFrame(ttk.Frame):
     şirket bazında tamamen ayrılır.
     """
     def __init__(self, master, app: "App"):
-        super().__init__(master)
         self.app = app
+        super().__init__(master, app)
+        self.build_ui()
+
+    def build_ui(self) -> None:
         self._build()
 
     def _build(self):
@@ -40,11 +45,21 @@ class SirketlerFrame(ttk.Frame):
 
         btns = ttk.Frame(top)
         btns.pack(fill=tk.X, padx=10, pady=(0, 8))
-        ttk.Button(btns, text="➕ Yeni Şirket", command=self.on_new).pack(side=tk.LEFT, padx=4)
-        ttk.Button(btns, text="✅ Seç / Aç", command=self.on_open).pack(side=tk.LEFT, padx=4)
-        ttk.Button(btns, text="✏️ Yeniden Adlandır", command=self.on_rename).pack(side=tk.LEFT, padx=4)
-        ttk.Button(btns, text="🗑️ Sil", command=self.on_delete).pack(side=tk.LEFT, padx=4)
-        ttk.Button(btns, text="🔄 Yenile", command=self.refresh).pack(side=tk.RIGHT, padx=4)
+        ttk.Button(btns, text="➕ Yeni Şirket", command=wrap_callback("company_new", self.on_new)).pack(
+            side=tk.LEFT, padx=4
+        )
+        ttk.Button(btns, text="✅ Seç / Aç", command=wrap_callback("company_open", self.on_open)).pack(
+            side=tk.LEFT, padx=4
+        )
+        ttk.Button(btns, text="✏️ Yeniden Adlandır", command=wrap_callback("company_rename", self.on_rename)).pack(
+            side=tk.LEFT, padx=4
+        )
+        ttk.Button(btns, text="🗑️ Sil", command=wrap_callback("company_delete", self.on_delete)).pack(
+            side=tk.LEFT, padx=4
+        )
+        ttk.Button(btns, text="🔄 Yenile", command=wrap_callback("company_refresh", self.refresh)).pack(
+            side=tk.RIGHT, padx=4
+        )
 
         cols = ("id", "name", "created_at", "db_file")
         self.tree = ttk.Treeview(top, columns=cols, show="headings", height=18)
@@ -64,7 +79,7 @@ class SirketlerFrame(ttk.Frame):
         ysb.pack(side=tk.RIGHT, fill=tk.Y, padx=(0, 10), pady=(0, 10))
 
         try:
-            self.tree.bind("<Double-1>", lambda _e: self.on_open())
+            self.tree.bind("<Double-1>", wrap_callback("company_open_double", lambda _e: self.on_open()))
         except Exception:
             pass
 
@@ -83,7 +98,7 @@ class SirketlerFrame(ttk.Frame):
         except Exception:
             return None
 
-    def refresh(self):
+    def refresh(self, data=None):
         try:
             active_name = getattr(self.app, "active_company_name", "") or ""
             self.lbl_active.config(text=f"Aktif Şirket: {active_name}")
@@ -205,4 +220,3 @@ class SirketlerFrame(ttk.Frame):
             self.refresh()
         except Exception as e:
             messagebox.showerror(APP_TITLE, f"Silinemedi:\n{e}")
-

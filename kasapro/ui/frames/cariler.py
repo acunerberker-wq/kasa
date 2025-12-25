@@ -11,17 +11,21 @@ from tkinter import ttk, messagebox
 
 from ...config import APP_TITLE
 from ...utils import parse_number_smart, safe_float, fmt_amount
+from ..base import BaseView
 from ..widgets import LabeledEntry, LabeledCombo
 from ..windows import CariEkstreWindow
 
 if TYPE_CHECKING:
     from ...app import App
 
-class CarilerFrame(ttk.Frame):
+class CarilerFrame(BaseView):
     def __init__(self, master, app: "App"):
-        super().__init__(master)
         self.app = app
+        super().__init__(master, app)
         self.selected_id: Optional[int] = None
+        self.build_ui()
+
+    def build_ui(self) -> None:
         self._build()
 
     def _build(self):
@@ -113,7 +117,7 @@ class CarilerFrame(ttk.Frame):
         self.btn_del.config(state=state)
         self.btn_edit.config(state=state)
 
-    def refresh(self):
+    def refresh(self, data=None):
         for i in self.tree.get_children():
             self.tree.delete(i)
         q = self.q.get()

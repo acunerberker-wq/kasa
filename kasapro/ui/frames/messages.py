@@ -10,20 +10,25 @@ import shutil
 import tkinter as tk
 from tkinter import ttk, messagebox, filedialog
 
+from ..base import BaseView
+from ..ui_logging import wrap_callback
 from ...config import APP_TITLE
 
 if TYPE_CHECKING:
     from ...app import App
 
 
-class MessagesFrame(ttk.Frame):
+class MessagesFrame(BaseView):
     def __init__(self, master, app: "App"):
-        super().__init__(master)
         self.app = app
+        super().__init__(master, app)
         self.page = 0
         self.limit = 50
         self._rows: List[Dict[str, object]] = []
         self._active_message_id: Optional[int] = None
+        self.build_ui()
+
+    def build_ui(self) -> None:
         self._build()
 
     def _build(self):
@@ -40,13 +45,16 @@ class MessagesFrame(ttk.Frame):
             state="readonly",
         )
         self.cmb_folder.pack(side=tk.LEFT, padx=6)
-        self.cmb_folder.bind("<<ComboboxSelected>>", lambda _e: self._on_folder_change())
+        self.cmb_folder.bind(
+            "<<ComboboxSelected>>",
+            wrap_callback("messages_folder_change", lambda _e: self._on_folder_change()),
+        )
 
         ttk.Label(top, text="Ara:").pack(side=tk.LEFT, padx=(10, 0))
         self.search_var = tk.StringVar()
         self.ent_search = ttk.Entry(top, textvariable=self.search_var, width=24)
         self.ent_search.pack(side=tk.LEFT, padx=6)
-        self.ent_search.bind("<Return>", lambda _e: self.refresh())
+        self.ent_search.bind("<Return>", wrap_callback("messages_search", lambda _e: self.refresh()))
 
         self.only_unread_var = tk.IntVar(value=0)
         self.chk_unread = ttk.Checkbutton(
@@ -57,13 +65,17 @@ class MessagesFrame(ttk.Frame):
         )
         self.chk_unread.pack(side=tk.LEFT, padx=8)
 
-        ttk.Button(top, text="🔄 Yenile", command=self.refresh).pack(side=tk.RIGHT)
-        ttk.Button(top, text="➕ Yeni Mesaj", command=self.compose_new).pack(side=tk.RIGHT, padx=6)
+        ttk.Button(top, text="🔄 Yenile", command=wrap_callback("messages_refresh", self.refresh)).pack(side=tk.RIGHT)
+        ttk.Button(top, text="➕ Yeni Mesaj", command=wrap_callback("messages_compose", self.compose_new)).pack(
+            side=tk.RIGHT, padx=6
+        )
 
         pager = ttk.Frame(self)
         pager.pack(fill=tk.X, padx=12, pady=(0, 6))
-        ttk.Button(pager, text="◀ Önceki", command=self.prev_page).pack(side=tk.LEFT)
-        ttk.Button(pager, text="Sonraki ▶", command=self.next_page).pack(side=tk.LEFT, padx=6)
+        ttk.Button(pager, text="◀ Önceki", command=wrap_callback("messages_prev", self.prev_page)).pack(side=tk.LEFT)
+        ttk.Button(pager, text="Sonraki ▶", command=wrap_callback("messages_next", self.next_page)).pack(
+            side=tk.LEFT, padx=6
+        )
         self.lbl_page = ttk.Label(pager, text="Sayfa 1")
         self.lbl_page.pack(side=tk.LEFT, padx=10)
 
@@ -120,7 +132,7 @@ class MessagesFrame(ttk.Frame):
         uname = self.app.get_active_username() if hasattr(self.app, "get_active_username") else ""
         return uid, uname
 
-    def refresh(self):
+    def refresh(self, data=None):
         uid, _uname = self._current_user()
         if not uid:
             return

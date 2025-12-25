@@ -12,6 +12,7 @@ from tkinter import ttk, messagebox, filedialog
 
 from ...config import APP_TITLE, HAS_OPENPYXL, HAS_REPORTLAB
 from ...utils import fmt_amount, fmt_tr_date, safe_float
+from ..base import BaseView
 from ..widgets import LabeledEntry, LabeledCombo
 
 if TYPE_CHECKING:
@@ -26,10 +27,10 @@ REPORT_TYPES = {
 }
 
 
-class SatisRaporlariFrame(ttk.Frame):
+class SatisRaporlariFrame(BaseView):
     def __init__(self, master, app: "App"):
-        super().__init__(master)
         self.app = app
+        super().__init__(master, app)
         self._cari_map: Dict[str, int] = {}
         self._report_key = "daily"
         self._page = 0
@@ -38,6 +39,9 @@ class SatisRaporlariFrame(ttk.Frame):
         self._current_rows: List[Dict[str, Any]] = []
         self._current_headers: List[str] = []
         self._current_title = ""
+        self.build_ui()
+
+    def build_ui(self) -> None:
         self._build()
 
     def _build(self):
@@ -135,7 +139,7 @@ class SatisRaporlariFrame(ttk.Frame):
         self._setup_tree("daily")
         self.run_report()
 
-    def refresh(self):
+    def refresh(self, data=None):
         try:
             self.lbl_company.config(
                 text=f"Aktif Şirket: {getattr(self.app, 'active_company_name', '') or '-'}"

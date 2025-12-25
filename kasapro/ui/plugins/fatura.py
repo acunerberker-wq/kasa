@@ -21,6 +21,7 @@ from tkinter import ttk, messagebox, filedialog
 
 from ...config import APP_TITLE, HAS_REPORTLAB
 from ...utils import fmt_amount, fmt_tr_date, safe_float, ensure_pdf_fonts
+from ..base import BaseView
 from ..widgets import LabeledEntry, LabeledCombo
 
 if TYPE_CHECKING:
@@ -54,12 +55,15 @@ def _today_str() -> str:
         return ""
 
 
-class FaturaFrame(ttk.Frame):
+class FaturaFrame(BaseView):
     def __init__(self, master, app: "App"):
-        super().__init__(master)
         self.app = app
+        super().__init__(master, app)
         self.current_fid: Optional[int] = None
         self._items: List[Dict[str, Any]] = []
+        self.build_ui()
+
+    def build_ui(self) -> None:
         self._build()
 
     # -----------------
@@ -535,7 +539,7 @@ class FaturaFrame(ttk.Frame):
     # -----------------
     # Genel: Refresh
     # -----------------
-    def refresh(self):
+    def refresh(self, data=None):
         self._reload_edit_lists()
         self.refresh_list()
         self.refresh_payments()

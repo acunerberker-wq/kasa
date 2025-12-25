@@ -19,20 +19,24 @@ from tkinter import ttk, messagebox
 
 from ...config import APP_TITLE
 from ...utils import today_iso, fmt_tr_date, fmt_amount
+from ..base import BaseView
 from ..widgets import SimpleField, LabeledEntry, LabeledCombo, MoneyEntry
 
 if TYPE_CHECKING:
     from ...app import App
 
-class KasaFrame(ttk.Frame):
+class KasaFrame(BaseView):
     def __init__(self, master, app: "App"):
-        super().__init__(master)
         self.app = app
+        super().__init__(master, app)
 
         self.edit_id: Optional[int] = None
         self._aciklama_win = None
         self._aciklama_txt = None
 
+        self.build_ui()
+
+    def build_ui(self) -> None:
         self._build()
 
     # -----------------
@@ -557,7 +561,7 @@ class KasaFrame(ttk.Frame):
         self.f_to.set(d.strftime("%d.%m.%Y"))
         self.refresh()
 
-    def refresh(self):
+    def refresh(self, data=None):
         """Geçmiş + raporlar + üst özet."""
         self._refresh_history()
         self._refresh_reports()

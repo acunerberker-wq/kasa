@@ -24,6 +24,7 @@ from ...utils import today_iso, fmt_amount, safe_float
 from ...core.fuzzy import best_substring_similarity, amount_score, combine_scores, combine3_scores, normalize_text
 from ..windows.import_wizard import ImportWizard
 from ..windows import BankaWorkspaceWindow
+from ..base import BaseView
 from ..widgets import LabeledEntry, LabeledCombo, MoneyEntry
 
 if TYPE_CHECKING:
@@ -41,14 +42,17 @@ def _current_period() -> str:
     return date.today().strftime("%Y-%m")
 
 
-class MaasTakibiFrame(ttk.Frame):
+class MaasTakibiFrame(BaseView):
     def __init__(self, master, app: "App"):
-        super().__init__(master)
         self.app = app
+        super().__init__(master, app)
 
         self._selected_employee_id: Optional[int] = None
         self._selected_payment_id: Optional[int] = None
 
+        self.build_ui()
+
+    def build_ui(self) -> None:
         self._build()
 
     # -----------------

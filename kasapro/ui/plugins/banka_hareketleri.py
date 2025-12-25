@@ -22,6 +22,7 @@ from tkinter import ttk, messagebox, filedialog
 
 from ...config import APP_TITLE, HAS_OPENPYXL
 from ...utils import fmt_tr_date, fmt_amount
+from ..base import BaseView
 from ..widgets import LabeledEntry, LabeledCombo
 from ..windows import ImportWizard, BankaWorkspaceWindow
 
@@ -36,10 +37,13 @@ PLUGIN_META = {
 }
 
 
-class BankaHareketleriFrame(ttk.Frame):
+class BankaHareketleriFrame(BaseView):
     def __init__(self, master, app: "App"):
-        super().__init__(master)
         self.app = app
+        super().__init__(master, app)
+        self.build_ui()
+
+    def build_ui(self) -> None:
         self._build()
 
     # -----------------
@@ -245,7 +249,7 @@ class BankaHareketleriFrame(ttk.Frame):
     # -----------------
     # Refresh
     # -----------------
-    def refresh(self):
+    def refresh(self, data=None):
         self._reload_banka_combo()
         self._reload_hesap_combo()
         self._reload_import_combo()
