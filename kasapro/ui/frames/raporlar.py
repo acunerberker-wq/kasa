@@ -87,7 +87,9 @@ class RaporlarFrame(BaseView):
         self.txt_kasa = tk.Text(right, height=20)
         self.txt_kasa.pack(fill=tk.BOTH, expand=True, padx=6, pady=6)
 
-        self.refresh()
+        # Başlangıç değerleri - otomatik yükleme yapma
+        self.lbl_kasa.config(text="Rapor oluşturmak için 'Son 30 gün' veya 'Yenile' butonuna basın.")
+        self.lbl_sel.config(text="Bakiye: 0,00")
 
     def last30(self):
         d_to = date.today()

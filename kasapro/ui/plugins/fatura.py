@@ -121,8 +121,9 @@ class FaturaFrame(BaseView):
             self.nb.add(self.tab_report, text="Raporlar")
             self._build_report_tab()
 
+            # Başlangıç durumu - otomatik yükleme yapma
             self.new_invoice()
-            self.refresh()
+            self.lbl_top_info.config(text="Fatura listesini görmek için 'Yenile' butonuna basın.")
         except Exception as e:
             messagebox.showerror(APP_TITLE, f"Fatura arayüzü oluşturulamadı:\n{str(e)}")
             # En azından basit bir hata mesajı göster
@@ -537,7 +538,8 @@ class FaturaFrame(BaseView):
         self.refresh_list()
         self.refresh_payments()
         self.refresh_series()
-        self.report_open_invoices(silent=True)
+        # Rapor otomatik yüklenmesin
+        # self.report_open_invoices(silent=True)
 
     def refresh_list(self):
         for i in self.tree.get_children():
@@ -1285,7 +1287,11 @@ class FaturaFrame(BaseView):
                 fid, tarih, no, cari, _s(r["tur"]), _s(r["durum"]), para, fmt_amount(toplam), fmt_amount(kalan)
             ))
 
-        self.lbl_report.config(text=f"Açık fatura: {len(out)}  •  Kalan toplam: {fmt_amount(total_kalan)}")
+        try:
+            self.lbl_report.config(text=f"Açık fatura: {len(out)}  •  Kalan toplam: {fmt_amount(total_kalan)}")
+        except AttributeError:
+            # lbl_report henüz oluşturulmamış olabilir
+            pass
         if not silent:
             try:
                 self.nb.select(self.tab_report)
@@ -1317,9 +1323,12 @@ class FaturaFrame(BaseView):
                 fid, tarih, no, cari, _s(r["tur"]), _s(r["durum"]), para, fmt_amount(toplam), fmt_amount(kalan)
             ))
 
-        self.lbl_report.config(
-            text=f"Satın alma siparişi: {len(out)}  •  Toplam: {fmt_amount(total)}  •  Kalan: {fmt_amount(total_kalan)}"
-        )
+        try:
+            self.lbl_report.config(
+                text=f"Satın alma siparişi: {len(out)}  •  Toplam: {fmt_amount(total)}  •  Kalan: {fmt_amount(total_kalan)}"
+            )
+        except AttributeError:
+            pass
         if not silent:
             try:
                 self.nb.select(self.tab_report)
@@ -1360,7 +1369,10 @@ class FaturaFrame(BaseView):
                 fid, tarih, no, cari, _s(r["tur"]), _s(r["durum"]), para, fmt_amount(toplam), fmt_amount(kalan)
             ))
 
-        self.lbl_report.config(text=f"{label}: {len(rows)}  •  Toplam: {fmt_amount(total)}")
+        try:
+            self.lbl_report.config(text=f"{label}: {len(rows)}  •  Toplam: {fmt_amount(total)}")
+        except AttributeError:
+            pass
         try:
             self.nb.select(self.tab_report)
         except Exception:
