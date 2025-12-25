@@ -394,16 +394,12 @@ class FaturaFrame(BaseView):
         self.pay_tree.column("id", width=55, anchor="center")
         self.pay_tree.column("tarih", width=95)
         self.pay_tree.column("tutar", width=110, anchor="e")
-            self.pay_tree.column("para", width=55, anchor="center")
-            self.pay_tree.column("odeme", width=140)
-            self.pay_tree.column("aciklama", width=360)
-            self.pay_tree.column("ref", width=140)
+        self.pay_tree.column("para", width=55, anchor="center")
+        self.pay_tree.column("odeme", width=140)
+        self.pay_tree.column("aciklama", width=360)
+        self.pay_tree.column("ref", width=140)
 
-            self.pay_tree.pack(fill=tk.BOTH, expand=True, padx=8, pady=(0, 8))
-        except Exception as e:
-            err = ttk.Label(self.tab_pay, text=f"Tahsilat sekme hatası: {str(e)}", foreground="red")
-            err.pack(padx=10, pady=10)
-            messagebox.showerror(APP_TITLE, f"Tahsilat sekmesi oluşturulamadı:\n{str(e)}")
+        self.pay_tree.pack(fill=tk.BOTH, expand=True, padx=8, pady=(0, 8))
 
     # -----------------
     # Tab: Ayarlar
