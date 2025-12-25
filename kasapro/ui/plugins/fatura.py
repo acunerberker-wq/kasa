@@ -405,15 +405,14 @@ class FaturaFrame(BaseView):
     # Tab: Ayarlar
     # -----------------
     def _build_settings_tab(self):
-        try:
-            hint = ttk.Label(
-                self.tab_settings,
-                text=(
-                    "Seri/Numara formatı: {yil} {seri} {no_pad} {no} {prefix} alanlarını kullanabilirsiniz.\n"
-                    "Örn: {yil}{seri}{no_pad}  =>  2025A000001"
-                ),
-            )
-            hint.pack(anchor="w", padx=10, pady=(10, 4))
+        hint = ttk.Label(
+            self.tab_settings,
+            text=(
+                "Seri/Numara formatı: {yil} {seri} {no_pad} {no} {prefix} alanlarını kullanabilirsiniz.\n"
+                "Örn: {yil}{seri}{no_pad}  =>  2025A000001"
+            ),
+        )
+        hint.pack(anchor="w", padx=10, pady=(10, 4))
 
         top = ttk.Frame(self.tab_settings)
         top.pack(fill=tk.X, padx=10, pady=6)
