@@ -240,6 +240,20 @@ class App:
 
         return w.user
 
+    def _hr_context(self) -> HRContext:
+        """HR modülü için context bilgisi sağlar."""
+        try:
+            company_id = getattr(self, "active_company_id", None) or 1
+            username = getattr(self, "data_owner_username", "unknown")
+            role = str(getattr(self, "user", {}).get("role", "user"))
+            return HRContext(
+                company_id=int(company_id),
+                actor_username=username,
+                actor_role=role
+            )
+        except Exception:
+            # Fallback: minimal context
+            return HRContext(company_id=1, actor_username="system", actor_role="user")
 
     def reload_settings(self):
         """Para birimi / ödeme / kategori gibi ayar listelerini tüm ekranlarda yeniler."""
