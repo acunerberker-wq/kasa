@@ -89,6 +89,9 @@ class TradeModuleFrame(ttk.Frame):
         self._build_stock_tab()
         self._build_reports_tab()
         self._build_settings_tab()
+        
+        # Refresh cari after all tabs are built
+        self._refresh_cari()
 
     def _ensure_permission(self, permission: str) -> bool:
         role = self.service._role()
@@ -163,7 +166,6 @@ class TradeModuleFrame(ttk.Frame):
         ttk.Button(btns, text="Tahsilat", command=self._sales_payment).pack(side=tk.LEFT, padx=4)
         ttk.Button(btns, text="İptal", command=self._sales_void).pack(side=tk.LEFT, padx=4)
 
-        self._refresh_cari()
         self.sales_doc_date.set(today_iso())
         self.sales_tax.set("20")
         self._sales_next_no()

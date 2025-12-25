@@ -376,9 +376,8 @@ class FaturaFrame(BaseView):
     # Tab: Tahsilat
     # -----------------
     def _build_pay_tab(self):
-        try:
-            top = ttk.Frame(self.tab_pay)
-            top.pack(fill=tk.X, padx=8, pady=8)
+        top = ttk.Frame(self.tab_pay)
+        top.pack(fill=tk.X, padx=8, pady=8)
 
         ttk.Button(top, text="➕ Tahsilat/Ödeme Ekle", command=self.add_payment).pack(side=tk.LEFT)
         ttk.Button(top, text="🗑️ Sil", command=self.delete_payment).pack(side=tk.LEFT, padx=6)

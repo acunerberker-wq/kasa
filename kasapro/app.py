@@ -40,6 +40,18 @@ from .ui.plugins.loader import discover_ui_plugins
 from .modules.notes_reminders.scheduler import ReminderScheduler
 from .modules.integrations.worker import IntegrationWorker
 
+# Import HRContext for typing
+try:
+    import sys
+    import os as _os
+    _modules_path = _os.path.abspath(_os.path.join(_os.path.dirname(__file__), "..", "modules"))
+    if _modules_path not in sys.path:
+        sys.path.insert(0, _modules_path)
+    from hr.service import HRContext
+except ImportError:
+    # Fallback if HR module not available
+    from typing import Any as HRContext
+
 class App:
     def __init__(self, base_dir: Optional[str] = None, test_mode: bool = False):
         self.root = tk.Tk()
