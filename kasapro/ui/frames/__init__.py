@@ -12,6 +12,7 @@ from .tanimlar_hub import TanimlarHubFrame as TanimlarHubFrame
 from .rapor_araclar_hub import RaporAraclarHubFrame as RaporAraclarHubFrame
 from .integrations_hub import IntegrationsHubFrame as IntegrationsHubFrame
 from .create_center import CreateCenterFrame as CreateCenterFrame
+from .stock_wms import StockWmsFrame as StockWmsFrame
 
 __all__ = [
     "KasaFrame",
@@ -25,6 +26,7 @@ __all__ = [
     "RaporAraclarHubFrame",
     "IntegrationsHubFrame",
     "CreateCenterFrame",
+    "StockWmsFrame",
 ]
 from .kasa import KasaFrame as KasaFrame
 from .cariler import CarilerFrame as CarilerFrame
@@ -39,6 +41,7 @@ from .rapor_araclar_hub import RaporAraclarHubFrame as RaporAraclarHubFrame
 from .messages import MessagesFrame as MessagesFrame
 from .integrations_hub import IntegrationsHubFrame as IntegrationsHubFrame
 from .create_center import CreateCenterFrame as CreateCenterFrame
+from .stock_wms import StockWmsFrame as StockWmsFrame
 
 __all__ = [
     "KasaFrame",
@@ -54,4 +57,5 @@ __all__ = [
     "MessagesFrame",
     "IntegrationsHubFrame",
     "CreateCenterFrame",
+    "StockWmsFrame",
 ]

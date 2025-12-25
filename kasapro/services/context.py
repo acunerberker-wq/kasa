@@ -19,6 +19,7 @@ from .settings_service import SettingsService
 from .company_users_service import CompanyUsersService
 from .cari_service import CariService
 from .messages_service import MessagesService
+from .wms_service import WmsService
 from ..modules.notes_reminders.service import NotesRemindersService
 from ..modules.dms.service import DmsService
 from ..modules.integrations.service import IntegrationService
@@ -45,10 +46,7 @@ class Services:
     cari: CariService
     messages: MessagesService
     notes_reminders: NotesRemindersService
-    dms: DmsService
-    integrations: IntegrationService
-    hr: Optional["HRService"]
-    hakedis: HakedisService
+    wms: WmsService
 
     @classmethod
     def build(cls, db: DB, usersdb: UsersDB, context_provider) -> "Services":
@@ -64,8 +62,5 @@ class Services:
             cari=CariService(db, exporter),
             messages=MessagesService(db, usersdb),
             notes_reminders=NotesRemindersService(db, usersdb),
-            dms=DmsService(db),
-            integrations=IntegrationService(db, context_provider),
-            hr=hr_service,
-            hakedis=hakedis_service,
+            wms=WmsService(db),
         )

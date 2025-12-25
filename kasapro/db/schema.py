@@ -1476,6 +1476,310 @@ def init_schema(conn: sqlite3.Connection) -> None:
         created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
     );""")
 
+    # -----------------
+    # WMS / Stok Çekirdek
+    # -----------------
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS periods(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        company_id INTEGER NOT NULL,
+        branch_id INTEGER NOT NULL,
+        name TEXT NOT NULL,
+        start_date TEXT NOT NULL,
+        end_date TEXT NOT NULL,
+        is_locked INTEGER NOT NULL DEFAULT 0,
+        locked_by INTEGER,
+        locked_at TEXT,
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    );""")
+
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS warehouse_permissions(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER NOT NULL,
+        company_id INTEGER NOT NULL,
+        branch_id INTEGER NOT NULL,
+        warehouse_id INTEGER NOT NULL,
+        can_view INTEGER NOT NULL DEFAULT 1,
+        can_post INTEGER NOT NULL DEFAULT 0,
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    );""")
+
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS doc_locks(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        company_id INTEGER NOT NULL,
+        branch_id INTEGER NOT NULL,
+        doc_type TEXT NOT NULL,
+        doc_no TEXT NOT NULL,
+        locked_by INTEGER,
+        locked_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        reason TEXT DEFAULT '',
+        is_active INTEGER NOT NULL DEFAULT 1
+    );""")
+
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS categories(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        company_id INTEGER NOT NULL,
+        name TEXT NOT NULL,
+        parent_id INTEGER,
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    );""")
+
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS brands(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        company_id INTEGER NOT NULL,
+        name TEXT NOT NULL,
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    );""")
+
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS variants(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        company_id INTEGER NOT NULL,
+        name TEXT NOT NULL,
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    );""")
+
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS uoms(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        company_id INTEGER NOT NULL,
+        code TEXT NOT NULL,
+        name TEXT NOT NULL,
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(company_id, code)
+    );""")
+
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS items(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        company_id INTEGER NOT NULL,
+        item_code TEXT NOT NULL,
+        name TEXT NOT NULL,
+        category_id INTEGER,
+        brand_id INTEGER,
+        variant_id INTEGER,
+        base_uom_id INTEGER NOT NULL,
+        track_lot INTEGER NOT NULL DEFAULT 0,
+        track_serial INTEGER NOT NULL DEFAULT 0,
+        negative_stock_policy TEXT NOT NULL DEFAULT 'forbid',
+        is_active INTEGER NOT NULL DEFAULT 1,
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(company_id, item_code)
+    );""")
+
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS item_barcodes(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        item_id INTEGER NOT NULL,
+        barcode TEXT NOT NULL,
+        is_primary INTEGER NOT NULL DEFAULT 0,
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(barcode),
+        FOREIGN KEY(item_id) REFERENCES items(id)
+    );""")
+
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS item_uoms(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        item_id INTEGER NOT NULL,
+        uom_id INTEGER NOT NULL,
+        is_base INTEGER NOT NULL DEFAULT 0,
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(item_id, uom_id),
+        FOREIGN KEY(item_id) REFERENCES items(id)
+    );""")
+
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS uom_conversions(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        item_id INTEGER NOT NULL,
+        from_uom_id INTEGER NOT NULL,
+        to_uom_id INTEGER NOT NULL,
+        factor REAL NOT NULL,
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(item_id, from_uom_id, to_uom_id),
+        FOREIGN KEY(item_id) REFERENCES items(id)
+    );""")
+
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS warehouses(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        company_id INTEGER NOT NULL,
+        branch_id INTEGER NOT NULL,
+        code TEXT NOT NULL,
+        name TEXT NOT NULL,
+        is_active INTEGER NOT NULL DEFAULT 1,
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(company_id, branch_id, code)
+    );""")
+
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS warehouse_locations(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        company_id INTEGER NOT NULL,
+        branch_id INTEGER NOT NULL,
+        warehouse_id INTEGER NOT NULL,
+        parent_id INTEGER,
+        name TEXT NOT NULL,
+        location_type TEXT NOT NULL DEFAULT 'STORAGE',
+        capacity_qty REAL,
+        capacity_weight REAL,
+        capacity_volume REAL,
+        is_active INTEGER NOT NULL DEFAULT 1,
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY(warehouse_id) REFERENCES warehouses(id)
+    );""")
+
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS customers(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        company_id INTEGER NOT NULL,
+        branch_id INTEGER NOT NULL,
+        name TEXT NOT NULL,
+        status TEXT NOT NULL DEFAULT 'ACTIVE',
+        is_consignment INTEGER NOT NULL DEFAULT 0,
+        customer_warehouse TEXT DEFAULT '',
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    );""")
+
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS suppliers(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        company_id INTEGER NOT NULL,
+        branch_id INTEGER NOT NULL,
+        name TEXT NOT NULL,
+        status TEXT NOT NULL DEFAULT 'ACTIVE',
+        is_consignment INTEGER NOT NULL DEFAULT 0,
+        supplier_warehouse TEXT DEFAULT '',
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    );""")
+
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS lots(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        company_id INTEGER NOT NULL,
+        item_id INTEGER NOT NULL,
+        lot_no TEXT NOT NULL,
+        expiry_date TEXT DEFAULT '',
+        manufacture_date TEXT DEFAULT '',
+        status TEXT NOT NULL DEFAULT 'ACTIVE',
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(company_id, item_id, lot_no),
+        FOREIGN KEY(item_id) REFERENCES items(id)
+    );""")
+
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS serials(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        company_id INTEGER NOT NULL,
+        item_id INTEGER NOT NULL,
+        serial_no TEXT NOT NULL,
+        status TEXT NOT NULL DEFAULT 'ACTIVE',
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(serial_no),
+        FOREIGN KEY(item_id) REFERENCES items(id)
+    );""")
+
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS stock_ledger(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        company_id INTEGER NOT NULL,
+        branch_id INTEGER NOT NULL,
+        warehouse_id INTEGER NOT NULL,
+        location_id INTEGER,
+        item_id INTEGER NOT NULL,
+        lot_id INTEGER,
+        serial_id INTEGER,
+        doc_id INTEGER,
+        doc_line_id INTEGER,
+        txn_date TEXT NOT NULL,
+        qty REAL NOT NULL,
+        direction TEXT NOT NULL,
+        cost REAL NOT NULL DEFAULT 0,
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    );""")
+
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS stock_balance(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        company_id INTEGER NOT NULL,
+        branch_id INTEGER NOT NULL,
+        warehouse_id INTEGER NOT NULL,
+        location_id INTEGER NOT NULL,
+        item_id INTEGER NOT NULL,
+        qty_on_hand REAL NOT NULL DEFAULT 0,
+        qty_reserved REAL NOT NULL DEFAULT 0,
+        qty_blocked REAL NOT NULL DEFAULT 0,
+        updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(company_id, branch_id, warehouse_id, location_id, item_id)
+    );""")
+
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS stock_reservations(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        company_id INTEGER NOT NULL,
+        branch_id INTEGER NOT NULL,
+        warehouse_id INTEGER NOT NULL,
+        location_id INTEGER NOT NULL,
+        item_id INTEGER NOT NULL,
+        qty REAL NOT NULL,
+        ref_doc_id INTEGER,
+        status TEXT NOT NULL DEFAULT 'ACTIVE',
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    );""")
+
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS stock_blocks(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        company_id INTEGER NOT NULL,
+        branch_id INTEGER NOT NULL,
+        warehouse_id INTEGER NOT NULL,
+        location_id INTEGER NOT NULL,
+        item_id INTEGER NOT NULL,
+        qty REAL NOT NULL,
+        reason TEXT DEFAULT '',
+        status TEXT NOT NULL DEFAULT 'ACTIVE',
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    );""")
+
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS consignments(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        company_id INTEGER NOT NULL,
+        branch_id INTEGER NOT NULL,
+        warehouse_id INTEGER NOT NULL,
+        item_id INTEGER NOT NULL,
+        qty REAL NOT NULL DEFAULT 0,
+        owner_type TEXT NOT NULL DEFAULT 'CUSTOMER',
+        owner_id INTEGER,
+        status TEXT NOT NULL DEFAULT 'ACTIVE',
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    );""")
+
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS stock_ledger_archive(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        company_id INTEGER NOT NULL,
+        branch_id INTEGER NOT NULL,
+        warehouse_id INTEGER NOT NULL,
+        location_id INTEGER,
+        item_id INTEGER NOT NULL,
+        lot_id INTEGER,
+        serial_id INTEGER,
+        doc_id INTEGER,
+        doc_line_id INTEGER,
+        txn_date TEXT NOT NULL,
+        qty REAL NOT NULL,
+        direction TEXT NOT NULL,
+        cost REAL NOT NULL DEFAULT 0,
+        archived_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    );""")
+
     conn.commit()
 
 
@@ -2258,6 +2562,14 @@ def migrate_schema(conn: sqlite3.Connection, log_fn: Optional[Callable[[str, str
     _ensure_index(conn, "idx_trade_orders_company", "trade_orders", "company_id, order_type, status", log_fn)
     _ensure_index(conn, "idx_trade_order_lines_order", "trade_order_lines", "order_id", log_fn)
     _ensure_index(conn, "idx_trade_user_roles_company", "trade_user_roles", "company_id, user_id", log_fn)
+    _ensure_index(conn, "idx_stock_ledger_core", "stock_ledger", "company_id, item_id, warehouse_id, txn_date", log_fn)
+    _ensure_index(conn, "idx_stock_balance_core", "stock_balance", "company_id, item_id, warehouse_id, location_id", log_fn)
+    _ensure_index(conn, "idx_docs_company_docno", "docs", "company_id, doc_no", log_fn)
+    _ensure_index(conn, "idx_docs_company_date_status", "docs", "company_id, doc_date, status", log_fn)
+    _ensure_index(conn, "idx_item_barcodes_code", "item_barcodes", "barcode", log_fn)
+    _ensure_index(conn, "idx_lots_lot_no", "lots", "lot_no", log_fn)
+    _ensure_index(conn, "idx_serials_serial_no", "serials", "serial_no", log_fn)
+    _ensure_index(conn, "idx_warehouse_locations_tree", "warehouse_locations", "company_id, warehouse_id, parent_id", log_fn)
 
     # users (eski DB'ler için kolon garantisi)
     _ensure_column(conn, "users", "role", "TEXT NOT NULL DEFAULT 'user'", log_fn)
@@ -2300,6 +2612,18 @@ def migrate_schema(conn: sqlite3.Connection, log_fn: Optional[Callable[[str, str
     _ensure_column(conn, "docs", "voided_at", "TEXT", log_fn)
     _ensure_column(conn, "docs", "reversed_doc_id", "INTEGER", log_fn)
     _ensure_column(conn, "docs", "payment_status", "TEXT NOT NULL DEFAULT 'UNPAID'", log_fn)
+    _ensure_column(conn, "docs", "module", "TEXT DEFAULT ''", log_fn)
+    _ensure_column(conn, "docs", "branch_id", "INTEGER NOT NULL DEFAULT 1", log_fn)
+    _ensure_column(conn, "docs", "tolerance_qty", "REAL DEFAULT 0", log_fn)
+    _ensure_column(conn, "docs", "tolerance_pct", "REAL DEFAULT 0", log_fn)
+    _ensure_column(conn, "doc_lines", "source_warehouse_id", "INTEGER", log_fn)
+    _ensure_column(conn, "doc_lines", "target_warehouse_id", "INTEGER", log_fn)
+    _ensure_column(conn, "doc_lines", "source_location_id", "INTEGER", log_fn)
+    _ensure_column(conn, "doc_lines", "target_location_id", "INTEGER", log_fn)
+    _ensure_column(conn, "doc_lines", "lot_id", "INTEGER", log_fn)
+    _ensure_column(conn, "doc_lines", "serial_id", "INTEGER", log_fn)
+    _ensure_column(conn, "doc_lines", "line_status", "TEXT DEFAULT ''", log_fn)
+    _ensure_column(conn, "doc_lines", "line_notes", "TEXT DEFAULT ''", log_fn)
 
     # cari_hareket
     _ensure_column(conn, "cari_hareket", "para", "TEXT DEFAULT 'TL'", log_fn)
@@ -2385,6 +2709,313 @@ def migrate_schema(conn: sqlite3.Connection, log_fn: Optional[Callable[[str, str
         if log_fn:
             try:
                 log_fn("Schema Migration Error", f"stok tables: {e}")
+            except Exception:
+                pass
+
+    # -----------------
+    # WMS / Stok Çekirdek (eski DB'ler için)
+    # -----------------
+    try:
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS periods(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                company_id INTEGER NOT NULL,
+                branch_id INTEGER NOT NULL,
+                name TEXT NOT NULL,
+                start_date TEXT NOT NULL,
+                end_date TEXT NOT NULL,
+                is_locked INTEGER NOT NULL DEFAULT 0,
+                locked_by INTEGER,
+                locked_at TEXT,
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+            );"""
+        )
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS warehouse_permissions(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER NOT NULL,
+                company_id INTEGER NOT NULL,
+                branch_id INTEGER NOT NULL,
+                warehouse_id INTEGER NOT NULL,
+                can_view INTEGER NOT NULL DEFAULT 1,
+                can_post INTEGER NOT NULL DEFAULT 0,
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+            );"""
+        )
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS doc_locks(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                company_id INTEGER NOT NULL,
+                branch_id INTEGER NOT NULL,
+                doc_type TEXT NOT NULL,
+                doc_no TEXT NOT NULL,
+                locked_by INTEGER,
+                locked_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                reason TEXT DEFAULT '',
+                is_active INTEGER NOT NULL DEFAULT 1
+            );"""
+        )
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS categories(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                company_id INTEGER NOT NULL,
+                name TEXT NOT NULL,
+                parent_id INTEGER,
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+            );"""
+        )
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS brands(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                company_id INTEGER NOT NULL,
+                name TEXT NOT NULL,
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+            );"""
+        )
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS variants(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                company_id INTEGER NOT NULL,
+                name TEXT NOT NULL,
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+            );"""
+        )
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS uoms(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                company_id INTEGER NOT NULL,
+                code TEXT NOT NULL,
+                name TEXT NOT NULL,
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                UNIQUE(company_id, code)
+            );"""
+        )
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS items(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                company_id INTEGER NOT NULL,
+                item_code TEXT NOT NULL,
+                name TEXT NOT NULL,
+                category_id INTEGER,
+                brand_id INTEGER,
+                variant_id INTEGER,
+                base_uom_id INTEGER NOT NULL,
+                track_lot INTEGER NOT NULL DEFAULT 0,
+                track_serial INTEGER NOT NULL DEFAULT 0,
+                negative_stock_policy TEXT NOT NULL DEFAULT 'forbid',
+                is_active INTEGER NOT NULL DEFAULT 1,
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                UNIQUE(company_id, item_code)
+            );"""
+        )
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS item_barcodes(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                item_id INTEGER NOT NULL,
+                barcode TEXT NOT NULL,
+                is_primary INTEGER NOT NULL DEFAULT 0,
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                UNIQUE(barcode)
+            );"""
+        )
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS item_uoms(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                item_id INTEGER NOT NULL,
+                uom_id INTEGER NOT NULL,
+                is_base INTEGER NOT NULL DEFAULT 0,
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                UNIQUE(item_id, uom_id)
+            );"""
+        )
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS uom_conversions(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                item_id INTEGER NOT NULL,
+                from_uom_id INTEGER NOT NULL,
+                to_uom_id INTEGER NOT NULL,
+                factor REAL NOT NULL,
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                UNIQUE(item_id, from_uom_id, to_uom_id)
+            );"""
+        )
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS warehouses(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                company_id INTEGER NOT NULL,
+                branch_id INTEGER NOT NULL,
+                code TEXT NOT NULL,
+                name TEXT NOT NULL,
+                is_active INTEGER NOT NULL DEFAULT 1,
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                UNIQUE(company_id, branch_id, code)
+            );"""
+        )
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS warehouse_locations(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                company_id INTEGER NOT NULL,
+                branch_id INTEGER NOT NULL,
+                warehouse_id INTEGER NOT NULL,
+                parent_id INTEGER,
+                name TEXT NOT NULL,
+                location_type TEXT NOT NULL DEFAULT 'STORAGE',
+                capacity_qty REAL,
+                capacity_weight REAL,
+                capacity_volume REAL,
+                is_active INTEGER NOT NULL DEFAULT 1,
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+            );"""
+        )
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS customers(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                company_id INTEGER NOT NULL,
+                branch_id INTEGER NOT NULL,
+                name TEXT NOT NULL,
+                status TEXT NOT NULL DEFAULT 'ACTIVE',
+                is_consignment INTEGER NOT NULL DEFAULT 0,
+                customer_warehouse TEXT DEFAULT '',
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+            );"""
+        )
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS suppliers(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                company_id INTEGER NOT NULL,
+                branch_id INTEGER NOT NULL,
+                name TEXT NOT NULL,
+                status TEXT NOT NULL DEFAULT 'ACTIVE',
+                is_consignment INTEGER NOT NULL DEFAULT 0,
+                supplier_warehouse TEXT DEFAULT '',
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+            );"""
+        )
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS lots(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                company_id INTEGER NOT NULL,
+                item_id INTEGER NOT NULL,
+                lot_no TEXT NOT NULL,
+                expiry_date TEXT DEFAULT '',
+                manufacture_date TEXT DEFAULT '',
+                status TEXT NOT NULL DEFAULT 'ACTIVE',
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                UNIQUE(company_id, item_id, lot_no)
+            );"""
+        )
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS serials(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                company_id INTEGER NOT NULL,
+                item_id INTEGER NOT NULL,
+                serial_no TEXT NOT NULL,
+                status TEXT NOT NULL DEFAULT 'ACTIVE',
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                UNIQUE(serial_no)
+            );"""
+        )
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS stock_ledger(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                company_id INTEGER NOT NULL,
+                branch_id INTEGER NOT NULL,
+                warehouse_id INTEGER NOT NULL,
+                location_id INTEGER,
+                item_id INTEGER NOT NULL,
+                lot_id INTEGER,
+                serial_id INTEGER,
+                doc_id INTEGER,
+                doc_line_id INTEGER,
+                txn_date TEXT NOT NULL,
+                qty REAL NOT NULL,
+                direction TEXT NOT NULL,
+                cost REAL NOT NULL DEFAULT 0,
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+            );"""
+        )
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS stock_balance(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                company_id INTEGER NOT NULL,
+                branch_id INTEGER NOT NULL,
+                warehouse_id INTEGER NOT NULL,
+                location_id INTEGER NOT NULL,
+                item_id INTEGER NOT NULL,
+                qty_on_hand REAL NOT NULL DEFAULT 0,
+                qty_reserved REAL NOT NULL DEFAULT 0,
+                qty_blocked REAL NOT NULL DEFAULT 0,
+                updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                UNIQUE(company_id, branch_id, warehouse_id, location_id, item_id)
+            );"""
+        )
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS stock_reservations(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                company_id INTEGER NOT NULL,
+                branch_id INTEGER NOT NULL,
+                warehouse_id INTEGER NOT NULL,
+                location_id INTEGER NOT NULL,
+                item_id INTEGER NOT NULL,
+                qty REAL NOT NULL,
+                ref_doc_id INTEGER,
+                status TEXT NOT NULL DEFAULT 'ACTIVE',
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+            );"""
+        )
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS stock_blocks(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                company_id INTEGER NOT NULL,
+                branch_id INTEGER NOT NULL,
+                warehouse_id INTEGER NOT NULL,
+                location_id INTEGER NOT NULL,
+                item_id INTEGER NOT NULL,
+                qty REAL NOT NULL,
+                reason TEXT DEFAULT '',
+                status TEXT NOT NULL DEFAULT 'ACTIVE',
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+            );"""
+        )
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS consignments(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                company_id INTEGER NOT NULL,
+                branch_id INTEGER NOT NULL,
+                warehouse_id INTEGER NOT NULL,
+                item_id INTEGER NOT NULL,
+                qty REAL NOT NULL DEFAULT 0,
+                owner_type TEXT NOT NULL DEFAULT 'CUSTOMER',
+                owner_id INTEGER,
+                status TEXT NOT NULL DEFAULT 'ACTIVE',
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+            );"""
+        )
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS stock_ledger_archive(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                company_id INTEGER NOT NULL,
+                branch_id INTEGER NOT NULL,
+                warehouse_id INTEGER NOT NULL,
+                location_id INTEGER,
+                item_id INTEGER NOT NULL,
+                lot_id INTEGER,
+                serial_id INTEGER,
+                doc_id INTEGER,
+                doc_line_id INTEGER,
+                txn_date TEXT NOT NULL,
+                qty REAL NOT NULL,
+                direction TEXT NOT NULL,
+                cost REAL NOT NULL DEFAULT 0,
+                archived_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+            );"""
+        )
+        conn.commit()
+    except Exception as e:
+        if log_fn:
+            try:
+                log_fn("Schema Migration Error", f"wms tables: {e}")
             except Exception:
                 pass
 

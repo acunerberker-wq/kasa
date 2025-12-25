@@ -30,6 +30,7 @@ from .repos import (
     SatisSiparisRepo,
     MessagesRepo,
     NotesRemindersRepo,
+    WMSRepo,
 )
 from ..modules.hakedis.repo import HakedisRepo
 
@@ -60,6 +61,7 @@ class DB:
         self.satis_siparis = SatisSiparisRepo(self.conn)
         self.messages = MessagesRepo(self.conn)
         self.notes_reminders = NotesRemindersRepo(self.conn)
+        self.wms = WMSRepo(self.conn, log_fn=self.logs.log)
 
         migrate_schema(self.conn, log_fn=self._safe_log)
         seed_defaults(self.conn, log_fn=self._safe_log)
@@ -416,6 +418,226 @@ class DB:
 
     def stok_hareket_delete(self, hid: int) -> None:
         return self.stok.hareket_delete(hid)
+
+    # -----------------
+    # WMS / Stok Çekirdek
+    # -----------------
+    def wms_create_period(
+        self,
+        company_id: int,
+        branch_id: int,
+        name: str,
+        start_date: str,
+        end_date: str,
+        is_locked: int = 0,
+    ) -> int:
+        return self.wms.create_period(company_id, branch_id, name, start_date, end_date, is_locked=is_locked)
+
+    def wms_lock_period(self, period_id: int, user_id: Optional[int] = None) -> None:
+        return self.wms.lock_period(period_id, user_id=user_id)
+
+    def wms_create_uom(self, company_id: int, code: str, name: str) -> int:
+        return self.wms.create_uom(company_id, code, name)
+
+    def wms_create_category(self, company_id: int, name: str, parent_id: Optional[int] = None) -> int:
+        return self.wms.create_category(company_id, name, parent_id=parent_id)
+
+    def wms_create_brand(self, company_id: int, name: str) -> int:
+        return self.wms.create_brand(company_id, name)
+
+    def wms_create_variant(self, company_id: int, name: str) -> int:
+        return self.wms.create_variant(company_id, name)
+
+    def wms_create_item(
+        self,
+        company_id: int,
+        item_code: str,
+        name: str,
+        base_uom_id: int,
+        category_id: Optional[int] = None,
+        brand_id: Optional[int] = None,
+        variant_id: Optional[int] = None,
+        track_lot: int = 0,
+        track_serial: int = 0,
+        negative_stock_policy: str = "forbid",
+        is_active: int = 1,
+    ) -> int:
+        return self.wms.create_item(
+            company_id,
+            item_code,
+            name,
+            base_uom_id,
+            category_id=category_id,
+            brand_id=brand_id,
+            variant_id=variant_id,
+            track_lot=track_lot,
+            track_serial=track_serial,
+            negative_stock_policy=negative_stock_policy,
+            is_active=is_active,
+        )
+
+    def wms_add_item_barcode(self, item_id: int, barcode: str, is_primary: int = 0) -> int:
+        return self.wms.add_item_barcode(item_id, barcode, is_primary=is_primary)
+
+    def wms_add_item_uom(self, item_id: int, uom_id: int, is_base: int = 0) -> int:
+        return self.wms.add_item_uom(item_id, uom_id, is_base=is_base)
+
+    def wms_add_uom_conversion(self, item_id: int, from_uom_id: int, to_uom_id: int, factor: float) -> int:
+        return self.wms.add_uom_conversion(item_id, from_uom_id, to_uom_id, factor)
+
+    def wms_create_warehouse(self, company_id: int, branch_id: int, code: str, name: str, is_active: int = 1) -> int:
+        return self.wms.create_warehouse(company_id, branch_id, code, name, is_active=is_active)
+
+    def wms_create_location(
+        self,
+        company_id: int,
+        branch_id: int,
+        warehouse_id: int,
+        name: str,
+        parent_id: Optional[int] = None,
+        location_type: str = "STORAGE",
+        capacity_qty: Optional[float] = None,
+        capacity_weight: Optional[float] = None,
+        capacity_volume: Optional[float] = None,
+        is_active: int = 1,
+    ) -> int:
+        return self.wms.create_location(
+            company_id,
+            branch_id,
+            warehouse_id,
+            name,
+            parent_id=parent_id,
+            location_type=location_type,
+            capacity_qty=capacity_qty,
+            capacity_weight=capacity_weight,
+            capacity_volume=capacity_volume,
+            is_active=is_active,
+        )
+
+    def wms_create_lot(
+        self,
+        company_id: int,
+        item_id: int,
+        lot_no: str,
+        expiry_date: str = "",
+        manufacture_date: str = "",
+        status: str = "ACTIVE",
+    ) -> int:
+        return self.wms.create_lot(
+            company_id,
+            item_id,
+            lot_no,
+            expiry_date=expiry_date,
+            manufacture_date=manufacture_date,
+            status=status,
+        )
+
+    def wms_create_serial(self, company_id: int, item_id: int, serial_no: str, status: str = "ACTIVE") -> int:
+        return self.wms.create_serial(company_id, item_id, serial_no, status=status)
+
+    def wms_pick_lot_fefo(self, company_id: int, item_id: int):
+        return self.wms.pick_lot_fefo(company_id, item_id)
+
+    def wms_set_warehouse_permission(
+        self,
+        user_id: int,
+        company_id: int,
+        branch_id: int,
+        warehouse_id: int,
+        can_view: int = 1,
+        can_post: int = 0,
+    ) -> int:
+        return self.wms.set_warehouse_permission(
+            user_id, company_id, branch_id, warehouse_id, can_view=can_view, can_post=can_post
+        )
+
+    def wms_create_doc(self, header: Dict[str, Any], lines: List[Dict[str, Any]], user_id: Optional[int] = None, username: str = "") -> int:
+        return self.wms.create_doc(header, lines, user_id=user_id, username=username)
+
+    def wms_post_doc(self, doc_id: int, user_id: Optional[int] = None, username: str = "", negative_stock_policy: str = "forbid") -> None:
+        return self.wms.post_doc(doc_id, user_id=user_id, username=username, negative_stock_policy=negative_stock_policy)
+
+    def wms_void_doc(self, doc_id: int, user_id: Optional[int] = None, reason: str = "") -> None:
+        return self.wms.void_doc(doc_id, user_id=user_id, reason=reason)
+
+    def wms_list_ledger(
+        self,
+        company_id: int,
+        branch_id: int,
+        warehouse_id: int,
+        item_id: Optional[int] = None,
+        limit: int = 200,
+        offset: int = 0,
+    ):
+        return self.wms.list_ledger(company_id, branch_id, warehouse_id, item_id=item_id, limit=limit, offset=offset)
+
+    def wms_list_ledger_masked_cost(
+        self,
+        user_id: int,
+        company_id: int,
+        branch_id: int,
+        warehouse_id: int,
+        item_id: Optional[int] = None,
+        limit: int = 200,
+        offset: int = 0,
+    ):
+        return self.wms.list_ledger_masked_cost(
+            user_id,
+            company_id,
+            branch_id,
+            warehouse_id,
+            item_id=item_id,
+            limit=limit,
+            offset=offset,
+        )
+
+    def wms_create_reservation(
+        self,
+        company_id: int,
+        branch_id: int,
+        warehouse_id: int,
+        location_id: int,
+        item_id: int,
+        qty: float,
+        ref_doc_id: Optional[int] = None,
+    ) -> int:
+        return self.wms.create_reservation(company_id, branch_id, warehouse_id, location_id, item_id, qty, ref_doc_id=ref_doc_id)
+
+    def wms_release_reservation(self, reservation_id: int) -> None:
+        return self.wms.release_reservation(reservation_id)
+
+    def wms_create_block(
+        self,
+        company_id: int,
+        branch_id: int,
+        warehouse_id: int,
+        location_id: int,
+        item_id: int,
+        qty: float,
+        reason: str = "",
+    ) -> int:
+        return self.wms.create_block(company_id, branch_id, warehouse_id, location_id, item_id, qty, reason=reason)
+
+    def wms_release_block(self, block_id: int) -> None:
+        return self.wms.release_block(block_id)
+
+    def wms_fifo_cost(self, company_id: int, branch_id: int, warehouse_id: int, item_id: int, qty: float) -> float:
+        return self.wms.calculate_fifo_cost(company_id, branch_id, warehouse_id, item_id, qty)
+
+    def wms_wa_cost(self, company_id: int, branch_id: int, warehouse_id: int, item_id: int) -> float:
+        return self.wms.calculate_weighted_avg_cost(company_id, branch_id, warehouse_id, item_id)
+
+    def wms_allocate_landed_cost(self, total_cost: float, weights: List[float]) -> List[float]:
+        return self.wms.allocate_landed_cost(total_cost, weights)
+
+    def wms_get_on_hand(self, company_id: int, branch_id: int, warehouse_id: int, location_id: int, item_id: int) -> float:
+        return self.wms.get_on_hand(company_id, branch_id, warehouse_id, location_id, item_id)
+
+    def wms_lock_doc(self, company_id: int, branch_id: int, doc_type: str, doc_no: str, user_id: Optional[int], reason: str = "") -> int:
+        return self.wms.lock_doc(company_id, branch_id, doc_type, doc_no, user_id, reason=reason)
+
+    def wms_is_doc_locked(self, company_id: int, branch_id: int, doc_type: str, doc_no: str) -> bool:
+        return self.wms.is_doc_locked(company_id, branch_id, doc_type, doc_no)
 
     # -----------------
     # Satın Alma Siparişleri

@@ -35,6 +35,7 @@ from .ui.frames import (
     MessagesFrame,
     IntegrationsHubFrame,
     CreateCenterFrame,
+    StockWmsFrame,
 )
 from .ui.plugins.loader import discover_ui_plugins
 from .modules.notes_reminders.scheduler import ReminderScheduler
@@ -798,6 +799,9 @@ class App:
                 continue
             nav_btn(p.nav_text, p.key)
 
+        nav_section("📦 STOK & WMS")
+        nav_btn("📦 Stok/WMS", "stok_wms")
+
         nav_section("🔌 ENTEGRASYONLAR")
         nav_btn("🔌 Entegrasyonlar", "entegrasyonlar")
 
@@ -852,6 +856,7 @@ class App:
         self.screen_registry.register("create_center", lambda parent, app: CreateCenterFrame(parent, app), title="Kayıt Oluştur (Merkez)")
         self.screen_registry.register("mesajlar", lambda parent, app: MessagesFrame(parent, app), title="Mesajlar")
         self.screen_registry.register("tanimlar", lambda parent, app: TanimlarHubFrame(parent, app), title="Tanımlar")
+        self.screen_registry.register("stok_wms", lambda parent, app: StockWmsFrame(parent, app), title="Stok/WMS")
         self.screen_registry.register(
             "rapor_araclar",
             lambda parent, app: RaporAraclarHubFrame(parent, app),
@@ -919,6 +924,7 @@ class App:
             "kullanicilar": "Kullanıcılar",
             "mesajlar": "Mesajlar",
             "entegrasyonlar": "Entegrasyonlar",
+            "stok_wms": "Stok/WMS",
         }
 
         # Plugin başlıkları

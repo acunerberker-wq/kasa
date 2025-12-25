@@ -3530,326 +3530,176 @@ AttributeError: 'DB' object has no attribute 'hakedis'
 2025-12-26 01:27:20,024 [INFO] kasapro.ui: UI screen_missing | key='entegrasyonlar', source='entegrasyonlar'
 2025-12-26 01:27:20,026 [INFO] kasapro.ui: UI screen_shown | key='entegrasyonlar'
 2025-12-26 01:27:21,848 [INFO] kasapro.ui: UI callback invoked: on_close
-2025-12-26 01:47:10,394 [ERROR] kasapro.app: Uygulama başlatma hatası
-Traceback (most recent call last):
-  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\app.py", line 1272, in main
-    App().run()
-    ~~~^^
-  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\app.py", line 117, in __init__
-    self.services = Services.build(self.db, self.usersdb, context_provider=self._hr_context)
-                    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\services\context.py", line 38, in build
-    hr_service = HRService(db, context_provider) if HRService else None
-                                                    ^^^^^^^^^
-NameError: name 'HRService' is not defined. Did you mean: 'Services'?
-2025-12-26 01:48:22,454 [ERROR] kasapro.app: Uygulama başlatma hatası
-Traceback (most recent call last):
-  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\app.py", line 1272, in main
-    App().run()
-    ~~~^^
-  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\app.py", line 118, in __init__
-    self.integrations_worker = IntegrationWorker(self.services.integrations)
-                               ^^^^^^^^^^^^^^^^^
-NameError: name 'IntegrationWorker' is not defined
-2025-12-26 01:49:31,324 [INFO] kasapro.ui: UI container_created | view='root_container'
-2025-12-26 01:49:31,327 [INFO] kasapro.ui: UI callback_bound | handler='open_help'
-2025-12-26 01:49:31,438 [INFO] kasapro.ui: UI callback_bound | handler='open_settings'
-2025-12-26 01:49:31,735 [INFO] kasapro.ui: UI menu_section_added | title='🧾 KAYIT OLUŞTUR'
-2025-12-26 01:49:31,735 [INFO] kasapro.ui: UI menu_added | key='create_center', text='🧾 Kayıt Oluştur (Merkez)'
-2025-12-26 01:49:31,735 [INFO] kasapro.ui: UI callback_bound | handler='nav:create_center'
-2025-12-26 01:49:31,761 [INFO] kasapro.ui: UI menu_section_added | title='📚 TANIMLAR & AYARLAR'
-2025-12-26 01:49:31,761 [INFO] kasapro.ui: UI menu_added | key='tanimlar', text='📚 Tanımlar'
-2025-12-26 01:49:31,761 [INFO] kasapro.ui: UI callback_bound | handler='nav:tanimlar'
-2025-12-26 01:49:31,777 [INFO] kasapro.ui: UI menu_section_added | title='💳 İŞLEMLER'
-2025-12-26 01:49:31,777 [INFO] kasapro.ui: UI menu_added | key='kasa', text='🏦 Kasa'
-2025-12-26 01:49:31,777 [INFO] kasapro.ui: UI callback_bound | handler='nav:kasa'
-2025-12-26 01:49:31,793 [INFO] kasapro.ui: UI menu_added | key='mesajlar', text='📨 Mesajlar'
-2025-12-26 01:49:31,793 [INFO] kasapro.ui: UI callback_bound | handler='nav:mesajlar'
-2025-12-26 01:49:31,803 [INFO] kasapro.ui: UI menu_added | key='stok', text='📦 Stok'
-2025-12-26 01:49:31,804 [INFO] kasapro.ui: UI callback_bound | handler='nav:stok'
-2025-12-26 01:49:31,814 [INFO] kasapro.ui: UI menu_added | key='advanced_invoice', text='🧾 Faturalar'
-2025-12-26 01:49:31,814 [INFO] kasapro.ui: UI callback_bound | handler='nav:advanced_invoice'
-2025-12-26 01:49:31,815 [INFO] kasapro.ui: UI menu_added | key='banka_hareketleri', text='🏦 Banka'
-2025-12-26 01:49:31,815 [INFO] kasapro.ui: UI callback_bound | handler='nav:banka_hareketleri'
-2025-12-26 01:49:31,816 [INFO] kasapro.ui: UI menu_added | key='fatura', text='🧾 Fatura'
-2025-12-26 01:49:31,816 [INFO] kasapro.ui: UI callback_bound | handler='nav:fatura'
-2025-12-26 01:49:31,816 [INFO] kasapro.ui: UI menu_added | key='satis_siparis_rapor', text='🧾 Satış Siparişleri'
-2025-12-26 01:49:31,817 [INFO] kasapro.ui: UI callback_bound | handler='nav:satis_siparis_rapor'
-2025-12-26 01:49:31,817 [INFO] kasapro.ui: UI menu_added | key='trade_module', text='🏭 Ticari'
-2025-12-26 01:49:31,817 [INFO] kasapro.ui: UI callback_bound | handler='nav:trade_module'
-2025-12-26 01:49:31,827 [INFO] kasapro.ui: UI menu_added | key='hr', text='🧑\u200d💼 İK'
-2025-12-26 01:49:31,827 [INFO] kasapro.ui: UI callback_bound | handler='nav:hr'
-2025-12-26 01:49:31,850 [INFO] kasapro.ui: UI menu_added | key='diger_giderler', text='🧾 Diğer Giderler'
-2025-12-26 01:49:31,850 [INFO] kasapro.ui: UI callback_bound | handler='nav:diger_giderler'
-2025-12-26 01:49:31,851 [INFO] kasapro.ui: UI menu_added | key='cari_hareketler', text='📒 Cari Hareketler'
-2025-12-26 01:49:31,851 [INFO] kasapro.ui: UI callback_bound | handler='nav:cari_hareketler'
-2025-12-26 01:49:31,861 [INFO] kasapro.ui: UI menu_added | key='maas_takibi', text='💼 Maaş Takibi'
-2025-12-26 01:49:31,862 [INFO] kasapro.ui: UI callback_bound | handler='nav:maas_takibi'
-2025-12-26 01:49:31,862 [INFO] kasapro.ui: UI menu_added | key='nakliye', text='🚚 Nakliye'
-2025-12-26 01:49:31,862 [INFO] kasapro.ui: UI callback_bound | handler='nav:nakliye'
-2025-12-26 01:49:31,877 [INFO] kasapro.ui: UI menu_added | key='cari_hareket_ekle', text='➕ Cari Hareket Ekle'
-2025-12-26 01:49:31,877 [INFO] kasapro.ui: UI callback_bound | handler='nav:cari_hareket_ekle'
-2025-12-26 01:49:31,878 [INFO] kasapro.ui: UI menu_added | key='dms', text='📄 Dokümanlar'
-2025-12-26 01:49:31,878 [INFO] kasapro.ui: UI callback_bound | handler='nav:dms'
-2025-12-26 01:49:31,890 [INFO] kasapro.ui: UI menu_added | key='hakedis', text='🏗️ Hakediş Merkezi'
-2025-12-26 01:49:31,891 [INFO] kasapro.ui: UI callback_bound | handler='nav:hakedis'
-2025-12-26 01:49:31,902 [INFO] kasapro.ui: UI menu_added | key='diagnostics', text='🧪 Sistem Testleri'
-2025-12-26 01:49:31,902 [INFO] kasapro.ui: UI callback_bound | handler='nav:diagnostics'
-2025-12-26 01:49:31,919 [INFO] kasapro.ui: UI menu_section_added | title='🔌 ENTEGRASYONLAR'
-2025-12-26 01:49:31,919 [INFO] kasapro.ui: UI menu_added | key='entegrasyonlar', text='🔌 Entegrasyonlar'
-2025-12-26 01:49:31,919 [INFO] kasapro.ui: UI callback_bound | handler='nav:entegrasyonlar'
-2025-12-26 01:49:31,932 [INFO] kasapro.ui: UI menu_section_added | title='📈 RAPORLAR & DASHBOARD'
-2025-12-26 01:49:31,932 [INFO] kasapro.ui: UI menu_added | key='rapor_araclar', text='📈 Rapor & Araçlar'
-2025-12-26 01:49:31,932 [INFO] kasapro.ui: UI callback_bound | handler='nav:rapor_araclar'
-2025-12-26 01:49:31,933 [INFO] kasapro.ui: UI menu_added | key='satis_raporlari', text='💹 Satış Raporları'
-2025-12-26 01:49:31,933 [INFO] kasapro.ui: UI callback_bound | handler='nav:satis_raporlari'
-2025-12-26 01:49:31,944 [INFO] kasapro.ui: UI callback_bound | handler='import_excel'
-2025-12-26 01:49:31,955 [INFO] kasapro.ui: UI callback_bound | handler='export_excel'
-2025-12-26 01:49:31,964 [INFO] kasapro.ui: UI callback_bound | handler='on_close'
-2025-12-26 01:49:31,983 [INFO] kasapro.ui: UI screen_registered | key='kasa', title='Kasa'
-2025-12-26 01:49:31,984 [INFO] kasapro.ui: UI frame_created | view='KasaFrame'
-2025-12-26 01:49:32,021 [INFO] kasapro.ui: UI screen_created | key='kasa', view='KasaFrame'
-2025-12-26 01:49:32,021 [INFO] kasapro.ui: UI screen_registered | key='create_center', title='Kayıt Oluştur (Merkez)'
-2025-12-26 01:49:32,022 [INFO] kasapro.ui: UI frame_created | view='CreateCenterFrame'
-2025-12-26 01:49:32,035 [ERROR] kasapro.ui: Failed to build screen: create_center
-Traceback (most recent call last):
-  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\navigation.py", line 46, in _create_frame
-    frame = spec.factory(self.container, self.controller)
-  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\app.py", line 852, in <lambda>
-    self.screen_registry.register("create_center", lambda parent, app: CreateCenterFrame(parent, app), title="Kayıt Oluştur (Merkez)")
-                                                                       ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
-  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\frames\create_center.py", line 27, in __init__
-    self.build_ui()
-    ~~~~~~~~~~~~~^^
-  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\frames\create_center.py", line 53, in build_ui
-    self._populate_categories()
-    ~~~~~~~~~~~~~~~~~~~~~~~~~^^
-  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\frames\create_center.py", line 163, in _populate_categories
-    categories = self._categories_for_role()
-  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\frames\create_center.py", line 169, in _categories_for_role
-    allowed = self._allowed_forms()
-  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\frames\create_center.py", line 152, in _allowed_forms
-    role = str(getattr(self.app, "user", {}).get("role", "")).lower()
-               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-AttributeError: 'sqlite3.Row' object has no attribute 'get'
-2025-12-26 01:49:32,038 [INFO] kasapro.ui: UI screen_registered | key='mesajlar', title='Mesajlar'
-2025-12-26 01:49:32,038 [INFO] kasapro.ui: UI frame_created | view='MessagesFrame'
-2025-12-26 01:49:32,039 [INFO] kasapro.ui: UI callback_bound | handler='messages_folder_change'
-2025-12-26 01:49:32,040 [INFO] kasapro.ui: UI callback_bound | handler='messages_search'
-2025-12-26 01:49:32,041 [INFO] kasapro.ui: UI callback_bound | handler='messages_refresh'
-2025-12-26 01:49:32,051 [INFO] kasapro.ui: UI callback_bound | handler='messages_compose'
-2025-12-26 01:49:32,053 [INFO] kasapro.ui: UI callback_bound | handler='messages_prev'
-2025-12-26 01:49:32,054 [INFO] kasapro.ui: UI callback_bound | handler='messages_next'
-2025-12-26 01:49:32,066 [INFO] kasapro.ui: UI screen_created | key='mesajlar', view='MessagesFrame'
-2025-12-26 01:49:32,066 [INFO] kasapro.ui: UI screen_registered | key='tanimlar', title='Tanımlar'
-2025-12-26 01:49:32,067 [INFO] kasapro.ui: UI frame_created | view='TanimlarHubFrame'
-2025-12-26 01:49:32,068 [INFO] kasapro.ui: UI tab_added | tab='cariler', container='tanimlar'
-2025-12-26 01:49:32,068 [INFO] kasapro.ui: UI tab_added | tab='calisanlar', container='tanimlar'
-2025-12-26 01:49:32,068 [INFO] kasapro.ui: UI tab_added | tab='meslekler', container='tanimlar'
-2025-12-26 01:49:32,069 [INFO] kasapro.ui: UI frame_created | view='CarilerFrame'
-2025-12-26 01:49:32,079 [INFO] kasapro.ui: UI frame_created | view='MaasTakibiFrame'
-2025-12-26 01:49:32,136 [INFO] kasapro.ui: UI frame_created | view='MaasMesleklerFrame'
-2025-12-26 01:49:32,145 [INFO] kasapro.ui: UI callback_bound | handler='tanimlar_tab_change'
-2025-12-26 01:49:32,145 [INFO] kasapro.ui: UI screen_created | key='tanimlar', view='TanimlarHubFrame'
-2025-12-26 01:49:32,145 [INFO] kasapro.ui: UI screen_registered | key='rapor_araclar', title='Rapor & Araçlar'
-2025-12-26 01:49:32,145 [INFO] kasapro.ui: UI frame_created | view='RaporAraclarHubFrame'
-2025-12-26 01:49:32,147 [INFO] kasapro.ui: UI tab_added | tab='raporlar', container='rapor_araclar'
-2025-12-26 01:49:32,147 [INFO] kasapro.ui: UI tab_added | tab='search', container='rapor_araclar'
-2025-12-26 01:49:32,147 [INFO] kasapro.ui: UI tab_added | tab='loglar', container='rapor_araclar'
-2025-12-26 01:49:32,148 [INFO] kasapro.ui: UI frame_created | view='RaporlarFrame'
-2025-12-26 01:49:32,150 [INFO] kasapro.ui: UI callback_bound | handler='raporlar_last30'
-2025-12-26 01:49:32,151 [INFO] kasapro.ui: UI callback_bound | handler='raporlar_refresh'
-2025-12-26 01:49:32,153 [INFO] kasapro.ui: UI callback_bound | handler='raporlar_canvas_config'
-2025-12-26 01:49:32,154 [INFO] kasapro.ui: UI callback_bound | handler='raporlar_select_all'
-2025-12-26 01:49:32,154 [INFO] kasapro.ui: UI callback_bound | handler='raporlar_clear_all'
-2025-12-26 01:49:32,155 [INFO] kasapro.ui: UI callback_bound | handler='raporlar_calc'
-2025-12-26 01:49:32,156 [INFO] kasapro.ui: UI frame_created | view='GlobalSearchFrame'
-2025-12-26 01:49:32,158 [INFO] kasapro.ui: UI callback_bound | handler='global_search'
-2025-12-26 01:49:32,158 [INFO] kasapro.ui: UI frame_created | view='LogsFrame'
-2025-12-26 01:49:32,159 [INFO] kasapro.ui: UI callback_bound | handler='logs_refresh'
-2025-12-26 01:49:32,159 [INFO] kasapro.ui: UI callback_bound | handler='logs_export_txt'
-2025-12-26 01:49:32,161 [INFO] kasapro.ui: UI frame_created | view='SatinAlmaRaporlarFrame'
-2025-12-26 01:49:32,287 [INFO] kasapro.ui: UI callback_bound | handler='rapor_araclar_tab_change'
-2025-12-26 01:49:32,287 [INFO] kasapro.ui: UI screen_created | key='rapor_araclar', view='RaporAraclarHubFrame'
-2025-12-26 01:49:32,288 [INFO] kasapro.ui: UI screen_registered | key='stok', title='Stok Yönetimi'
-2025-12-26 01:49:32,288 [INFO] kasapro.ui: UI frame_created | view='StokFrame'
-2025-12-26 01:49:32,339 [INFO] kasapro.ui: UI screen_created | key='stok', view='StokFrame'
-2025-12-26 01:49:32,339 [INFO] kasapro.ui: UI screen_registered | key='advanced_invoice', title='Faturalar'
-2025-12-26 01:49:32,340 [ERROR] kasapro.ui: Failed to build screen: advanced_invoice
-Traceback (most recent call last):
-  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\navigation.py", line 46, in _create_frame
-    frame = spec.factory(self.container, self.controller)
-  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\plugins\advanced_invoice.py", line 17, in build
-    return InvoiceModuleFrame(master, app)
-  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\modules\invoice\ui.py", line 38, in __init__
-    self.repo = app.db.invoice_adv
-                ^^^^^^^^^^^^^^^^^^
-AttributeError: 'DB' object has no attribute 'invoice_adv'
-2025-12-26 01:49:32,342 [INFO] kasapro.ui: UI screen_registered | key='banka_hareketleri', title='Banka Hareketleri'
-2025-12-26 01:49:32,342 [INFO] kasapro.ui: UI frame_created | view='BankaHareketleriFrame'
-2025-12-26 01:49:32,358 [INFO] kasapro.ui: UI screen_created | key='banka_hareketleri', view='BankaHareketleriFrame'
-2025-12-26 01:49:32,358 [INFO] kasapro.ui: UI screen_registered | key='fatura', title='Fatura'
-2025-12-26 01:49:32,358 [INFO] kasapro.ui: UI frame_created | view='FaturaFrame'
-2025-12-26 01:49:32,415 [INFO] kasapro.ui: UI callback invoked: tanimlar_tab_change
-2025-12-26 01:49:32,416 [INFO] kasapro.ui: UI callback invoked: rapor_araclar_tab_change
-2025-12-26 01:49:34,212 [INFO] kasapro.ui: UI screen_created | key='fatura', view='FaturaFrame'
-2025-12-26 01:49:34,212 [INFO] kasapro.ui: UI screen_registered | key='satis_siparis_rapor', title='Satış Sipariş Raporları'
-2025-12-26 01:49:34,213 [INFO] kasapro.ui: UI frame_created | view='SatisSiparisRaporFrame'
-2025-12-26 01:49:34,225 [INFO] kasapro.ui: UI screen_created | key='satis_siparis_rapor', view='SatisSiparisRaporFrame'
-2025-12-26 01:49:34,226 [INFO] kasapro.ui: UI screen_registered | key='trade_module', title='Gelişmiş Alış/Satış (Ticari) Modülü'
-2025-12-26 01:49:34,227 [ERROR] kasapro.ui: Failed to build screen: trade_module
-Traceback (most recent call last):
-  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\navigation.py", line 46, in _create_frame
-    frame = spec.factory(self.container, self.controller)
-  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\plugins\trade_module.py", line 18, in build
-    return TradeModuleFrame(master, app)
-  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\modules\trade\ui.py", line 46, in __init__
-    app_role=str(getattr(app, "user", {}).get("role", "")),
-                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-AttributeError: 'sqlite3.Row' object has no attribute 'get'
-2025-12-26 01:49:34,228 [INFO] kasapro.ui: UI screen_registered | key='hr', title='İK Modülü'
-2025-12-26 01:49:34,228 [INFO] kasapro.ui: UI frame_created | view='HRFrame'
-2025-12-26 01:49:34,300 [INFO] kasapro.ui: UI screen_created | key='hr', view='HRFrame'
-2025-12-26 01:49:34,300 [INFO] kasapro.ui: UI screen_registered | key='diger_giderler', title='Şirket Diğer Giderler'
-2025-12-26 01:49:34,301 [INFO] kasapro.ui: UI frame_created | view='DigerGiderlerFrame'
-2025-12-26 01:49:34,323 [INFO] kasapro.ui: UI screen_created | key='diger_giderler', view='DigerGiderlerFrame'
-2025-12-26 01:49:34,323 [INFO] kasapro.ui: UI screen_registered | key='cari_hareketler', title='Cari Hareketler'
-2025-12-26 01:49:34,324 [INFO] kasapro.ui: UI frame_created | view='CariHareketlerFrame'
-2025-12-26 01:49:34,330 [INFO] kasapro.ui: UI screen_created | key='cari_hareketler', view='CariHareketlerFrame'
-2025-12-26 01:49:34,330 [INFO] kasapro.ui: UI screen_registered | key='maas_takibi', title='Şirket Maaş Takibi'
-2025-12-26 01:49:34,331 [INFO] kasapro.ui: UI frame_created | view='MaasTakibiFrame'
-2025-12-26 01:49:34,370 [INFO] kasapro.ui: UI screen_created | key='maas_takibi', view='MaasTakibiFrame'
-2025-12-26 01:49:34,370 [INFO] kasapro.ui: UI screen_registered | key='nakliye', title='Nakliye Yönetimi'
-2025-12-26 01:49:34,371 [INFO] kasapro.ui: UI frame_created | view='NakliyeFrame'
-2025-12-26 01:49:34,426 [INFO] kasapro.ui: UI screen_created | key='nakliye', view='NakliyeFrame'
-2025-12-26 01:49:34,426 [INFO] kasapro.ui: UI screen_registered | key='cari_hareket_ekle', title='Cari Hareket Ekle'
-2025-12-26 01:49:34,427 [INFO] kasapro.ui: UI frame_created | view='CariHareketEkleFrame'
-2025-12-26 01:49:34,437 [INFO] kasapro.ui: UI screen_created | key='cari_hareket_ekle', view='CariHareketEkleFrame'
-2025-12-26 01:49:34,437 [INFO] kasapro.ui: UI screen_registered | key='maas_meslekler', title='Maaş Meslek Yönetimi'
-2025-12-26 01:49:34,438 [INFO] kasapro.ui: UI frame_created | view='MaasMesleklerFrame'
-2025-12-26 01:49:34,446 [INFO] kasapro.ui: UI screen_created | key='maas_meslekler', view='MaasMesleklerFrame'
-2025-12-26 01:49:34,446 [INFO] kasapro.ui: UI screen_registered | key='dms', title='Dokümanlar'
-2025-12-26 01:49:34,458 [ERROR] kasapro.ui: Failed to build screen: dms
-Traceback (most recent call last):
-  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\navigation.py", line 46, in _create_frame
-    frame = spec.factory(self.container, self.controller)
-  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\plugins\dms.py", line 17, in build
-    return DmsHubFrame(master, app)
-  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\modules\dms\ui\hub.py", line 33, in __init__
-    self._refresh_approvals()
-    ~~~~~~~~~~~~~~~~~~~~~~~^^
-  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\modules\dms\ui\hub.py", line 330, in _refresh_approvals
-    role = str(getattr(self.app, "user", {}).get("role") or "user")
-               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-AttributeError: 'sqlite3.Row' object has no attribute 'get'
-2025-12-26 01:49:34,459 [INFO] kasapro.ui: UI screen_registered | key='hakedis', title='Proje/Şantiye > Hakediş Merkezi'
-2025-12-26 01:49:34,460 [ERROR] kasapro.ui: Failed to build screen: hakedis
-Traceback (most recent call last):
-  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\navigation.py", line 46, in _create_frame
-    frame = spec.factory(self.container, self.controller)
-  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\plugins\hakedis.py", line 18, in build
-    return HakedisFrame(master, app)
-  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\modules\hakedis\ui.py", line 20, in __init__
-    self.repo = app.db.hakedis
-                ^^^^^^^^^^^^^^
-AttributeError: 'DB' object has no attribute 'hakedis'
-2025-12-26 01:49:34,461 [INFO] kasapro.ui: UI screen_registered | key='diagnostics', title='Sistem Testleri'
-2025-12-26 01:49:34,462 [INFO] kasapro.ui: UI frame_created | view='DiagnosticsFrame'
-2025-12-26 01:49:34,465 [INFO] kasapro.ui: UI callback_bound | handler='diagnostics_run'
-2025-12-26 01:49:34,466 [INFO] kasapro.ui: UI callback_bound | handler='diagnostics_clear'
-2025-12-26 01:49:34,466 [INFO] kasapro.ui: UI callback_bound | handler='diagnostics_copy'
-2025-12-26 01:49:34,468 [INFO] kasapro.ui: UI screen_created | key='diagnostics', view='DiagnosticsFrame'
-2025-12-26 01:49:34,468 [INFO] kasapro.ui: UI screen_registered | key='kullanicilar', title='Kullanıcılar'
-2025-12-26 01:49:34,468 [INFO] kasapro.ui: UI frame_created | view='KullanicilarFrame'
-2025-12-26 01:49:34,471 [INFO] kasapro.ui: UI callback_bound | handler='users_add'
-2025-12-26 01:49:34,472 [INFO] kasapro.ui: UI callback_bound | handler='users_reset'
-2025-12-26 01:49:34,480 [INFO] kasapro.ui: UI callback_bound | handler='users_delete'
-2025-12-26 01:49:34,481 [INFO] kasapro.ui: UI callback_bound | handler='users_refresh'
-2025-12-26 01:49:34,482 [INFO] kasapro.ui: UI callback_bound | handler='users_reset_double'
-2025-12-26 01:49:34,483 [INFO] kasapro.ui: UI screen_created | key='kullanicilar', view='KullanicilarFrame'
-2025-12-26 01:49:34,487 [INFO] kasapro.ui: UI callback_bound | handler='shortcut_help'
-2025-12-26 01:49:34,487 [INFO] kasapro.ui: UI callback_bound | target='root', tk_event='<F1>', handler='open_help'
-2025-12-26 01:49:34,487 [INFO] kasapro.ui: UI callback_bound | handler='shortcut_search'
-2025-12-26 01:49:34,487 [INFO] kasapro.ui: UI callback_bound | target='root', tk_event='<Control-f>', handler='show(search)'
-2025-12-26 01:49:34,487 [INFO] kasapro.ui: UI screen_shown | key='kasa'
-2025-12-26 01:49:34,490 [INFO] kasapro.ui: UI callback_bound | handler='on_close'
-2025-12-26 01:49:34,490 [INFO] kasapro.ui: UI callback_bound | target='root', tk_event='WM_DELETE_WINDOW', handler='on_close'
-2025-12-26 01:49:39,895 [INFO] kasapro.ui: UI callback invoked: nav:stok
-2025-12-26 01:49:39,897 [INFO] kasapro.ui: UI screen_shown | key='stok'
-2025-12-26 01:49:47,538 [INFO] kasapro.ui: UI callback invoked: nav:banka_hareketleri
-2025-12-26 01:49:47,540 [INFO] kasapro.ui: UI screen_shown | key='banka_hareketleri'
-2025-12-26 01:49:47,881 [INFO] kasapro.ui: UI callback invoked: nav:fatura
-2025-12-26 01:49:47,883 [INFO] kasapro.ui: UI screen_shown | key='fatura'
-2025-12-26 01:49:48,214 [INFO] kasapro.ui: UI callback invoked: nav:satis_siparis_rapor
-2025-12-26 01:49:48,215 [INFO] kasapro.ui: UI screen_shown | key='satis_siparis_rapor'
-2025-12-26 01:49:48,710 [INFO] kasapro.ui: UI callback invoked: nav:trade_module
-2025-12-26 01:49:48,711 [INFO] kasapro.ui: UI screen_missing | key='trade_module', source='trade_module'
-2025-12-26 01:49:48,712 [INFO] kasapro.ui: UI screen_shown | key='trade_module'
-2025-12-26 01:49:49,494 [INFO] kasapro.ui: UI callback invoked: nav:satis_siparis_rapor
-2025-12-26 01:49:49,494 [INFO] kasapro.ui: UI screen_shown | key='satis_siparis_rapor'
-2025-12-26 01:49:49,997 [INFO] kasapro.ui: UI callback invoked: nav:trade_module
-2025-12-26 01:49:49,997 [INFO] kasapro.ui: UI screen_missing | key='trade_module', source='trade_module'
-2025-12-26 01:49:49,999 [INFO] kasapro.ui: UI screen_shown | key='trade_module'
-2025-12-26 01:49:50,745 [INFO] kasapro.ui: UI callback invoked: nav:hr
-2025-12-26 01:49:50,745 [INFO] kasapro.ui: UI screen_shown | key='hr'
-2025-12-26 01:49:53,366 [INFO] kasapro.ui: UI callback invoked: nav:maas_takibi
-2025-12-26 01:49:53,368 [INFO] kasapro.ui: UI screen_shown | key='maas_takibi'
-2025-12-26 01:49:55,899 [INFO] kasapro.ui: UI callback invoked: nav:nakliye
-2025-12-26 01:49:55,900 [INFO] kasapro.ui: UI screen_shown | key='nakliye'
-2025-12-26 01:49:57,834 [INFO] kasapro.ui: UI callback invoked: nav:hakedis
-2025-12-26 01:49:57,834 [INFO] kasapro.ui: UI screen_missing | key='hakedis', source='hakedis'
-2025-12-26 01:49:57,835 [INFO] kasapro.ui: UI screen_shown | key='hakedis'
-2025-12-26 01:49:58,847 [INFO] kasapro.ui: UI callback invoked: nav:diagnostics
-2025-12-26 01:49:58,847 [INFO] kasapro.ui: UI screen_shown | key='diagnostics'
-2025-12-26 01:50:00,061 [INFO] kasapro.ui: UI callback invoked: diagnostics_run
-2025-12-26 01:50:01,926 [INFO] kasapro.ui: UI callback invoked: nav:entegrasyonlar
-2025-12-26 01:50:01,926 [INFO] kasapro.ui: UI screen_missing | key='entegrasyonlar', source='entegrasyonlar'
-2025-12-26 01:50:01,927 [INFO] kasapro.ui: UI screen_shown | key='entegrasyonlar'
-2025-12-26 01:50:03,135 [INFO] kasapro.ui: UI callback invoked: nav:tanimlar
-2025-12-26 01:50:03,135 [INFO] kasapro.ui: UI screen_shown | key='tanimlar'
-2025-12-26 01:50:04,416 [INFO] kasapro.ui: UI callback invoked: nav:create_center
-2025-12-26 01:50:04,416 [INFO] kasapro.ui: UI screen_missing | key='create_center', source='create_center'
-2025-12-26 01:50:04,418 [INFO] kasapro.ui: UI screen_shown | key='create_center'
-2025-12-26 01:50:05,923 [INFO] kasapro.ui: UI callback invoked: nav:kasa
-2025-12-26 01:50:05,923 [INFO] kasapro.ui: UI screen_shown | key='kasa'
-2025-12-26 01:50:06,298 [INFO] kasapro.ui: UI callback invoked: nav:mesajlar
-2025-12-26 01:50:06,299 [INFO] kasapro.ui: UI screen_shown | key='mesajlar'
-2025-12-26 01:50:06,681 [INFO] kasapro.ui: UI callback invoked: nav:stok
-2025-12-26 01:50:06,682 [INFO] kasapro.ui: UI screen_shown | key='stok'
-2025-12-26 01:50:07,033 [INFO] kasapro.ui: UI callback invoked: nav:advanced_invoice
-2025-12-26 01:50:07,033 [INFO] kasapro.ui: UI screen_missing | key='advanced_invoice', source='advanced_invoice'
-2025-12-26 01:50:07,034 [INFO] kasapro.ui: UI screen_shown | key='advanced_invoice'
-2025-12-26 01:50:07,420 [INFO] kasapro.ui: UI callback invoked: nav:fatura
-2025-12-26 01:50:07,420 [INFO] kasapro.ui: UI screen_shown | key='fatura'
-2025-12-26 01:50:07,959 [INFO] kasapro.ui: UI callback invoked: nav:banka_hareketleri
-2025-12-26 01:50:07,960 [INFO] kasapro.ui: UI screen_shown | key='banka_hareketleri'
-2025-12-26 01:50:08,519 [INFO] kasapro.ui: UI callback invoked: nav:fatura
-2025-12-26 01:50:08,520 [INFO] kasapro.ui: UI screen_shown | key='fatura'
-2025-12-26 01:50:08,837 [INFO] kasapro.ui: UI callback invoked: nav:satis_siparis_rapor
-2025-12-26 01:50:08,838 [INFO] kasapro.ui: UI screen_shown | key='satis_siparis_rapor'
-2025-12-26 01:50:09,177 [INFO] kasapro.ui: UI callback invoked: nav:trade_module
-2025-12-26 01:50:09,177 [INFO] kasapro.ui: UI screen_missing | key='trade_module', source='trade_module'
-2025-12-26 01:50:09,178 [INFO] kasapro.ui: UI screen_shown | key='trade_module'
-2025-12-26 01:50:09,676 [INFO] kasapro.ui: UI callback invoked: nav:hr
-2025-12-26 01:50:09,676 [INFO] kasapro.ui: UI screen_shown | key='hr'
-2025-12-26 01:50:10,602 [INFO] kasapro.ui: UI callback invoked: nav:diger_giderler
-2025-12-26 01:50:10,603 [INFO] kasapro.ui: UI screen_shown | key='diger_giderler'
-2025-12-26 01:50:11,524 [INFO] kasapro.ui: UI callback invoked: nav:nakliye
-2025-12-26 01:50:11,525 [INFO] kasapro.ui: UI screen_shown | key='nakliye'
-2025-12-26 01:50:12,045 [INFO] kasapro.ui: UI callback invoked: nav:cari_hareket_ekle
-2025-12-26 01:50:12,046 [INFO] kasapro.ui: UI screen_shown | key='cari_hareket_ekle'
-2025-12-26 01:50:12,497 [INFO] kasapro.ui: UI callback invoked: nav:dms
-2025-12-26 01:50:12,497 [INFO] kasapro.ui: UI screen_missing | key='dms', source='dms'
-2025-12-26 01:50:12,498 [INFO] kasapro.ui: UI screen_shown | key='dms'
-2025-12-26 01:50:14,356 [INFO] kasapro.ui: UI callback invoked: nav:dms
-2025-12-26 01:50:14,356 [INFO] kasapro.ui: UI screen_missing | key='dms', source='dms'
-2025-12-26 01:50:14,356 [INFO] kasapro.ui: UI screen_shown | key='dms'
-2025-12-26 01:50:14,617 [INFO] kasapro.ui: UI callback invoked: nav:cari_hareket_ekle
-2025-12-26 01:50:14,617 [INFO] kasapro.ui: UI screen_shown | key='cari_hareket_ekle'
-2025-12-26 01:50:14,917 [INFO] kasapro.ui: UI callback invoked: nav:dms
-2025-12-26 01:50:14,917 [INFO] kasapro.ui: UI screen_missing | key='dms', source='dms'
-2025-12-26 01:50:14,918 [INFO] kasapro.ui: UI screen_shown | key='dms'
-2025-12-26 01:50:15,220 [INFO] kasapro.ui: UI callback invoked: nav:hakedis
-2025-12-26 01:50:15,220 [INFO] kasapro.ui: UI screen_missing | key='hakedis', source='hakedis'
-2025-12-26 01:50:15,220 [INFO] kasapro.ui: UI screen_shown | key='hakedis'
-2025-12-26 01:50:18,578 [INFO] kasapro.ui: UI callback invoked: on_close
+2025-12-25 22:56:39,837 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE GRN WMS-2024-000001
+2025-12-25 22:56:39,844 INFO kasapro.db.repos.wms_repo audit_log stock_doc POST GRN WMS-2024-000001
+2025-12-25 22:56:40,706 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE GRN WMS-2024-000001
+2025-12-25 22:56:40,713 INFO kasapro.db.repos.wms_repo audit_log stock_doc POST GRN WMS-2024-000001
+2025-12-25 22:56:40,722 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE SHIP WMS-2024-000002
+2025-12-25 22:56:41,528 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE GRN WMS-2024-000001
+2025-12-25 22:56:41,532 INFO kasapro.db.repos.wms_repo audit_log stock_doc POST GRN WMS-2024-000001
+2025-12-25 22:56:42,294 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE GRN WMS-2024-000001
+2025-12-25 22:56:42,305 INFO kasapro.db.repos.wms_repo audit_log stock_doc POST GRN WMS-2024-000001
+2025-12-25 22:56:42,312 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE COUNT WMS-2024-000002
+2025-12-25 22:56:43,183 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE GRN WMS-2024-000001
+2025-12-25 22:56:43,978 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE GRN A-2024-000001
+2025-12-25 22:56:43,983 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE GRN A-2024-000002
+2025-12-25 22:56:45,628 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE GRN WMS-2024-000001
+2025-12-25 22:56:45,633 INFO kasapro.db.repos.wms_repo audit_log stock_doc POST GRN WMS-2024-000001
+2025-12-25 22:56:46,522 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE GRN WMS-2024-000001
+2025-12-25 22:56:46,527 INFO kasapro.db.repos.wms_repo audit_log stock_doc POST GRN WMS-2024-000001
+2025-12-25 22:56:48,142 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE GRN WMS-2024-000001
+2025-12-25 22:56:48,894 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE SHIP WMS-2024-000001
+2025-12-25 22:56:48,900 INFO kasapro.db.repos.wms_repo audit_log stock_doc POST SHIP WMS-2024-000001
+2025-12-25 22:56:49,741 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE SHIP WMS-2024-000001
+2025-12-25 22:56:50,563 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE SHIP WMS-2024-000001
+2025-12-25 22:56:50,566 INFO kasapro.db.repos.wms_repo audit_log stock_policy NEGATIVE_WARN Available 0.0 < 1.0
+2025-12-25 22:56:50,572 INFO kasapro.db.repos.wms_repo audit_log stock_doc POST SHIP WMS-2024-000001
+2025-12-25 22:56:51,493 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE GRN WMS-2024-000001
+2025-12-25 22:56:52,734 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE GRN WMS-2024-000001
+2025-12-25 22:56:52,740 INFO kasapro.db.repos.wms_repo audit_log stock_doc POST GRN WMS-2024-000001
+2025-12-25 22:56:52,750 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE SHIP WMS-2024-000002
+2025-12-25 22:56:53,578 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE GRN WMS-2024-000001
+2025-12-25 22:56:53,584 INFO kasapro.db.repos.wms_repo audit_log stock_doc POST GRN WMS-2024-000001
+2025-12-25 22:56:53,599 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE SHIP WMS-2024-000002
+2025-12-25 22:56:53,604 INFO kasapro.db.repos.wms_repo audit_log stock_doc POST SHIP WMS-2024-000002
+2025-12-25 22:56:54,459 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE GRN WMS-2024-000001
+2025-12-25 22:56:55,293 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE GRN WMS-2024-000001
+2025-12-25 22:56:55,299 INFO kasapro.db.repos.wms_repo audit_log stock_doc POST GRN WMS-2024-000001
+2025-12-25 22:56:55,307 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE SHIP WMS-2024-000002
+2025-12-25 22:56:55,315 INFO kasapro.db.repos.wms_repo audit_log stock_doc POST SHIP WMS-2024-000002
+2025-12-25 22:56:56,089 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE GRN WMS-2024-000001
+2025-12-25 22:56:56,094 INFO kasapro.db.repos.wms_repo audit_log stock_doc POST GRN WMS-2024-000001
+2025-12-25 22:56:56,100 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE TRF WMS-2024-000002
+2025-12-25 22:56:56,107 INFO kasapro.db.repos.wms_repo audit_log stock_doc POST TRF WMS-2024-000002
+2025-12-25 22:56:56,885 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE GRN WMS-2024-000001
+2025-12-25 22:56:56,894 INFO kasapro.db.repos.wms_repo audit_log stock_doc POST GRN WMS-2024-000001
+2025-12-25 22:57:18,915 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE GRN WMS-2024-000001
+2025-12-25 22:57:18,920 INFO kasapro.db.repos.wms_repo audit_log stock_doc POST GRN WMS-2024-000001
+2025-12-25 22:57:19,603 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE GRN WMS-2024-000001
+2025-12-25 22:57:19,609 INFO kasapro.db.repos.wms_repo audit_log stock_doc POST GRN WMS-2024-000001
+2025-12-25 22:57:19,617 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE SHIP WMS-2024-000002
+2025-12-25 22:57:20,366 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE GRN WMS-2024-000001
+2025-12-25 22:57:20,371 INFO kasapro.db.repos.wms_repo audit_log stock_doc POST GRN WMS-2024-000001
+2025-12-25 22:57:21,085 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE GRN WMS-2024-000001
+2025-12-25 22:57:21,089 INFO kasapro.db.repos.wms_repo audit_log stock_doc POST GRN WMS-2024-000001
+2025-12-25 22:57:21,096 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE COUNT WMS-2024-000002
+2025-12-25 22:57:21,101 INFO kasapro.db.repos.wms_repo audit_log stock_doc POST COUNT WMS-2024-000002
+2025-12-25 22:57:21,880 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE GRN WMS-2024-000001
+2025-12-25 22:57:22,635 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE GRN A-2024-000001
+2025-12-25 22:57:22,640 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE GRN A-2024-000002
+2025-12-25 22:57:24,103 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE GRN WMS-2024-000001
+2025-12-25 22:57:24,108 INFO kasapro.db.repos.wms_repo audit_log stock_doc POST GRN WMS-2024-000001
+2025-12-25 22:57:24,828 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE GRN WMS-2024-000001
+2025-12-25 22:57:24,833 INFO kasapro.db.repos.wms_repo audit_log stock_doc POST GRN WMS-2024-000001
+2025-12-25 22:57:26,390 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE GRN WMS-2024-000001
+2025-12-25 22:57:27,134 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE SHIP WMS-2024-000001
+2025-12-25 22:57:27,140 INFO kasapro.db.repos.wms_repo audit_log stock_doc POST SHIP WMS-2024-000001
+2025-12-25 22:57:27,907 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE SHIP WMS-2024-000001
+2025-12-25 22:57:28,602 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE SHIP WMS-2024-000001
+2025-12-25 22:57:28,604 INFO kasapro.db.repos.wms_repo audit_log stock_policy NEGATIVE_WARN Available 0.0 < 1.0
+2025-12-25 22:57:28,609 INFO kasapro.db.repos.wms_repo audit_log stock_doc POST SHIP WMS-2024-000001
+2025-12-25 22:57:29,302 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE GRN WMS-2024-000001
+2025-12-25 22:57:29,993 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE GRN WMS-2024-000001
+2025-12-25 22:57:29,998 INFO kasapro.db.repos.wms_repo audit_log stock_doc POST GRN WMS-2024-000001
+2025-12-25 22:57:30,013 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE SHIP WMS-2024-000002
+2025-12-25 22:57:30,704 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE GRN WMS-2024-000001
+2025-12-25 22:57:30,709 INFO kasapro.db.repos.wms_repo audit_log stock_doc POST GRN WMS-2024-000001
+2025-12-25 22:57:30,719 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE SHIP WMS-2024-000002
+2025-12-25 22:57:30,724 INFO kasapro.db.repos.wms_repo audit_log stock_doc POST SHIP WMS-2024-000002
+2025-12-25 22:57:31,386 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE GRN WMS-2024-000001
+2025-12-25 22:57:32,081 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE GRN WMS-2024-000001
+2025-12-25 22:57:32,086 INFO kasapro.db.repos.wms_repo audit_log stock_doc POST GRN WMS-2024-000001
+2025-12-25 22:57:32,092 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE SHIP WMS-2024-000002
+2025-12-25 22:57:32,098 INFO kasapro.db.repos.wms_repo audit_log stock_doc POST SHIP WMS-2024-000002
+2025-12-25 22:57:32,829 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE GRN WMS-2024-000001
+2025-12-25 22:57:32,833 INFO kasapro.db.repos.wms_repo audit_log stock_doc POST GRN WMS-2024-000001
+2025-12-25 22:57:32,839 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE TRF WMS-2024-000002
+2025-12-25 22:57:32,843 INFO kasapro.db.repos.wms_repo audit_log stock_doc POST TRF WMS-2024-000002
+2025-12-25 22:57:33,509 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE GRN WMS-2024-000001
+2025-12-25 22:57:33,513 INFO kasapro.db.repos.wms_repo audit_log stock_doc POST GRN WMS-2024-000001
+2025-12-25 22:57:44,739 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE GRN WMS-2024-000001
+2025-12-25 22:57:44,744 INFO kasapro.db.repos.wms_repo audit_log stock_doc POST GRN WMS-2024-000001
+2025-12-25 22:57:45,410 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE GRN WMS-2024-000001
+2025-12-25 22:57:45,415 INFO kasapro.db.repos.wms_repo audit_log stock_doc POST GRN WMS-2024-000001
+2025-12-25 22:57:45,423 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE SHIP WMS-2024-000002
+2025-12-25 22:57:46,152 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE GRN WMS-2024-000001
+2025-12-25 22:57:46,158 INFO kasapro.db.repos.wms_repo audit_log stock_doc POST GRN WMS-2024-000001
+2025-12-25 22:57:46,970 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE GRN WMS-2024-000001
+2025-12-25 22:57:46,975 INFO kasapro.db.repos.wms_repo audit_log stock_doc POST GRN WMS-2024-000001
+2025-12-25 22:57:46,981 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE COUNT WMS-2024-000002
+2025-12-25 22:57:47,782 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE GRN WMS-2024-000001
+2025-12-25 22:57:48,465 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE GRN A-2024-000001
+2025-12-25 22:57:48,470 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE GRN A-2024-000002
+2025-12-25 22:57:50,015 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE GRN WMS-2024-000001
+2025-12-25 22:57:50,021 INFO kasapro.db.repos.wms_repo audit_log stock_doc POST GRN WMS-2024-000001
+2025-12-25 22:57:50,808 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE GRN WMS-2024-000001
+2025-12-25 22:57:50,812 INFO kasapro.db.repos.wms_repo audit_log stock_doc POST GRN WMS-2024-000001
+2025-12-25 22:57:52,435 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE GRN WMS-2024-000001
+2025-12-25 22:57:53,260 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE SHIP WMS-2024-000001
+2025-12-25 22:57:53,265 INFO kasapro.db.repos.wms_repo audit_log stock_doc POST SHIP WMS-2024-000001
+2025-12-25 22:57:54,135 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE SHIP WMS-2024-000001
+2025-12-25 22:57:54,905 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE SHIP WMS-2024-000001
+2025-12-25 22:57:54,908 INFO kasapro.db.repos.wms_repo audit_log stock_policy NEGATIVE_WARN Available 0.0 < 1.0
+2025-12-25 22:57:54,914 INFO kasapro.db.repos.wms_repo audit_log stock_doc POST SHIP WMS-2024-000001
+2025-12-25 22:57:55,739 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE GRN WMS-2024-000001
+2025-12-25 22:57:56,471 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE GRN WMS-2024-000001
+2025-12-25 22:57:56,479 INFO kasapro.db.repos.wms_repo audit_log stock_doc POST GRN WMS-2024-000001
+2025-12-25 22:57:56,487 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE SHIP WMS-2024-000002
+2025-12-25 22:57:57,266 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE GRN WMS-2024-000001
+2025-12-25 22:57:57,272 INFO kasapro.db.repos.wms_repo audit_log stock_doc POST GRN WMS-2024-000001
+2025-12-25 22:57:57,283 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE SHIP WMS-2024-000002
+2025-12-25 22:57:57,288 INFO kasapro.db.repos.wms_repo audit_log stock_doc POST SHIP WMS-2024-000002
+2025-12-25 22:57:58,085 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE GRN WMS-2024-000001
+2025-12-25 22:57:58,849 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE GRN WMS-2024-000001
+2025-12-25 22:57:58,855 INFO kasapro.db.repos.wms_repo audit_log stock_doc POST GRN WMS-2024-000001
+2025-12-25 22:57:58,861 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE SHIP WMS-2024-000002
+2025-12-25 22:57:58,866 INFO kasapro.db.repos.wms_repo audit_log stock_doc POST SHIP WMS-2024-000002
+2025-12-25 22:57:59,662 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE GRN WMS-2024-000001
+2025-12-25 22:57:59,668 INFO kasapro.db.repos.wms_repo audit_log stock_doc POST GRN WMS-2024-000001
+2025-12-25 22:57:59,675 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE TRF WMS-2024-000002
+2025-12-25 22:57:59,680 INFO kasapro.db.repos.wms_repo audit_log stock_doc POST TRF WMS-2024-000002
+2025-12-25 22:58:00,488 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE GRN WMS-2024-000001
+2025-12-25 22:58:00,495 INFO kasapro.db.repos.wms_repo audit_log stock_doc POST GRN WMS-2024-000001
+2025-12-25 22:58:16,142 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE GRN WMS-2024-000001
+2025-12-25 22:58:16,147 INFO kasapro.db.repos.wms_repo audit_log stock_doc POST GRN WMS-2024-000001
+2025-12-25 22:58:16,886 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE GRN WMS-2024-000001
+2025-12-25 22:58:16,892 INFO kasapro.db.repos.wms_repo audit_log stock_doc POST GRN WMS-2024-000001
+2025-12-25 22:58:16,902 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE SHIP WMS-2024-000002
+2025-12-25 22:58:17,657 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE GRN WMS-2024-000001
+2025-12-25 22:58:17,663 INFO kasapro.db.repos.wms_repo audit_log stock_doc POST GRN WMS-2024-000001
+2025-12-25 22:58:18,442 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE GRN WMS-2024-000001
+2025-12-25 22:58:18,447 INFO kasapro.db.repos.wms_repo audit_log stock_doc POST GRN WMS-2024-000001
+2025-12-25 22:58:18,454 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE COUNT WMS-2024-000002
+2025-12-25 22:58:19,308 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE GRN WMS-2024-000001
+2025-12-25 22:58:20,026 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE GRN A-2024-000001
+2025-12-25 22:58:20,031 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE GRN A-2024-000002
+2025-12-25 22:58:21,400 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE GRN WMS-2024-000001
+2025-12-25 22:58:21,404 INFO kasapro.db.repos.wms_repo audit_log stock_doc POST GRN WMS-2024-000001
+2025-12-25 22:58:22,096 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE GRN WMS-2024-000001
+2025-12-25 22:58:22,102 INFO kasapro.db.repos.wms_repo audit_log stock_doc POST GRN WMS-2024-000001
+2025-12-25 22:58:23,861 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE GRN WMS-2024-000001
+2025-12-25 22:58:24,648 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE SHIP WMS-2024-000001
+2025-12-25 22:58:24,654 INFO kasapro.db.repos.wms_repo audit_log stock_doc POST SHIP WMS-2024-000001
+2025-12-25 22:58:25,427 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE SHIP WMS-2024-000001
+2025-12-25 22:58:26,206 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE SHIP WMS-2024-000001
+2025-12-25 22:58:26,209 INFO kasapro.db.repos.wms_repo audit_log stock_policy NEGATIVE_WARN Available 0.0 < 1.0
+2025-12-25 22:58:26,214 INFO kasapro.db.repos.wms_repo audit_log stock_doc POST SHIP WMS-2024-000001
+2025-12-25 22:58:26,970 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE GRN WMS-2024-000001
+2025-12-25 22:58:27,673 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE GRN WMS-2024-000001
+2025-12-25 22:58:27,678 INFO kasapro.db.repos.wms_repo audit_log stock_doc POST GRN WMS-2024-000001
+2025-12-25 22:58:27,691 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE SHIP WMS-2024-000002
+2025-12-25 22:58:28,835 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE GRN WMS-2024-000001
+2025-12-25 22:58:28,842 INFO kasapro.db.repos.wms_repo audit_log stock_doc POST GRN WMS-2024-000001
+2025-12-25 22:58:28,859 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE SHIP WMS-2024-000002
+2025-12-25 22:58:28,865 INFO kasapro.db.repos.wms_repo audit_log stock_doc POST SHIP WMS-2024-000002
+2025-12-25 22:58:29,601 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE GRN WMS-2024-000001
+2025-12-25 22:58:30,335 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE GRN WMS-2024-000001
+2025-12-25 22:58:30,340 INFO kasapro.db.repos.wms_repo audit_log stock_doc POST GRN WMS-2024-000001
+2025-12-25 22:58:30,345 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE SHIP WMS-2024-000002
+2025-12-25 22:58:30,350 INFO kasapro.db.repos.wms_repo audit_log stock_doc POST SHIP WMS-2024-000002
+2025-12-25 22:58:30,996 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE GRN WMS-2024-000001
+2025-12-25 22:58:31,000 INFO kasapro.db.repos.wms_repo audit_log stock_doc POST GRN WMS-2024-000001
+2025-12-25 22:58:31,005 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE TRF WMS-2024-000002
+2025-12-25 22:58:31,010 INFO kasapro.db.repos.wms_repo audit_log stock_doc POST TRF WMS-2024-000002
+2025-12-25 22:58:31,684 INFO kasapro.db.repos.wms_repo audit_log stock_doc CREATE GRN WMS-2024-000001
+2025-12-25 22:58:31,689 INFO kasapro.db.repos.wms_repo audit_log stock_doc POST GRN WMS-2024-000001
