@@ -17,24 +17,7 @@ from .settings_service import SettingsService
 from .company_users_service import CompanyUsersService
 from .cari_service import CariService
 from .messages_service import MessagesService
-from ..modules.dms.service import DmsService
 from ..modules.notes_reminders.service import NotesRemindersService
-from ..modules.integrations.service import IntegrationService
-from ..modules.hakedis.service import HakedisService
-
-# HR module is in top-level modules/ not kasapro/modules/
-try:
-    import sys
-    import os
-    # Add modules/ to path if not already there
-    modules_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "modules"))
-    if modules_path not in sys.path:
-        sys.path.insert(0, modules_path)
-    from hr.service import HRService, HRContext
-except ImportError:
-    # Fallback: HR module may not be installed
-    HRService = None
-    HRContext = None
 
 
 @dataclass
@@ -47,11 +30,7 @@ class Services:
     company_users: CompanyUsersService
     cari: CariService
     messages: MessagesService
-    dms: DmsService
     notes_reminders: NotesRemindersService
-    integrations: IntegrationService
-    hr: HRService
-    hakedis: HakedisService
 
     @classmethod
     def build(cls, db: DB, usersdb: UsersDB, context_provider) -> "Services":
@@ -66,9 +45,5 @@ class Services:
             company_users=CompanyUsersService(db),
             cari=CariService(db, exporter),
             messages=MessagesService(db, usersdb),
-            dms=DmsService(db),
             notes_reminders=NotesRemindersService(db, usersdb),
-            integrations=IntegrationService(db, context_provider),
-            hr=hr_service,
-            hakedis=hakedis_service,
         )

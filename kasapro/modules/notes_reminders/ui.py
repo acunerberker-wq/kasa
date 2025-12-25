@@ -216,7 +216,7 @@ class NotesRemindersFrame(ttk.Frame):
         self.reminder_status = LabeledCombo(
             row1,
             "Durum:",
-            ["(Tümü)", "scheduled", "overdue", "done", "canceled", "archived"],
+            ["(Tümü)", "scheduled", "overdue", "done", "canceled", "archived", "deleted"],
             12,
         )
         self.reminder_status.pack(side=tk.LEFT, padx=6)
@@ -704,7 +704,12 @@ class ReminderEditor(tk.Toplevel):
         self.in_priority.set(data.get("priority", "normal"))
 
         status_val = str(data.get("status", "scheduled"))
-        self.in_status = LabeledCombo(frm, "Durum:", ["scheduled", "overdue", "done", "canceled", "archived"], 12)
+        self.in_status = LabeledCombo(
+            frm,
+            "Durum:",
+            ["scheduled", "overdue", "done", "canceled", "archived", "deleted"],
+            12,
+        )
         self.in_status.pack(fill=tk.X, pady=4)
         self.in_status.set(status_val)
 

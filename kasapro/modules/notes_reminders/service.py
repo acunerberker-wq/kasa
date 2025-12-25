@@ -332,7 +332,7 @@ class NotesRemindersService:
     def check_due_reminders(self, company_id: int, owner_user_id: int) -> Tuple[List[Dict[str, str]], int]:
         cid = self._company_id(company_id)
         now = now_iso()
-        due = self.db.notes_reminders.list_due_reminders(cid, "scheduled", now)
+        due = self.db.notes_reminders.list_due_reminders(cid, owner_user_id, "scheduled", now)
         notified = []
         for r in due:
             self.db.notes_reminders.set_reminder_status(int(r["id"]), "overdue")

@@ -27,24 +27,10 @@ class NotesRemindersRepo:
     ) -> int:
         cur = self.conn.execute(
             """
-            INSERT INTO audit_log(
-                company_id, entity_type, entity_id, module, ref_id,
-                action, user_id, username, details, message
-            )
-            VALUES(?,?,?,?,?,?,?,?,?,?)
+            INSERT INTO audit_log(company_id, user_id, action, entity, entity_id, detail, created_at)
+            VALUES(?,?,?,?,?,?,?)
             """,
-            (
-                int(company_id),
-                str(entity),
-                int(entity_id),
-                "notes_reminders",
-                int(entity_id),
-                str(action),
-                int(user_id),
-                "",
-                str(detail),
-                str(detail),
-            ),
+            (int(company_id), int(user_id), str(action), str(entity), int(entity_id), str(detail), now_iso()),
         )
         self.conn.commit()
         return int(cur.lastrowid)
@@ -362,15 +348,22 @@ class NotesRemindersRepo:
         """
         return list(self.conn.execute(sql, params))
 
-    def list_due_reminders(self, company_id: int, status: str, due_before: str) -> List[sqlite3.Row]:
+    def list_due_reminders(
+        self,
+        company_id: int,
+        owner_user_id: int,
+        status: str,
+        due_before: str,
+    ) -> List[sqlite3.Row]:
         return list(
             self.conn.execute(
                 """
                 SELECT * FROM reminders
                 WHERE company_id=? AND status=? AND due_at <= ?
+                  AND (owner_user_id=? OR assignee_user_id=?)
                 ORDER BY due_at ASC
                 """,
-                (int(company_id), str(status), str(due_before)),
+                (int(company_id), str(status), str(due_before), int(owner_user_id), int(owner_user_id)),
             )
         )
 

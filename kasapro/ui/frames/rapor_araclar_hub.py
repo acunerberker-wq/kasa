@@ -58,10 +58,8 @@ class RaporAraclarHubFrame(BaseView):
         self.nb.add(self.tab_loglar, text="🧾 Log")
         log_ui_event("tab_added", tab="loglar", container="rapor_araclar")
         self.nb.add(self.tab_satin_alma, text="📦 Satın Alma Sipariş Raporları")
-        log_ui_event("tab_added", tab="satin_alma", container="rapor_araclar")
         self._notes_tab_base_text = "🗒️ Notlar & Hatırlatmalar"
         self.nb.add(self.tab_notes_reminders, text=self._notes_tab_base_text)
-        log_ui_event("tab_added", tab="notlar_hatirlatmalar", container="rapor_araclar")
 
         # İçerikler
         self.raporlar_frame = RaporlarFrame(self.tab_raporlar, self.app)
