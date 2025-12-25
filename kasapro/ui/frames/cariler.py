@@ -105,7 +105,7 @@ class CarilerFrame(BaseView):
 
         rbtn = ttk.Frame(right)
         rbtn.pack(fill=tk.X, padx=10, pady=10)
-        ttk.Button(rbtn, text="Yeni", command=self.clear_form).pack(side=tk.LEFT)
+        ttk.Button(rbtn, text="Yeni", command=lambda: self.app.open_create_center("cari")).pack(side=tk.LEFT)
         ttk.Button(rbtn, text="Kaydet", command=self.save).pack(side=tk.LEFT, padx=6)
 
         self._apply_permissions()

@@ -42,7 +42,7 @@ class StokFrame(BaseView):
         top.pack(fill=tk.X, padx=10, pady=(10, 6))
 
         ttk.Button(top, text="Yenile", command=self.refresh).pack(side=tk.LEFT, padx=(0, 6))
-        ttk.Button(top, text="Yeni Ürün", command=self.clear_urun_form).pack(side=tk.LEFT)
+        ttk.Button(top, text="Yeni Ürün", command=lambda: self.app.open_create_center("urun")).pack(side=tk.LEFT)
         ttk.Button(top, text="Yeni Hareket", command=self.clear_hareket_form).pack(side=tk.LEFT, padx=6)
 
         self.lbl_summary = ttk.Label(top, text="")

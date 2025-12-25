@@ -626,15 +626,10 @@ class TradeModuleFrame(ttk.Frame):
         doc_id = self._selected_id(self.sales_tree)
         if not doc_id:
             return
-        amount = simpledialog.askfloat(APP_TITLE, "Tahsilat tutarı")
-        if not amount:
-            return
         try:
-            self.service.record_payment(int(doc_id), amount, today_iso(), "Nakit", use_bank=False)
-        except Exception as exc:
-            messagebox.showerror(APP_TITLE, str(exc))
-            return
-        self._load_sales_list()
+            self.app.open_create_center("tahsilat", {"doc_id": int(doc_id)})
+        except Exception:
+            pass
 
     def _purchase_payment(self) -> None:
         if not self._ensure_permission("payments"):

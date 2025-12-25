@@ -74,7 +74,7 @@ class FaturaFrame(BaseView):
             top = ttk.Frame(self)
             top.pack(fill=tk.X, padx=10, pady=(10, 6))
 
-            ttk.Button(top, text="➕ Yeni Fatura", command=self.new_invoice).pack(side=tk.LEFT)
+            ttk.Button(top, text="➕ Yeni Fatura", command=lambda: self.app.open_create_center("satis_fatura")).pack(side=tk.LEFT)
             ttk.Button(top, text="💾 Kaydet", command=self.save_invoice).pack(side=tk.LEFT, padx=6)
             self.btn_pdf = ttk.Button(top, text="🧾 PDF", command=self.export_pdf)
             self.btn_pdf.pack(side=tk.LEFT, padx=6)

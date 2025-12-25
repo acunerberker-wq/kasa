@@ -136,6 +136,8 @@ def apply_modern_style(root: tk.Tk):
     # Giriş alanları
     style.configure("TEntry", padding=6)
     style.configure("TCombobox", padding=4)
+    style.configure("Error.TEntry", fieldbackground="#FEE2E2", foreground=colors["text"])
+    style.configure("Error.TCombobox", fieldbackground="#FEE2E2", foreground=colors["text"])
 
     # LabelFrame
     style.configure("TLabelframe", background=colors["bg"])

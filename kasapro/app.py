@@ -34,6 +34,7 @@ from .ui.frames import (
     KullanicilarFrame,
     MessagesFrame,
     IntegrationsHubFrame,
+    CreateCenterFrame,
 )
 from .ui.plugins.loader import discover_ui_plugins
 from .modules.notes_reminders.scheduler import ReminderScheduler
@@ -759,7 +760,10 @@ class App:
         # ----------------
         # Menü bölümleri
         # ----------------
-        nav_section("📚 TANIMLAR")
+        nav_section("🧾 KAYIT OLUŞTUR")
+        nav_btn("🧾 Kayıt Oluştur (Merkez)", "create_center")
+
+        nav_section("📚 TANIMLAR & AYARLAR")
         nav_btn("📚 Tanımlar", "tanimlar")
 
         # Şirket yönetimi sol menüden kaldırıldı; ⚙️ Ayarlar > Şirketler sekmesinde.
@@ -780,7 +784,7 @@ class App:
         nav_section("🔌 ENTEGRASYONLAR")
         nav_btn("🔌 Entegrasyonlar", "entegrasyonlar")
 
-        nav_section("📈 RAPOR & ARAÇLAR")
+        nav_section("📈 RAPORLAR & DASHBOARD")
         nav_btn("📈 Rapor & Araçlar", "rapor_araclar")
         nav_btn("💹 Satış Raporları", "satis_raporlari")
 
@@ -828,6 +832,7 @@ class App:
 
         # Ekranlar
         self.screen_registry.register("kasa", lambda parent, app: KasaFrame(parent, app), title="Kasa")
+        self.screen_registry.register("create_center", lambda parent, app: CreateCenterFrame(parent, app), title="Kayıt Oluştur (Merkez)")
         self.screen_registry.register("mesajlar", lambda parent, app: MessagesFrame(parent, app), title="Mesajlar")
         self.screen_registry.register("tanimlar", lambda parent, app: TanimlarHubFrame(parent, app), title="Tanımlar")
         self.screen_registry.register(
@@ -886,6 +891,7 @@ class App:
         """Ekran değişince sol menü + başlık gibi UI parçalarını günceller."""
         title_map = {
             "kasa": "Kasa",
+            "create_center": "Kayıt Oluştur (Merkez)",
             "tanimlar": "Tanımlar",
             "cariler": "Tanımlar",
             "rapor_araclar": "Rapor & Araçlar",
@@ -931,6 +937,7 @@ class App:
 
 
     def show(self, key: str):
+        self.active_screen_key = key
         # Bazı menü tuşları, var olan bir ekranın belirli sekmesine yönlenebilir (örn: Çalışanlar -> Maaş Takibi/Çalışanlar sekmesi)
         route = None
         try:
@@ -1018,6 +1025,24 @@ class App:
         if key == "kullanicilar":
             try:
                 self.frames["kullanicilar"].refresh()  # type: ignore
+            except Exception:
+                pass
+        if key == "create_center":
+            try:
+                self.frames["create_center"].refresh()  # type: ignore
+            except Exception:
+                pass
+
+    def open_create_center(self, form_id: Optional[str] = None, context: Optional[Dict[str, Any]] = None) -> None:
+        self.show("create_center")
+        try:
+            frame = self.frames.get("create_center")
+        except Exception:
+            frame = None
+        if frame is not None and form_id:
+            try:
+                frame.select_form(form_id, context=context)  # type: ignore
+                log_ui_event("create_center_open", form=form_id)
             except Exception:
                 pass
     def open_settings(self):
