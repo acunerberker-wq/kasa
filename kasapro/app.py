@@ -866,6 +866,7 @@ class App:
         # Plugin ekranları
         for p in getattr(self, "ui_plugins", []) or []:
             self.screen_registry.register(p.key, p.build, title=p.page_title)
+            log_ui_event("plugin_ui_registered", key=p.key, title=p.page_title)
 
         if self.is_admin:
             self.screen_registry.register("kullanicilar", lambda parent, app: KullanicilarFrame(parent, app), title="Kullanıcılar")

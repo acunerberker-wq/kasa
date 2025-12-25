@@ -9,10 +9,13 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import date
+import json
 import os
 import shutil
 import time
-from typing import Callable, List, Tuple, TYPE_CHECKING
+import threading
+from queue import Queue, Empty
+from typing import Callable, Dict, List, Tuple, TYPE_CHECKING
 
 import tkinter as tk
 from tkinter import ttk, messagebox
@@ -20,6 +23,7 @@ from tkinter import ttk, messagebox
 from ..base import BaseView
 from ..ui_logging import wrap_callback
 
+import logging
 from ...config import (
     APP_BASE_DIR,
     APP_TITLE,
@@ -37,10 +41,69 @@ if TYPE_CHECKING:
 
 PLUGIN_META = {
     "key": "diagnostics",
+    "name": "Sistem Testleri",
+    "version": "1.1.0",
+    "enabled": True,
     "nav_text": "🧪 Sistem Testleri",
     "page_title": "Sistem Testleri",
     "order": 95,
 }
+
+
+logger = logging.getLogger("kasapro.plugins.diagnostics")
+
+CONFIG_KEY = "diagnostics.config"
+DEFAULT_CONFIG = {
+    "auto_run": False,
+    "min_free_mb": 100,
+}
+
+
+def _ensure_logger() -> None:
+    if any(isinstance(h, logging.FileHandler) and getattr(h, "baseFilename", "").endswith("app.log") for h in logger.handlers):
+        return
+    log_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "..", "logs", "app.log")
+    log_path = os.path.abspath(log_path)
+    os.makedirs(os.path.dirname(log_path), exist_ok=True)
+    handler = logging.FileHandler(log_path)
+    formatter = logging.Formatter("%(asctime)s %(levelname)s %(name)s %(message)s")
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+    logger.setLevel(logging.INFO)
+
+
+def _validate_config(config: Dict[str, object]) -> Dict[str, object]:
+    auto_run = bool(config.get("auto_run", DEFAULT_CONFIG["auto_run"]))
+    min_free_mb = config.get("min_free_mb", DEFAULT_CONFIG["min_free_mb"])
+    try:
+        min_free_mb = int(min_free_mb)
+    except Exception:
+        min_free_mb = DEFAULT_CONFIG["min_free_mb"]
+    if min_free_mb < 10:
+        min_free_mb = DEFAULT_CONFIG["min_free_mb"]
+    return {"auto_run": auto_run, "min_free_mb": min_free_mb}
+
+
+def load_config(db) -> Dict[str, object]:
+    raw = None
+    try:
+        raw = db.get_setting(CONFIG_KEY)
+    except Exception:
+        raw = None
+    if not raw:
+        return DEFAULT_CONFIG.copy()
+    try:
+        payload = json.loads(raw)
+        if isinstance(payload, dict):
+            return _validate_config(payload)
+    except Exception:
+        pass
+    return DEFAULT_CONFIG.copy()
+
+
+def save_config(db, config: Dict[str, object]) -> None:
+    validated = _validate_config(config)
+    db.set_setting(CONFIG_KEY, json.dumps(validated))
 
 
 @dataclass(frozen=True)
@@ -55,7 +118,12 @@ class DiagnosticsFrame(BaseView):
         self.app = app
         super().__init__(master, app)
         self.status_var = tk.StringVar(value="Hazır")
+        self._queue: "Queue[List[CheckResult]]" = Queue()
+        self._worker: threading.Thread | None = None
+        self._config = load_config(self.app.db)
         self.build_ui()
+        if self._config.get("auto_run"):
+            self.after(200, self.run_checks)
 
     def build_ui(self) -> None:
         self._build()
@@ -81,15 +149,31 @@ class DiagnosticsFrame(BaseView):
 
         actions = ttk.Frame(self)
         actions.pack(fill=tk.X, padx=10, pady=6)
-        ttk.Button(actions, text="Testleri Çalıştır", command=wrap_callback("diagnostics_run", self.run_checks)).pack(
-            side=tk.LEFT
-        )
+        self.btn_run = ttk.Button(actions, text="Testleri Çalıştır", command=wrap_callback("diagnostics_run", self.run_checks))
+        self.btn_run.pack(side=tk.LEFT)
         ttk.Button(actions, text="Temizle", command=wrap_callback("diagnostics_clear", self.clear_results)).pack(
             side=tk.LEFT, padx=6
         )
         ttk.Button(actions, text="Raporu Kopyala", command=wrap_callback("diagnostics_copy", self.copy_report)).pack(
             side=tk.LEFT
         )
+
+        settings = ttk.LabelFrame(self, text="Ayarlar")
+        settings.pack(fill=tk.X, padx=10, pady=(0, 6))
+        self.auto_run_var = tk.BooleanVar(value=bool(self._config.get("auto_run")))
+        ttk.Checkbutton(settings, text="Açılışta otomatik çalıştır", variable=self.auto_run_var).pack(side=tk.LEFT, padx=6)
+        ttk.Label(settings, text="Minimum boş alan (MB):").pack(side=tk.LEFT, padx=(12, 4))
+        self.min_free_var = tk.StringVar(value=str(self._config.get("min_free_mb", 100)))
+        ttk.Entry(settings, textvariable=self.min_free_var, width=8).pack(side=tk.LEFT)
+        ttk.Button(settings, text="Kaydet", command=wrap_callback("diagnostics_save_cfg", self._save_config)).pack(side=tk.LEFT, padx=8)
+
+        if not getattr(self.app, "is_admin", True):
+            ttk.Label(self, text="Bu ekran yalnızca yöneticiler için kullanılabilir.", foreground="#b00020").pack(
+                anchor="w",
+                padx=10,
+                pady=(0, 6),
+            )
+            self.btn_run.config(state="disabled")
 
         table_wrap = ttk.Frame(self)
         table_wrap.pack(fill=tk.BOTH, expand=True, padx=10, pady=(0, 10))
@@ -114,32 +198,29 @@ class DiagnosticsFrame(BaseView):
         self.status_var.set("Hazır")
 
     def run_checks(self):
+        if self._worker and self._worker.is_alive():
+            return
+        if not getattr(self.app, "is_admin", True):
+            messagebox.showwarning(APP_TITLE, "Bu ekran yalnızca yöneticiler için kullanılabilir.")
+            return
         self.clear_results()
         self.status_var.set("Testler çalıştırılıyor...")
+        self.btn_run.config(state="disabled")
         self.update_idletasks()
+        _ensure_logger()
+        logger.info("Diagnostics run started")
 
-        start = time.time()
-        results: List[CheckResult] = []
-        for name, fn in self._checks():
-            results.append(self._run_check(name, fn))
+        def worker():
+            start = time.time()
+            results: List[CheckResult] = []
+            for name, fn in self._checks():
+                results.append(self._run_check(name, fn))
+            elapsed = time.time() - start
+            self._queue.put(results + [CheckResult(name="__elapsed__", ok=True, detail=f"{elapsed:.2f}")])
 
-        total = len(results)
-        ok_count = sum(1 for r in results if r.ok)
-        fail_count = total - ok_count
-        elapsed = time.time() - start
-
-        for res in results:
-            self.tree.insert(
-                "",
-                tk.END,
-                values=(
-                    res.name,
-                    "✅ Başarılı" if res.ok else "❌ Hata",
-                    res.detail,
-                ),
-            )
-
-        self.status_var.set(f"{total} test: {ok_count} başarılı, {fail_count} hata ({elapsed:.2f} sn)")
+        self._worker = threading.Thread(target=worker, daemon=True)
+        self._worker.start()
+        self.after(100, self._poll_results)
 
     def copy_report(self):
         report = self._build_report_text()
@@ -167,9 +248,54 @@ class DiagnosticsFrame(BaseView):
         try:
             ok, detail = fn()
         except Exception as exc:
+            _ensure_logger()
+            logger.exception("Diagnostics check failed: %s", name)
             ok = False
             detail = f"Beklenmeyen hata: {exc}"
         return CheckResult(name=name, ok=ok, detail=detail)
+
+    def _poll_results(self) -> None:
+        try:
+            payload = self._queue.get_nowait()
+        except Empty:
+            self.after(100, self._poll_results)
+            return
+        elapsed = 0.0
+        if payload and payload[-1].name == "__elapsed__":
+            try:
+                elapsed = float(payload[-1].detail)
+            except Exception:
+                elapsed = 0.0
+            payload = payload[:-1]
+
+        total = len(payload)
+        ok_count = sum(1 for r in payload if r.ok)
+        fail_count = total - ok_count
+
+        for res in payload:
+            self.tree.insert(
+                "",
+                tk.END,
+                values=(
+                    res.name,
+                    "✅ Başarılı" if res.ok else "❌ Hata",
+                    res.detail,
+                ),
+            )
+        self.status_var.set(f"{total} test: {ok_count} başarılı, {fail_count} hata ({elapsed:.2f} sn)")
+        self.btn_run.config(state="normal")
+        _ensure_logger()
+        logger.info("Diagnostics run finished: total=%s ok=%s fail=%s", total, ok_count, fail_count)
+
+    def _save_config(self) -> None:
+        config = {
+            "auto_run": bool(self.auto_run_var.get()),
+            "min_free_mb": self.min_free_var.get(),
+        }
+        config = _validate_config(config)
+        save_config(self.app.db, config)
+        self._config = config
+        messagebox.showinfo(APP_TITLE, "Ayarlar kaydedildi.")
 
     def _checks(self) -> List[Tuple[str, Callable[[], Tuple[bool, str]]]]:
         return [
@@ -222,7 +348,8 @@ class DiagnosticsFrame(BaseView):
         except Exception as exc:
             return False, f"Disk bilgisi okunamadı: {exc}"
         free_mb = free / (1024 * 1024)
-        if free_mb < 100:
+        threshold = int(self._config.get("min_free_mb", 100))
+        if free_mb < threshold:
             return False, f"Düşük disk alanı: {free_mb:.1f} MB"
         return True, f"Boş alan: {free_mb:.1f} MB"
 

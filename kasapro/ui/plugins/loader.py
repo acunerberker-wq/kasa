@@ -19,10 +19,26 @@ from __future__ import annotations
 from dataclasses import dataclass
 from importlib import import_module
 import logging
+import os
 import pkgutil
 from typing import Callable, Dict, List, Optional
 
 from tkinter import ttk
+
+
+def _ensure_plugin_logger() -> logging.Logger:
+    logger = logging.getLogger("kasapro.ui.plugins")
+    if any(isinstance(h, logging.FileHandler) and getattr(h, "baseFilename", "").endswith("app.log") for h in logger.handlers):
+        return logger
+    log_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "..", "..", "logs", "app.log")
+    log_path = os.path.abspath(log_path)
+    os.makedirs(os.path.dirname(log_path), exist_ok=True)
+    handler = logging.FileHandler(log_path)
+    formatter = logging.Formatter("%(asctime)s %(levelname)s %(name)s %(message)s")
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+    logger.setLevel(logging.INFO)
+    return logger
 
 
 @dataclass(frozen=True)
@@ -39,7 +55,7 @@ def discover_ui_plugins() -> List[UIPlugin]:
 
     Hatalı/eksik eklentiler uygulamayı düşürmez; sessizce atlanır.
     """
-    logger = logging.getLogger("kasapro.ui.plugins")
+    logger = _ensure_plugin_logger()
     plugins: List[UIPlugin] = []
     try:
         pkg = import_module("kasapro.ui.plugins")
@@ -68,6 +84,9 @@ def discover_ui_plugins() -> List[UIPlugin]:
             key = str(meta.get("key") or "").strip()
             nav_text = str(meta.get("nav_text") or "").strip()
             page_title = str(meta.get("page_title") or key).strip()
+            enabled = bool(meta.get("enabled", True))
+            name = str(meta.get("name") or key).strip()
+            version = str(meta.get("version") or "0.1.0").strip()
             order_value = meta.get("order")
             if isinstance(order_value, (int, float, str)):
                 order = int(order_value)
@@ -76,10 +95,14 @@ def discover_ui_plugins() -> List[UIPlugin]:
         except Exception:
             logger.exception("UI plugin metadata invalid: %s", name)
             continue
+        if not enabled:
+            logger.info("UI plugin disabled: %s", key)
+            continue
         if not key or not nav_text:
             continue
 
         plugins.append(UIPlugin(key=key, nav_text=nav_text, page_title=page_title, build=build, order=order))
+        logger.info("UI plugin loaded: %s (%s v%s)", key, name, version)
 
     plugins.sort(key=lambda p: (p.order, p.key))
     return plugins
