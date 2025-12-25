@@ -6,8 +6,10 @@ App açılırken tek bir yerde oluşturulur ve UI'ye `app.services` olarak veril
 
 from __future__ import annotations
 
+import sys
+import os
 from dataclasses import dataclass
-from typing import Callable
+from typing import Callable, Optional
 
 from ..db.main_db import DB
 from ..db.users_db import UsersDB
@@ -18,6 +20,18 @@ from .company_users_service import CompanyUsersService
 from .cari_service import CariService
 from .messages_service import MessagesService
 from ..modules.notes_reminders.service import NotesRemindersService
+from ..modules.dms.service import DmsService
+from ..modules.integrations.service import IntegrationService
+from ..modules.hakedis.service import HakedisService
+
+# HR modülü için dinamik import (modules/ klasöründen)
+try:
+    _modules_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "modules"))
+    if _modules_path not in sys.path:
+        sys.path.insert(0, _modules_path)
+    from hr.service import HRService
+except ImportError:
+    HRService = None
 
 
 @dataclass
@@ -31,6 +45,10 @@ class Services:
     cari: CariService
     messages: MessagesService
     notes_reminders: NotesRemindersService
+    dms: DmsService
+    integrations: IntegrationService
+    hr: Optional["HRService"]
+    hakedis: HakedisService
 
     @classmethod
     def build(cls, db: DB, usersdb: UsersDB, context_provider) -> "Services":
@@ -46,4 +64,8 @@ class Services:
             cari=CariService(db, exporter),
             messages=MessagesService(db, usersdb),
             notes_reminders=NotesRemindersService(db, usersdb),
+            dms=DmsService(db),
+            integrations=IntegrationService(db, context_provider),
+            hr=hr_service,
+            hakedis=hakedis_service,
         )
