@@ -47,6 +47,10 @@ class Services:
     messages: MessagesService
     notes_reminders: NotesRemindersService
     wms: WmsService
+    dms: DmsService
+    integrations: IntegrationService
+    hr: Optional["HRService"]
+    hakedis: HakedisService
 
     @classmethod
     def build(cls, db: DB, usersdb: UsersDB, context_provider) -> "Services":
@@ -63,4 +67,8 @@ class Services:
             messages=MessagesService(db, usersdb),
             notes_reminders=NotesRemindersService(db, usersdb),
             wms=WmsService(db),
+            dms=DmsService(db),
+            integrations=IntegrationService(db, context_provider),
+            hr=hr_service,
+            hakedis=hakedis_service,
         )
