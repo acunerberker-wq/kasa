@@ -24,6 +24,15 @@ Aynı klasördeki `kasapro.ini` ile data/log konumlarını ve log seviyesini de�
 - Excel import/export: `pip install openpyxl`
 - PDF export: `pip install reportlab`
 
+## UI Smoke Test (Test Runner)
+
+UI otomasyon testi Tkinter tabanlıdır ve görsel çıktılar için `pillow` kullanır.
+
+- Kurulum: `pip install -r requirements-dev.txt`
+- Çalıştırma: `python -m tests.run_ui_smoke`
+
+Çıktılar `test_artifacts/` altında `logs/`, `screenshots/`, `results.json` ve `report.md/report.html` olarak üretilir.
+
 ## Excel Çalışma Alanı (Banka)
 
 Banka ekranındaki tablo kısmında:
