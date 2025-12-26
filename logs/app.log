@@ -6491,3 +6491,27 @@ Traceback (most recent call last):
     self.hakedis = HakedisRepo(self.conn, log_fn=self.logs.log)
                    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 TypeError: HakedisRepo.__init__() got an unexpected keyword argument 'log_fn'
+2025-12-26 07:33:15,677 [ERROR] kasapro.app: Uygulama başlatma hatası
+Traceback (most recent call last):
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\app.py", line 1324, in main
+    App().run()
+    ~~~^^
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\app.py", line 131, in __init__
+    self.db = DB(db_path)
+              ~~^^^^^^^^^
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\db\main_db.py", line 64, in __init__
+    self.hakedis = HakedisRepo(self.conn, log_fn=self.logs.log)
+                   ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: HakedisRepo.__init__() got an unexpected keyword argument 'log_fn'
+2025-12-26 07:38:50,743 [ERROR] kasapro.app: Uygulama başlatma hatası
+Traceback (most recent call last):
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\app.py", line 1324, in main
+    App().run()
+    ~~~^^
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\app.py", line 131, in __init__
+    self.db = DB(db_path)
+              ~~^^^^^^^^^
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\db\main_db.py", line 64, in __init__
+    self.hakedis = HakedisRepo(self.conn, log_fn=self.logs.log)
+                   ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: HakedisRepo.__init__() got an unexpected keyword argument 'log_fn'
