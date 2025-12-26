@@ -52,6 +52,7 @@ class Services:
     messages: MessagesService
     notes_reminders: NotesRemindersService
     wms: WmsService
+    dms: DmsService
     integrations: IntegrationService
     hakedis: HakedisService
     hr: Optional[Any]
@@ -61,6 +62,7 @@ class Services:
         exporter = ExportService()
         hr_service = HRService(db, context_provider) if HRService else None
         hakedis_service = HakedisService(db)
+        dms_service = DmsService(db)
         integrations_service = IntegrationService(db, context_provider)
         return cls(
             db=db,
@@ -72,6 +74,7 @@ class Services:
             messages=MessagesService(db, usersdb),
             notes_reminders=NotesRemindersService(db, usersdb),
             wms=WmsService(db),
+            dms=dms_service,
             integrations=integrations_service,
             hakedis=hakedis_service,
             hr=hr_service,

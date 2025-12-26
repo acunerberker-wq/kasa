@@ -27,10 +27,18 @@ class NotesRemindersRepo:
     ) -> int:
         cur = self.conn.execute(
             """
-            INSERT INTO audit_log(company_id, user_id, action, entity, entity_id, detail, created_at)
+            INSERT INTO audit_log(company_id, entity_type, entity_id, action, actor_id, details, created_at)
             VALUES(?,?,?,?,?,?,?)
             """,
-            (int(company_id), int(user_id), str(action), str(entity), int(entity_id), str(detail), now_iso()),
+            (
+                int(company_id),
+                str(entity),
+                int(entity_id),
+                str(action),
+                int(user_id),
+                str(detail),
+                now_iso(),
+            ),
         )
         self.conn.commit()
         return int(cur.lastrowid)
