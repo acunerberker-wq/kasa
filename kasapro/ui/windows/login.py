@@ -20,7 +20,7 @@ class LoginWindow(tk.Toplevel):
         self.usersdb = usersdb
         self.user: Optional[sqlite3.Row] = None
         self.title("Giriş")
-        self.geometry("390x255")
+        self.geometry("520x420")
         self.resizable(False, False)
         # root withdraw durumunda transient sorun çıkarabiliyor
         try:
@@ -30,9 +30,19 @@ class LoginWindow(tk.Toplevel):
             pass
         self.protocol("WM_DELETE_WINDOW", self.do_exit)
 
-        ttk.Label(self, text="KasaPro Giriş", font=("Calibri", 14, "bold")).pack(pady=(14, 6))
-        frm = ttk.Frame(self)
+        self.configure(padx=0, pady=0)
+        container = ttk.Frame(self, style="TFrame")
+        container.pack(fill=tk.BOTH, expand=True, padx=24, pady=24)
+
+        card = ttk.Frame(container, style="Panel.TFrame")
+        card.pack(fill=tk.BOTH, expand=True, padx=8, pady=8)
+
+        ttk.Label(card, text="KasaPro", style="H1.TLabel").pack(pady=(16, 4))
+        ttk.Label(card, text="Hesabına giriş yap", style="Muted.TLabel").pack(pady=(0, 12))
+
+        frm = ttk.Frame(card, style="Panel.TFrame")
         frm.pack(fill=tk.X, padx=18, pady=6)
+
         # Kullanıcı seçimi (liste)
         self.pick_user = LabeledCombo(
             frm,
@@ -75,12 +85,18 @@ class LoginWindow(tk.Toplevel):
         except Exception:
             pass
 
-        btn = ttk.Frame(self)
-        btn.pack(fill=tk.X, padx=18, pady=10)
-        ttk.Button(btn, text="Giriş", command=self.do_login).pack(side=tk.LEFT)
-        ttk.Button(btn, text="Çıkış", command=self.do_exit).pack(side=tk.RIGHT)
+        self.remember_var = tk.BooleanVar(value=False)
+        ttk.Checkbutton(frm, text="Beni hatırla", variable=self.remember_var).pack(anchor="w", pady=(8, 0))
 
-        ttk.Label(self, text="İlk kurulum: admin / admin", foreground="#666").pack(pady=(0, 6))
+        btn = ttk.Frame(card, style="Panel.TFrame")
+        btn.pack(fill=tk.X, padx=18, pady=(10, 4))
+        ttk.Button(btn, text="Giriş Yap", style="Primary.TButton", command=self.do_login).pack(fill=tk.X)
+
+        ttk.Button(card, text="Şifremi unuttum", style="Secondary.TButton", command=self.do_exit).pack(
+            pady=(6, 0)
+        )
+
+        ttk.Label(card, text="İlk kurulum: admin / admin", style="Muted.TLabel").pack(pady=(8, 6))
         self.bind("<Return>", lambda _e: self.do_login())
         # ✅ Daha sağlam modal gösterimi (root withdraw olsa bile)
         self.protocol("WM_DELETE_WINDOW", self.do_exit)

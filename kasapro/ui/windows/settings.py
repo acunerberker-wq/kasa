@@ -663,8 +663,9 @@ class SettingsWindow(tk.Toplevel):
         except Exception:
             pass
         try:
-            if "kasa" in self.app.frames and hasattr(self.app.frames["kasa"], "reload_cari_combo"):
-                self.app.frames["kasa"].reload_cari_combo()  # type: ignore
+            kasa_frame = self.app._get_kasa_frame() if hasattr(self.app, "_get_kasa_frame") else None
+            if kasa_frame is not None and hasattr(kasa_frame, "reload_cari_combo"):
+                kasa_frame.reload_cari_combo()  # type: ignore
         except Exception:
             pass
         try:
