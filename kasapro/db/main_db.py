@@ -32,6 +32,7 @@ from .repos import (
     HRRepo,
 )
 from ..modules.hakedis.repo import HakedisRepo
+from ..modules.hakedis.repo import HakedisRepo
 
 
 class DB:
@@ -59,6 +60,7 @@ class DB:
         self.satin_alma = SatinAlmaRepo(self.conn)
         self.satis_siparis = SatisSiparisRepo(self.conn)
         self.messages = MessagesRepo(self.conn)
+        self.hakedis = HakedisRepo(self.conn, log_fn=self.logs.log)
         self.hr = HRRepo(self.conn)
 
         migrate_schema(self.conn, log_fn=self._safe_log)
