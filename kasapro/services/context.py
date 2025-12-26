@@ -6,8 +6,9 @@ App açılırken tek bir yerde oluşturulur ve UI'ye `app.services` olarak veril
 
 from __future__ import annotations
 
-import sys
+import importlib.util
 import os
+import sys
 from dataclasses import dataclass
 from typing import Callable, Optional, Any
 
@@ -26,12 +27,13 @@ from ..modules.integrations.service import IntegrationService
 from ..modules.hakedis.service import HakedisService
 
 # HR modülü için dinamik import (modules/ klasöründen)
-try:
-    _modules_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "modules"))
-    if _modules_path not in sys.path:
-        sys.path.insert(0, _modules_path)
+_modules_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "modules"))
+if _modules_path not in sys.path:
+    sys.path.insert(0, _modules_path)
+_hr_spec = importlib.util.find_spec("hr.service")
+if _hr_spec:
     from hr.service import HRService
-except ImportError:
+else:
     HRService = None
 
 
