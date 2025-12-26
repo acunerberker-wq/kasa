@@ -843,8 +843,8 @@ class App:
 
         # Status bar
         self.status_var = tk.StringVar(value="F1: Yardım  •  Ctrl+F: Global Arama  •  Çift tık: Düzenle")
-        self.status = ttk.Label(content, textvariable=self.status_var, style="Status.TLabel")
-        self.status.pack(fill=tk.X, side=tk.BOTTOM)
+        self.status_bar = ttk.Label(content, textvariable=self.status_var, style="Status.TLabel")
+        self.status_bar.pack(fill=tk.X, side=tk.BOTTOM)
 
         # Sol menü üst bilgi
         hdr = ttk.Frame(nav, style="Sidebar.TFrame")
