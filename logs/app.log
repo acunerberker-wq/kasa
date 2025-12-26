@@ -7568,3 +7568,44 @@ Traceback (most recent call last):
     )
     ^
 TypeError: LabeledCombo.__init__() got an unexpected keyword argument 'label_text'
+2025-12-26 05:35:38,906 [ERROR] kasapro.app: Veritabanı hatası
+Traceback (most recent call last):
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\app.py", line 146, in _init_db
+    self.user = self._load_test_user() if self._test_mode else self._login()
+                                                               ~~~~~~~~~~~^^
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\app.py", line 387, in _login
+    w = LoginWindow(self.root, self.usersdb)
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\windows\login.py", line 37, in __init__
+    self.pick_user = LabeledCombo(
+                     ~~~~~~~~~~~~^
+        frm,
+        ^^^^
+    ...<2 lines>...
+        width=18
+        ^^^^^^^^
+    )
+    ^
+TypeError: LabeledCombo.__init__() got an unexpected keyword argument 'label_text'
+2025-12-26 05:35:40,523 [ERROR] kasapro.app: Uygulama başlatma hatası
+Traceback (most recent call last):
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\app.py", line 1451, in main
+    app = App()  # ✅ root otomatik oluşturulur
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\app.py", line 91, in __init__
+    self._init_db()
+    ~~~~~~~~~~~~~^^
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\app.py", line 146, in _init_db
+    self.user = self._load_test_user() if self._test_mode else self._login()
+                                                               ~~~~~~~~~~~^^
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\app.py", line 387, in _login
+    w = LoginWindow(self.root, self.usersdb)
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\windows\login.py", line 37, in __init__
+    self.pick_user = LabeledCombo(
+                     ~~~~~~~~~~~~^
+        frm,
+        ^^^^
+    ...<2 lines>...
+        width=18
+        ^^^^^^^^
+    )
+    ^
+TypeError: LabeledCombo.__init__() got an unexpected keyword argument 'label_text'
