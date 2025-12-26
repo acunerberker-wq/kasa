@@ -54,7 +54,13 @@ except ImportError:
     from typing import Any as HRContext
 
 class App:
-    def __init__(self, root: tk.Tk | None = None):
+    def __init__(
+        self,
+        root: tk.Tk | None = None,
+        *,
+        base_dir: Optional[str] = None,
+        test_mode: bool = False,
+    ):
         """Uygulama başlat.
         
         Args:
@@ -70,7 +76,8 @@ class App:
         self.root = root
         
         # Attributes ilk olarak tanımla
-        self._test_mode = False
+        self._test_mode = bool(test_mode)
+        self.base_dir = base_dir or APP_BASE_DIR
         self.db = None
         self.logger = logging.getLogger(__name__)
         self.user_id = None
@@ -107,34 +114,7 @@ class App:
     
     def _setup_theme(self) -> None:
         """Uygulama temasını ayarla."""
-        import tkinter.font as tkFont
-        
-        # Koyu tema (modern, profesyonel)
-        style = ttk.Style()
-        style.theme_use('clam')
-        
-        # Renkler
-        bg_primary = "#1e1e1e"      # Koyu arka plan
-        bg_secondary = "#2d2d2d"    # İkincil arka plan
-        fg_primary = "#ffffff"      # Ana metin
-        fg_secondary = "#cccccc"    # İkincil metin
-        accent = "#007acc"          # Vurgulama rengi
-        
-        style.configure('TFrame', background=bg_primary, foreground=fg_primary)
-        style.configure('TLabel', background=bg_primary, foreground=fg_primary)
-        style.configure('TButton', background=bg_secondary, foreground=fg_primary)
-        style.map('TButton',
-            background=[('active', accent)],
-            foreground=[('active', fg_primary)]
-        )
-        style.configure('TNotebook', background=bg_primary, foreground=fg_primary)
-        style.configure('TNotebook.Tab', background=bg_secondary, foreground=fg_primary)
-        style.map('TNotebook.Tab',
-            background=[('selected', accent)],
-            foreground=[('selected', fg_primary)]
-        )
-        
-        self.root.configure(bg=bg_primary)
+        self._ui_colors = apply_modern_style(self.root)
     
     def _setup_icon(self) -> None:
         """Pencere ikonunu ayarla."""
@@ -161,10 +141,9 @@ class App:
     def _init_db(self) -> None:
         """Veritabanı bağlantısını aç."""
         try:
-            self.base_dir = APP_BASE_DIR
             self.usersdb = UsersDB(self.base_dir)
 
-            self.user = self._login()
+            self.user = self._load_test_user() if self._test_mode else self._login()
             if not self.user:
                 try:
                     self.usersdb.close()
@@ -231,19 +210,12 @@ class App:
         try:
             # Menü çubuğu
             self._create_menu_bar()
-            
-            # Ana container
-            main_container = ttk.Frame(self.root)
-            main_container.pack(fill=tk.BOTH, expand=True)
-            
-            # Sidebar
-            self._create_sidebar(main_container)
-            
-            # Content area
-            self._create_content_area(main_container)
-            
-            # ✅ Status bar oluştur
-            self.status_bar = StatusBar(self.root)
+
+            # Ana UI (sidebar + içerik)
+            self._build_ui()
+
+            # Exception handler'ları UI seviyesinde bağla
+            self._install_exception_handlers()
             
             if not self._test_mode:
                 try:
@@ -314,14 +286,14 @@ class App:
     def _select_company(self) -> None:
         """Şirket seçme dialog'u."""
         try:
-            pass  # İşlevi uygula
+            self.open_settings(initial_tab="companies")
         except Exception as e:
             self.logger.exception("Şirket seçme hatası")
     
     def _show_settings(self) -> None:
         """Ayarlar penceresini aç."""
         try:
-            pass  # İşlevi uygula
+            self.open_settings()
         except Exception as e:
             self.logger.exception("Ayarlar açma hatası")
     
@@ -817,10 +789,11 @@ class App:
 
     def _build_ui(self):
         # Modern tema + okunabilir fontlar
-        try:
-            self._ui_colors = apply_modern_style(self.root)
-        except Exception:
-            self._ui_colors = {}
+        if not getattr(self, "_ui_colors", None):
+            try:
+                self._ui_colors = apply_modern_style(self.root)
+            except Exception:
+                self._ui_colors = {}
 
         container = ttk.Frame(self.root, style="TFrame")
         container.pack(fill=tk.BOTH, expand=True)
@@ -1250,8 +1223,8 @@ class App:
                 log_ui_event("create_center_open", form=form_id)
             except Exception:
                 pass
-    def open_settings(self):
-        SettingsWindow(self)
+    def open_settings(self, initial_tab: Optional[str] = None):
+        SettingsWindow(self, initial_tab=initial_tab)
 
 
     def open_help(self):

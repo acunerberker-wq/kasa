@@ -81,8 +81,9 @@ class SmokeTests(unittest.TestCase):
     def test_ui_smoke(self) -> None:
         app = App(base_dir=self.base_dir, test_mode=True)
         try:
-            for key in ("kasa", "tanimlar", "rapor_araclar"):
+            for key in ("kasa", "tanimlar", "rapor_araclar", "mesajlar", "stok_wms"):
                 self.assertIn(key, app.frames)
+                app.show(key)
         finally:
             app.on_close()
 

@@ -28,10 +28,11 @@ if TYPE_CHECKING:
     from ...app import App
 
 class SettingsWindow(tk.Toplevel):
-    def __init__(self, app: "App"):
+    def __init__(self, app: "App", initial_tab: Optional[str] = None):
         super().__init__(app.root)
         self.app = app
         self.db = app.db
+        self._initial_tab = initial_tab
         self.title("Ayarlar")
         self.geometry("820x560")
         self._build()
@@ -40,6 +41,7 @@ class SettingsWindow(tk.Toplevel):
     def _build(self):
         nb = ttk.Notebook(self)
         nb.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+        self.nb = nb
 
         tab_lists = ttk.Frame(nb)
         nb.add(tab_lists, text="Listeler")
@@ -64,6 +66,24 @@ class SettingsWindow(tk.Toplevel):
 
         tab_shared_storage = ttk.Frame(nb)
         nb.add(tab_shared_storage, text="Ortak Depolama")
+        self._tab_map = {
+            "listeler": tab_lists,
+            "lists": tab_lists,
+            "aktif": tab_active,
+            "active": tab_active,
+            "sirketler": tab_companies,
+            "companies": tab_companies,
+            "kullanicilar": tab_users,
+            "users": tab_users,
+            "stok": tab_stock,
+            "stock": tab_stock,
+            "db_yedek": tab_db_backup,
+            "backup": tab_db_backup,
+            "db_geri_yukle": tab_db_restore,
+            "restore": tab_db_restore,
+            "ortak_depolama": tab_shared_storage,
+            "shared_storage": tab_shared_storage,
+        }
 
         # ---- Listeler ----
         self._list_editor(tab_lists, "Para Birimleri", "currencies", self.db.list_currencies(), y=0)
@@ -87,7 +107,19 @@ class SettingsWindow(tk.Toplevel):
         self._build_db_restore_tab(tab_db_restore)
         self._build_shared_storage_tab(tab_shared_storage)
 
-        # Varsayılan olarak ilk sekmede kalsın.
+        self._select_initial_tab()
+
+    def _select_initial_tab(self) -> None:
+        if not getattr(self, "_initial_tab", None):
+            return
+        key = str(self._initial_tab or "").strip().lower()
+        tab = self._tab_map.get(key)
+        if tab is None:
+            return
+        try:
+            self.nb.select(tab)
+        except Exception:
+            pass
 
     def _list_editor(self, master, title, key, items, y=0):
         box = ttk.LabelFrame(master, text=title)
