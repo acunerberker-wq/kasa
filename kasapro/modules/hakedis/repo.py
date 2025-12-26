@@ -17,8 +17,10 @@ class ReportRow:
 
 
 class HakedisRepo:
-    def __init__(self, conn: sqlite3.Connection, log_fn=None):
+    def __init__(self, conn: sqlite3.Connection, log_fn=None, **kwargs):
         self.conn = conn
+        if log_fn is None:
+            log_fn = kwargs.get("log_fn")
         self.log_fn = log_fn
 
     def _now(self) -> str:
@@ -769,4 +771,4 @@ class HakedisRepo:
             SELECT * FROM audit_log WHERE company_id=? AND module=? ORDER BY id DESC
             """,
             (company_id, module),
-        ).fetchall()
+        ).fetchall()
