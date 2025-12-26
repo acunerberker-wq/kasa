@@ -4979,3 +4979,608 @@ AttributeError: 'DB' object has no attribute 'hakedis'
 2025-12-26 03:46:56,674 [INFO] kasapro.ui: UI screen_shown | key='hr'
 2025-12-26 03:46:57,757 INFO kasapro.ui UI callback invoked: on_close
 2025-12-26 03:46:57,757 [INFO] kasapro.ui: UI callback invoked: on_close
+2025-12-26 04:03:03,212 INFO kasapro.ui UI container_created | view='app_shell'
+2025-12-26 04:03:03,212 [INFO] kasapro.ui: UI container_created | view='app_shell'
+2025-12-26 04:03:03,213 INFO kasapro.ui UI callback_bound | handler='open_help'
+2025-12-26 04:03:03,213 [INFO] kasapro.ui: UI callback_bound | handler='open_help'
+2025-12-26 04:03:03,330 INFO kasapro.ui UI callback_bound | handler='open_settings'
+2025-12-26 04:03:03,330 [INFO] kasapro.ui: UI callback_bound | handler='open_settings'
+2025-12-26 04:03:03,347 INFO kasapro.ui.plugins UI plugin loaded: advanced_invoice (advanced_invoice v0.1.0)
+2025-12-26 04:03:03,347 INFO kasapro.ui.plugins UI plugin loaded: advanced_invoice (advanced_invoice v0.1.0)
+2025-12-26 04:03:03,347 [INFO] kasapro.ui.plugins: UI plugin loaded: advanced_invoice (advanced_invoice v0.1.0)
+2025-12-26 04:03:03,347 INFO kasapro.ui.plugins UI plugin loaded: banka_hareketleri (banka_hareketleri v0.1.0)
+2025-12-26 04:03:03,347 INFO kasapro.ui.plugins UI plugin loaded: banka_hareketleri (banka_hareketleri v0.1.0)
+2025-12-26 04:03:03,347 [INFO] kasapro.ui.plugins: UI plugin loaded: banka_hareketleri (banka_hareketleri v0.1.0)
+2025-12-26 04:03:03,348 INFO kasapro.ui.plugins UI plugin loaded: cari_hareket_ekle (cari_hareket_ekle v0.1.0)
+2025-12-26 04:03:03,348 INFO kasapro.ui.plugins UI plugin loaded: cari_hareket_ekle (cari_hareket_ekle v0.1.0)
+2025-12-26 04:03:03,348 [INFO] kasapro.ui.plugins: UI plugin loaded: cari_hareket_ekle (cari_hareket_ekle v0.1.0)
+2025-12-26 04:03:03,349 INFO kasapro.ui.plugins UI plugin loaded: cari_hareketler (cari_hareketler v0.1.0)
+2025-12-26 04:03:03,349 INFO kasapro.ui.plugins UI plugin loaded: cari_hareketler (cari_hareketler v0.1.0)
+2025-12-26 04:03:03,349 [INFO] kasapro.ui.plugins: UI plugin loaded: cari_hareketler (cari_hareketler v0.1.0)
+2025-12-26 04:03:03,351 INFO kasapro.ui.plugins UI plugin loaded: diagnostics (Sistem Testleri v1.1.0)
+2025-12-26 04:03:03,351 INFO kasapro.ui.plugins UI plugin loaded: diagnostics (Sistem Testleri v1.1.0)
+2025-12-26 04:03:03,351 [INFO] kasapro.ui.plugins: UI plugin loaded: diagnostics (Sistem Testleri v1.1.0)
+2025-12-26 04:03:03,352 INFO kasapro.ui.plugins UI plugin loaded: diger_giderler (diger_giderler v0.1.0)
+2025-12-26 04:03:03,352 INFO kasapro.ui.plugins UI plugin loaded: diger_giderler (diger_giderler v0.1.0)
+2025-12-26 04:03:03,352 [INFO] kasapro.ui.plugins: UI plugin loaded: diger_giderler (diger_giderler v0.1.0)
+2025-12-26 04:03:03,353 INFO kasapro.ui.plugins UI plugin loaded: dms (dms v0.1.0)
+2025-12-26 04:03:03,353 INFO kasapro.ui.plugins UI plugin loaded: dms (dms v0.1.0)
+2025-12-26 04:03:03,353 [INFO] kasapro.ui.plugins: UI plugin loaded: dms (dms v0.1.0)
+2025-12-26 04:03:03,354 INFO kasapro.ui.plugins UI plugin loaded: fatura (fatura v0.1.0)
+2025-12-26 04:03:03,354 INFO kasapro.ui.plugins UI plugin loaded: fatura (fatura v0.1.0)
+2025-12-26 04:03:03,354 [INFO] kasapro.ui.plugins: UI plugin loaded: fatura (fatura v0.1.0)
+2025-12-26 04:03:03,355 INFO kasapro.ui.plugins UI plugin loaded: hakedis (hakedis v0.1.0)
+2025-12-26 04:03:03,355 INFO kasapro.ui.plugins UI plugin loaded: hakedis (hakedis v0.1.0)
+2025-12-26 04:03:03,355 [INFO] kasapro.ui.plugins: UI plugin loaded: hakedis (hakedis v0.1.0)
+2025-12-26 04:03:03,356 INFO kasapro.ui.plugins UI plugin loaded: hr (hr v0.1.0)
+2025-12-26 04:03:03,356 INFO kasapro.ui.plugins UI plugin loaded: hr (hr v0.1.0)
+2025-12-26 04:03:03,356 [INFO] kasapro.ui.plugins: UI plugin loaded: hr (hr v0.1.0)
+2025-12-26 04:03:03,357 INFO kasapro.ui.plugins UI plugin loaded: maas_eklentileri (maas_eklentileri v0.1.0)
+2025-12-26 04:03:03,357 INFO kasapro.ui.plugins UI plugin loaded: maas_eklentileri (maas_eklentileri v0.1.0)
+2025-12-26 04:03:03,357 [INFO] kasapro.ui.plugins: UI plugin loaded: maas_eklentileri (maas_eklentileri v0.1.0)
+2025-12-26 04:03:03,358 INFO kasapro.ui.plugins UI plugin loaded: maas_meslekler (maas_meslekler v0.1.0)
+2025-12-26 04:03:03,358 INFO kasapro.ui.plugins UI plugin loaded: maas_meslekler (maas_meslekler v0.1.0)
+2025-12-26 04:03:03,358 [INFO] kasapro.ui.plugins: UI plugin loaded: maas_meslekler (maas_meslekler v0.1.0)
+2025-12-26 04:03:03,359 INFO kasapro.ui.plugins UI plugin loaded: maas_takibi (maas_takibi v0.1.0)
+2025-12-26 04:03:03,359 INFO kasapro.ui.plugins UI plugin loaded: maas_takibi (maas_takibi v0.1.0)
+2025-12-26 04:03:03,359 [INFO] kasapro.ui.plugins: UI plugin loaded: maas_takibi (maas_takibi v0.1.0)
+2025-12-26 04:03:03,360 INFO kasapro.ui.plugins UI plugin loaded: nakliye (nakliye v0.1.0)
+2025-12-26 04:03:03,360 INFO kasapro.ui.plugins UI plugin loaded: nakliye (nakliye v0.1.0)
+2025-12-26 04:03:03,360 [INFO] kasapro.ui.plugins: UI plugin loaded: nakliye (nakliye v0.1.0)
+2025-12-26 04:03:03,361 INFO kasapro.ui.plugins UI plugin loaded: satis_siparis_rapor (satis_siparis_rapor v0.1.0)
+2025-12-26 04:03:03,361 INFO kasapro.ui.plugins UI plugin loaded: satis_siparis_rapor (satis_siparis_rapor v0.1.0)
+2025-12-26 04:03:03,361 [INFO] kasapro.ui.plugins: UI plugin loaded: satis_siparis_rapor (satis_siparis_rapor v0.1.0)
+2025-12-26 04:03:03,362 INFO kasapro.ui.plugins UI plugin loaded: stok (stok v0.1.0)
+2025-12-26 04:03:03,362 INFO kasapro.ui.plugins UI plugin loaded: stok (stok v0.1.0)
+2025-12-26 04:03:03,362 [INFO] kasapro.ui.plugins: UI plugin loaded: stok (stok v0.1.0)
+2025-12-26 04:03:03,366 INFO kasapro.ui.plugins UI plugin loaded: trade_module (trade_module v0.1.0)
+2025-12-26 04:03:03,366 INFO kasapro.ui.plugins UI plugin loaded: trade_module (trade_module v0.1.0)
+2025-12-26 04:03:03,366 [INFO] kasapro.ui.plugins: UI plugin loaded: trade_module (trade_module v0.1.0)
+2025-12-26 04:03:03,627 [INFO] kasapro.ui: UI menu_section_added | title='üè† DASHBOARD'
+2025-12-26 04:03:03,632 [INFO] kasapro.ui: UI menu_added | key='dashboard', text='üè† Dashboard'
+2025-12-26 04:03:03,634 INFO kasapro.ui UI callback_bound | handler='nav:dashboard'
+2025-12-26 04:03:03,634 [INFO] kasapro.ui: UI callback_bound | handler='nav:dashboard'
+2025-12-26 04:03:03,661 [INFO] kasapro.ui: UI menu_section_added | title='üßæ KAYIT OLU≈ûTUR'
+2025-12-26 04:03:03,663 [INFO] kasapro.ui: UI menu_added | key='create_center', text='üßæ Kayƒ±t Olu≈ütur (Merkez)'
+2025-12-26 04:03:03,666 INFO kasapro.ui UI callback_bound | handler='nav:create_center'
+2025-12-26 04:03:03,666 [INFO] kasapro.ui: UI callback_bound | handler='nav:create_center'
+2025-12-26 04:03:03,687 [INFO] kasapro.ui: UI menu_section_added | title='üìö TANIMLAR & AYARLAR'
+2025-12-26 04:03:03,690 [INFO] kasapro.ui: UI menu_added | key='cariler', text='üë• Cariler'
+2025-12-26 04:03:03,692 INFO kasapro.ui UI callback_bound | handler='nav:cariler'
+2025-12-26 04:03:03,692 [INFO] kasapro.ui: UI callback_bound | handler='nav:cariler'
+2025-12-26 04:03:03,707 [INFO] kasapro.ui: UI menu_added | key='tanimlar', text='üìö Tanƒ±mlar'
+2025-12-26 04:03:03,710 INFO kasapro.ui UI callback_bound | handler='nav:tanimlar'
+2025-12-26 04:03:03,710 [INFO] kasapro.ui: UI callback_bound | handler='nav:tanimlar'
+2025-12-26 04:03:03,726 [INFO] kasapro.ui: UI menu_section_added | title='üí≥ ƒ∞≈ûLEMLER'
+2025-12-26 04:03:03,729 [INFO] kasapro.ui: UI menu_added | key='kasa', text='üè¶ Kasa'
+2025-12-26 04:03:03,731 INFO kasapro.ui UI callback_bound | handler='nav:kasa'
+2025-12-26 04:03:03,731 [INFO] kasapro.ui: UI callback_bound | handler='nav:kasa'
+2025-12-26 04:03:03,740 [INFO] kasapro.ui: UI menu_added | key='mesajlar', text='üì® Mesajlar'
+2025-12-26 04:03:03,742 INFO kasapro.ui UI callback_bound | handler='nav:mesajlar'
+2025-12-26 04:03:03,742 [INFO] kasapro.ui: UI callback_bound | handler='nav:mesajlar'
+2025-12-26 04:03:03,756 [INFO] kasapro.ui: UI menu_added | key='stok', text='üì¶ Stok'
+2025-12-26 04:03:03,764 INFO kasapro.ui UI callback_bound | handler='nav:stok'
+2025-12-26 04:03:03,764 [INFO] kasapro.ui: UI callback_bound | handler='nav:stok'
+2025-12-26 04:03:03,778 [INFO] kasapro.ui: UI menu_added | key='advanced_invoice', text='üßæ Faturalar'
+2025-12-26 04:03:03,781 INFO kasapro.ui UI callback_bound | handler='nav:advanced_invoice'
+2025-12-26 04:03:03,781 [INFO] kasapro.ui: UI callback_bound | handler='nav:advanced_invoice'
+2025-12-26 04:03:03,782 [INFO] kasapro.ui: UI menu_added | key='banka_hareketleri', text='üè¶ Banka'
+2025-12-26 04:03:03,784 INFO kasapro.ui UI callback_bound | handler='nav:banka_hareketleri'
+2025-12-26 04:03:03,784 [INFO] kasapro.ui: UI callback_bound | handler='nav:banka_hareketleri'
+2025-12-26 04:03:03,784 [INFO] kasapro.ui: UI menu_added | key='fatura', text='üßæ Fatura'
+2025-12-26 04:03:03,787 INFO kasapro.ui UI callback_bound | handler='nav:fatura'
+2025-12-26 04:03:03,787 [INFO] kasapro.ui: UI callback_bound | handler='nav:fatura'
+2025-12-26 04:03:03,788 [INFO] kasapro.ui: UI menu_added | key='satis_siparis_rapor', text='üßæ Satƒ±≈ü Sipari≈üleri'
+2025-12-26 04:03:03,792 INFO kasapro.ui UI callback_bound | handler='nav:satis_siparis_rapor'
+2025-12-26 04:03:03,792 [INFO] kasapro.ui: UI callback_bound | handler='nav:satis_siparis_rapor'
+2025-12-26 04:03:03,793 [INFO] kasapro.ui: UI menu_added | key='trade_module', text='üè≠ Ticari'
+2025-12-26 04:03:03,795 INFO kasapro.ui UI callback_bound | handler='nav:trade_module'
+2025-12-26 04:03:03,795 [INFO] kasapro.ui: UI callback_bound | handler='nav:trade_module'
+2025-12-26 04:03:03,804 [INFO] kasapro.ui: UI menu_added | key='hr', text='üßë\u200düíº ƒ∞K'
+2025-12-26 04:03:03,807 INFO kasapro.ui UI callback_bound | handler='nav:hr'
+2025-12-26 04:03:03,807 [INFO] kasapro.ui: UI callback_bound | handler='nav:hr'
+2025-12-26 04:03:03,830 [INFO] kasapro.ui: UI menu_added | key='diger_giderler', text='üßæ Diƒüer Giderler'
+2025-12-26 04:03:03,833 INFO kasapro.ui UI callback_bound | handler='nav:diger_giderler'
+2025-12-26 04:03:03,833 [INFO] kasapro.ui: UI callback_bound | handler='nav:diger_giderler'
+2025-12-26 04:03:03,834 [INFO] kasapro.ui: UI menu_added | key='cari_hareketler', text='üìí Cari Hareketler'
+2025-12-26 04:03:03,836 INFO kasapro.ui UI callback_bound | handler='nav:cari_hareketler'
+2025-12-26 04:03:03,836 [INFO] kasapro.ui: UI callback_bound | handler='nav:cari_hareketler'
+2025-12-26 04:03:03,848 [INFO] kasapro.ui: UI menu_added | key='maas_takibi', text='üíº Maa≈ü Takibi'
+2025-12-26 04:03:03,851 INFO kasapro.ui UI callback_bound | handler='nav:maas_takibi'
+2025-12-26 04:03:03,851 [INFO] kasapro.ui: UI callback_bound | handler='nav:maas_takibi'
+2025-12-26 04:03:03,851 [INFO] kasapro.ui: UI menu_added | key='nakliye', text='üöö Nakliye'
+2025-12-26 04:03:03,854 INFO kasapro.ui UI callback_bound | handler='nav:nakliye'
+2025-12-26 04:03:03,854 [INFO] kasapro.ui: UI callback_bound | handler='nav:nakliye'
+2025-12-26 04:03:03,868 [INFO] kasapro.ui: UI menu_added | key='cari_hareket_ekle', text='‚ûï Cari Hareket Ekle'
+2025-12-26 04:03:03,870 INFO kasapro.ui UI callback_bound | handler='nav:cari_hareket_ekle'
+2025-12-26 04:03:03,870 [INFO] kasapro.ui: UI callback_bound | handler='nav:cari_hareket_ekle'
+2025-12-26 04:03:03,870 [INFO] kasapro.ui: UI menu_added | key='dms', text='üìÑ Dok√ºmanlar'
+2025-12-26 04:03:03,873 INFO kasapro.ui UI callback_bound | handler='nav:dms'
+2025-12-26 04:03:03,873 [INFO] kasapro.ui: UI callback_bound | handler='nav:dms'
+2025-12-26 04:03:03,883 [INFO] kasapro.ui: UI menu_added | key='hakedis', text='üèóÔ∏è Hakedi≈ü Merkezi'
+2025-12-26 04:03:03,886 INFO kasapro.ui UI callback_bound | handler='nav:hakedis'
+2025-12-26 04:03:03,886 [INFO] kasapro.ui: UI callback_bound | handler='nav:hakedis'
+2025-12-26 04:03:03,897 [INFO] kasapro.ui: UI menu_added | key='diagnostics', text='üß™ Sistem Testleri'
+2025-12-26 04:03:03,900 INFO kasapro.ui UI callback_bound | handler='nav:diagnostics'
+2025-12-26 04:03:03,900 [INFO] kasapro.ui: UI callback_bound | handler='nav:diagnostics'
+2025-12-26 04:03:03,910 [INFO] kasapro.ui: UI menu_section_added | title='üì¶ STOK & WMS'
+2025-12-26 04:03:03,912 [INFO] kasapro.ui: UI menu_added | key='stok_wms', text='üì¶ Stok/WMS'
+2025-12-26 04:03:03,915 INFO kasapro.ui UI callback_bound | handler='nav:stok_wms'
+2025-12-26 04:03:03,915 [INFO] kasapro.ui: UI callback_bound | handler='nav:stok_wms'
+2025-12-26 04:03:03,925 [INFO] kasapro.ui: UI menu_section_added | title='üîå ENTEGRASYONLAR'
+2025-12-26 04:03:03,927 [INFO] kasapro.ui: UI menu_added | key='entegrasyonlar', text='üîå Entegrasyonlar'
+2025-12-26 04:03:03,929 INFO kasapro.ui UI callback_bound | handler='nav:entegrasyonlar'
+2025-12-26 04:03:03,929 [INFO] kasapro.ui: UI callback_bound | handler='nav:entegrasyonlar'
+2025-12-26 04:03:03,939 [INFO] kasapro.ui: UI menu_section_added | title='üìà RAPORLAR & DASHBOARD'
+2025-12-26 04:03:03,941 [INFO] kasapro.ui: UI menu_added | key='rapor_araclar', text='üìà Rapor & Ara√ßlar'
+2025-12-26 04:03:03,943 INFO kasapro.ui UI callback_bound | handler='nav:rapor_araclar'
+2025-12-26 04:03:03,943 [INFO] kasapro.ui: UI callback_bound | handler='nav:rapor_araclar'
+2025-12-26 04:03:03,944 [INFO] kasapro.ui: UI menu_added | key='satis_raporlari', text='üíπ Satƒ±≈ü Raporlarƒ±'
+2025-12-26 04:03:03,946 INFO kasapro.ui UI callback_bound | handler='nav:satis_raporlari'
+2025-12-26 04:03:03,946 [INFO] kasapro.ui: UI callback_bound | handler='nav:satis_raporlari'
+2025-12-26 04:03:03,957 INFO kasapro.ui UI callback_bound | handler='import_excel'
+2025-12-26 04:03:03,957 [INFO] kasapro.ui: UI callback_bound | handler='import_excel'
+2025-12-26 04:03:03,966 INFO kasapro.ui UI callback_bound | handler='export_excel'
+2025-12-26 04:03:03,966 [INFO] kasapro.ui: UI callback_bound | handler='export_excel'
+2025-12-26 04:03:03,976 INFO kasapro.ui UI callback_bound | handler='on_close'
+2025-12-26 04:03:03,976 [INFO] kasapro.ui: UI callback_bound | handler='on_close'
+2025-12-26 04:03:03,996 INFO kasapro.ui UI screen_registered | key='dashboard', title='Dashboard'
+2025-12-26 04:03:03,996 [INFO] kasapro.ui: UI screen_registered | key='dashboard', title='Dashboard'
+2025-12-26 04:03:04,013 INFO kasapro.ui UI screen_created | key='dashboard', view='DashboardScreen'
+2025-12-26 04:03:04,013 [INFO] kasapro.ui: UI screen_created | key='dashboard', view='DashboardScreen'
+2025-12-26 04:03:04,013 INFO kasapro.ui UI screen_registered | key='kasa', title='Kasa'
+2025-12-26 04:03:04,013 [INFO] kasapro.ui: UI screen_registered | key='kasa', title='Kasa'
+2025-12-26 04:03:04,017 INFO kasapro.ui UI frame_created | view='KasaFrame'
+2025-12-26 04:03:04,017 [INFO] kasapro.ui: UI frame_created | view='KasaFrame'
+2025-12-26 04:03:04,064 INFO kasapro.ui UI screen_created | key='kasa', view='KasaScreen'
+2025-12-26 04:03:04,064 [INFO] kasapro.ui: UI screen_created | key='kasa', view='KasaScreen'
+2025-12-26 04:03:04,064 INFO kasapro.ui UI screen_registered | key='cariler', title='Cariler'
+2025-12-26 04:03:04,064 [INFO] kasapro.ui: UI screen_registered | key='cariler', title='Cariler'
+2025-12-26 04:03:04,067 INFO kasapro.ui UI frame_created | view='CarilerFrame'
+2025-12-26 04:03:04,067 [INFO] kasapro.ui: UI frame_created | view='CarilerFrame'
+2025-12-26 04:03:04,081 INFO kasapro.ui UI screen_created | key='cariler', view='CarilerScreen'
+2025-12-26 04:03:04,081 [INFO] kasapro.ui: UI screen_created | key='cariler', view='CarilerScreen'
+2025-12-26 04:03:04,081 INFO kasapro.ui UI screen_registered | key='create_center', title='Kay˝t Olu˛tur (Merkez)'
+2025-12-26 04:03:04,081 [INFO] kasapro.ui: UI screen_registered | key='create_center', title='Kayƒ±t Olu≈ütur (Merkez)'
+2025-12-26 04:03:04,082 INFO kasapro.ui UI frame_created | view='CreateCenterFrame'
+2025-12-26 04:03:04,082 [INFO] kasapro.ui: UI frame_created | view='CreateCenterFrame'
+2025-12-26 04:03:04,098 ERROR kasapro.ui Failed to build screen: create_center
+Traceback (most recent call last):
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\navigation.py", line 46, in _create_frame
+    frame = spec.factory(self.container, self.controller)
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\app.py", line 838, in <lambda>
+    self.screen_registry.register("create_center", lambda parent, app: CreateCenterFrame(parent, app), title="Kay˝t Olu˛tur (Merkez)")
+                                                                       ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\frames\create_center.py", line 27, in __init__
+    self.build_ui()
+    ~~~~~~~~~~~~~^^
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\frames\create_center.py", line 53, in build_ui
+    self._populate_categories()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\frames\create_center.py", line 163, in _populate_categories
+    categories = self._categories_for_role()
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\frames\create_center.py", line 169, in _categories_for_role
+    allowed = self._allowed_forms()
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\frames\create_center.py", line 152, in _allowed_forms
+    role = str(getattr(self.app, "user", {}).get("role", "")).lower()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'sqlite3.Row' object has no attribute 'get'
+2025-12-26 04:03:04,098 [ERROR] kasapro.ui: Failed to build screen: create_center
+Traceback (most recent call last):
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\navigation.py", line 46, in _create_frame
+    frame = spec.factory(self.container, self.controller)
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\app.py", line 838, in <lambda>
+    self.screen_registry.register("create_center", lambda parent, app: CreateCenterFrame(parent, app), title="Kayƒ±t Olu≈ütur (Merkez)")
+                                                                       ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\frames\create_center.py", line 27, in __init__
+    self.build_ui()
+    ~~~~~~~~~~~~~^^
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\frames\create_center.py", line 53, in build_ui
+    self._populate_categories()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\frames\create_center.py", line 163, in _populate_categories
+    categories = self._categories_for_role()
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\frames\create_center.py", line 169, in _categories_for_role
+    allowed = self._allowed_forms()
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\frames\create_center.py", line 152, in _allowed_forms
+    role = str(getattr(self.app, "user", {}).get("role", "")).lower()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'sqlite3.Row' object has no attribute 'get'
+2025-12-26 04:03:04,099 INFO kasapro.ui UI screen_registered | key='mesajlar', title='Mesajlar'
+2025-12-26 04:03:04,099 [INFO] kasapro.ui: UI screen_registered | key='mesajlar', title='Mesajlar'
+2025-12-26 04:03:04,100 INFO kasapro.ui UI frame_created | view='MessagesFrame'
+2025-12-26 04:03:04,100 [INFO] kasapro.ui: UI frame_created | view='MessagesFrame'
+2025-12-26 04:03:04,102 INFO kasapro.ui UI callback_bound | handler='messages_folder_change'
+2025-12-26 04:03:04,102 [INFO] kasapro.ui: UI callback_bound | handler='messages_folder_change'
+2025-12-26 04:03:04,103 INFO kasapro.ui UI callback_bound | handler='messages_search'
+2025-12-26 04:03:04,103 [INFO] kasapro.ui: UI callback_bound | handler='messages_search'
+2025-12-26 04:03:04,103 INFO kasapro.ui UI callback_bound | handler='messages_refresh'
+2025-12-26 04:03:04,103 [INFO] kasapro.ui: UI callback_bound | handler='messages_refresh'
+2025-12-26 04:03:04,112 INFO kasapro.ui UI callback_bound | handler='messages_compose'
+2025-12-26 04:03:04,112 [INFO] kasapro.ui: UI callback_bound | handler='messages_compose'
+2025-12-26 04:03:04,114 INFO kasapro.ui UI callback_bound | handler='messages_prev'
+2025-12-26 04:03:04,114 [INFO] kasapro.ui: UI callback_bound | handler='messages_prev'
+2025-12-26 04:03:04,115 INFO kasapro.ui UI callback_bound | handler='messages_next'
+2025-12-26 04:03:04,115 [INFO] kasapro.ui: UI callback_bound | handler='messages_next'
+2025-12-26 04:03:04,128 INFO kasapro.ui UI screen_created | key='mesajlar', view='MessagesFrame'
+2025-12-26 04:03:04,128 [INFO] kasapro.ui: UI screen_created | key='mesajlar', view='MessagesFrame'
+2025-12-26 04:03:04,128 INFO kasapro.ui UI screen_registered | key='tanimlar', title='Tan˝mlar'
+2025-12-26 04:03:04,128 [INFO] kasapro.ui: UI screen_registered | key='tanimlar', title='Tanƒ±mlar'
+2025-12-26 04:03:04,129 INFO kasapro.ui UI frame_created | view='TanimlarHubFrame'
+2025-12-26 04:03:04,129 [INFO] kasapro.ui: UI frame_created | view='TanimlarHubFrame'
+2025-12-26 04:03:04,130 INFO kasapro.ui UI tab_added | tab='cariler', container='tanimlar'
+2025-12-26 04:03:04,130 [INFO] kasapro.ui: UI tab_added | tab='cariler', container='tanimlar'
+2025-12-26 04:03:04,131 INFO kasapro.ui UI tab_added | tab='calisanlar', container='tanimlar'
+2025-12-26 04:03:04,131 [INFO] kasapro.ui: UI tab_added | tab='calisanlar', container='tanimlar'
+2025-12-26 04:03:04,131 INFO kasapro.ui UI tab_added | tab='meslekler', container='tanimlar'
+2025-12-26 04:03:04,131 [INFO] kasapro.ui: UI tab_added | tab='meslekler', container='tanimlar'
+2025-12-26 04:03:04,131 INFO kasapro.ui UI frame_created | view='CarilerFrame'
+2025-12-26 04:03:04,131 [INFO] kasapro.ui: UI frame_created | view='CarilerFrame'
+2025-12-26 04:03:04,144 INFO kasapro.ui UI frame_created | view='MaasTakibiFrame'
+2025-12-26 04:03:04,144 [INFO] kasapro.ui: UI frame_created | view='MaasTakibiFrame'
+2025-12-26 04:03:04,209 INFO kasapro.ui UI frame_created | view='MaasMesleklerFrame'
+2025-12-26 04:03:04,209 [INFO] kasapro.ui: UI frame_created | view='MaasMesleklerFrame'
+2025-12-26 04:03:04,220 INFO kasapro.ui UI callback_bound | handler='tanimlar_tab_change'
+2025-12-26 04:03:04,220 [INFO] kasapro.ui: UI callback_bound | handler='tanimlar_tab_change'
+2025-12-26 04:03:04,220 INFO kasapro.ui UI screen_created | key='tanimlar', view='TanimlarHubFrame'
+2025-12-26 04:03:04,220 [INFO] kasapro.ui: UI screen_created | key='tanimlar', view='TanimlarHubFrame'
+2025-12-26 04:03:04,220 INFO kasapro.ui UI screen_registered | key='stok_wms', title='Stok/WMS'
+2025-12-26 04:03:04,220 [INFO] kasapro.ui: UI screen_registered | key='stok_wms', title='Stok/WMS'
+2025-12-26 04:03:04,221 INFO kasapro.ui UI frame_created | view='StockWmsFrame'
+2025-12-26 04:03:04,221 [INFO] kasapro.ui: UI frame_created | view='StockWmsFrame'
+2025-12-26 04:03:04,228 INFO kasapro.ui UI tab_added | tab='stock_card', container='stock_wms'
+2025-12-26 04:03:04,228 [INFO] kasapro.ui: UI tab_added | tab='stock_card', container='stock_wms'
+2025-12-26 04:03:04,228 INFO kasapro.ui UI callback_bound | handler='wms_demo_docs'
+2025-12-26 04:03:04,228 [INFO] kasapro.ui: UI callback_bound | handler='wms_demo_docs'
+2025-12-26 04:03:04,230 INFO kasapro.ui UI screen_created | key='stok_wms', view='StockWmsFrame'
+2025-12-26 04:03:04,230 [INFO] kasapro.ui: UI screen_created | key='stok_wms', view='StockWmsFrame'
+2025-12-26 04:03:04,230 INFO kasapro.ui UI screen_registered | key='rapor_araclar', title='Rapor & AraÁlar'
+2025-12-26 04:03:04,230 [INFO] kasapro.ui: UI screen_registered | key='rapor_araclar', title='Rapor & Ara√ßlar'
+2025-12-26 04:03:04,231 INFO kasapro.ui UI frame_created | view='RaporAraclarHubFrame'
+2025-12-26 04:03:04,231 [INFO] kasapro.ui: UI frame_created | view='RaporAraclarHubFrame'
+2025-12-26 04:03:04,233 INFO kasapro.ui UI tab_added | tab='raporlar', container='rapor_araclar'
+2025-12-26 04:03:04,233 [INFO] kasapro.ui: UI tab_added | tab='raporlar', container='rapor_araclar'
+2025-12-26 04:03:04,233 INFO kasapro.ui UI tab_added | tab='search', container='rapor_araclar'
+2025-12-26 04:03:04,233 [INFO] kasapro.ui: UI tab_added | tab='search', container='rapor_araclar'
+2025-12-26 04:03:04,233 INFO kasapro.ui UI tab_added | tab='loglar', container='rapor_araclar'
+2025-12-26 04:03:04,233 [INFO] kasapro.ui: UI tab_added | tab='loglar', container='rapor_araclar'
+2025-12-26 04:03:04,234 INFO kasapro.ui UI frame_created | view='RaporlarFrame'
+2025-12-26 04:03:04,234 [INFO] kasapro.ui: UI frame_created | view='RaporlarFrame'
+2025-12-26 04:03:04,237 INFO kasapro.ui UI callback_bound | handler='raporlar_last30'
+2025-12-26 04:03:04,237 [INFO] kasapro.ui: UI callback_bound | handler='raporlar_last30'
+2025-12-26 04:03:04,237 INFO kasapro.ui UI callback_bound | handler='raporlar_refresh'
+2025-12-26 04:03:04,237 [INFO] kasapro.ui: UI callback_bound | handler='raporlar_refresh'
+2025-12-26 04:03:04,240 INFO kasapro.ui UI callback_bound | handler='raporlar_canvas_config'
+2025-12-26 04:03:04,240 [INFO] kasapro.ui: UI callback_bound | handler='raporlar_canvas_config'
+2025-12-26 04:03:04,241 INFO kasapro.ui UI callback_bound | handler='raporlar_select_all'
+2025-12-26 04:03:04,241 [INFO] kasapro.ui: UI callback_bound | handler='raporlar_select_all'
+2025-12-26 04:03:04,242 INFO kasapro.ui UI callback_bound | handler='raporlar_clear_all'
+2025-12-26 04:03:04,242 [INFO] kasapro.ui: UI callback_bound | handler='raporlar_clear_all'
+2025-12-26 04:03:04,242 INFO kasapro.ui UI callback_bound | handler='raporlar_calc'
+2025-12-26 04:03:04,242 [INFO] kasapro.ui: UI callback_bound | handler='raporlar_calc'
+2025-12-26 04:03:04,243 INFO kasapro.ui UI frame_created | view='GlobalSearchFrame'
+2025-12-26 04:03:04,243 [INFO] kasapro.ui: UI frame_created | view='GlobalSearchFrame'
+2025-12-26 04:03:04,245 INFO kasapro.ui UI callback_bound | handler='global_search'
+2025-12-26 04:03:04,245 [INFO] kasapro.ui: UI callback_bound | handler='global_search'
+2025-12-26 04:03:04,246 INFO kasapro.ui UI frame_created | view='LogsFrame'
+2025-12-26 04:03:04,246 [INFO] kasapro.ui: UI frame_created | view='LogsFrame'
+2025-12-26 04:03:04,247 INFO kasapro.ui UI callback_bound | handler='logs_refresh'
+2025-12-26 04:03:04,247 [INFO] kasapro.ui: UI callback_bound | handler='logs_refresh'
+2025-12-26 04:03:04,247 INFO kasapro.ui UI callback_bound | handler='logs_export_txt'
+2025-12-26 04:03:04,247 [INFO] kasapro.ui: UI callback_bound | handler='logs_export_txt'
+2025-12-26 04:03:04,250 INFO kasapro.ui UI frame_created | view='SatinAlmaRaporlarFrame'
+2025-12-26 04:03:04,250 [INFO] kasapro.ui: UI frame_created | view='SatinAlmaRaporlarFrame'
+2025-12-26 04:03:04,379 INFO kasapro.ui UI callback_bound | handler='rapor_araclar_tab_change'
+2025-12-26 04:03:04,379 [INFO] kasapro.ui: UI callback_bound | handler='rapor_araclar_tab_change'
+2025-12-26 04:03:04,380 INFO kasapro.ui UI screen_created | key='rapor_araclar', view='RaporAraclarHubFrame'
+2025-12-26 04:03:04,380 [INFO] kasapro.ui: UI screen_created | key='rapor_araclar', view='RaporAraclarHubFrame'
+2025-12-26 04:03:04,380 INFO kasapro.ui UI screen_registered | key='stok', title='Stok Yˆnetimi'
+2025-12-26 04:03:04,380 [INFO] kasapro.ui: UI screen_registered | key='stok', title='Stok Y√∂netimi'
+2025-12-26 04:03:04,381 INFO kasapro.ui UI frame_created | view='StokFrame'
+2025-12-26 04:03:04,381 [INFO] kasapro.ui: UI frame_created | view='StokFrame'
+2025-12-26 04:03:04,431 INFO kasapro.ui UI screen_created | key='stok', view='StokFrame'
+2025-12-26 04:03:04,431 [INFO] kasapro.ui: UI screen_created | key='stok', view='StokFrame'
+2025-12-26 04:03:04,432 INFO kasapro.ui UI plugin_ui_registered | key='stok', title='Stok Yˆnetimi'
+2025-12-26 04:03:04,432 [INFO] kasapro.ui: UI plugin_ui_registered | key='stok', title='Stok Y√∂netimi'
+2025-12-26 04:03:04,432 INFO kasapro.ui UI screen_registered | key='advanced_invoice', title='Faturalar'
+2025-12-26 04:03:04,432 [INFO] kasapro.ui: UI screen_registered | key='advanced_invoice', title='Faturalar'
+2025-12-26 04:03:04,433 ERROR kasapro.ui Failed to build screen: advanced_invoice
+Traceback (most recent call last):
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\navigation.py", line 46, in _create_frame
+    frame = spec.factory(self.container, self.controller)
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\plugins\advanced_invoice.py", line 17, in build
+    return InvoiceModuleFrame(master, app)
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\modules\invoice\ui.py", line 38, in __init__
+    self.repo = app.db.invoice_adv
+                ^^^^^^^^^^^^^^^^^^
+AttributeError: 'DB' object has no attribute 'invoice_adv'
+2025-12-26 04:03:04,433 [ERROR] kasapro.ui: Failed to build screen: advanced_invoice
+Traceback (most recent call last):
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\navigation.py", line 46, in _create_frame
+    frame = spec.factory(self.container, self.controller)
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\plugins\advanced_invoice.py", line 17, in build
+    return InvoiceModuleFrame(master, app)
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\modules\invoice\ui.py", line 38, in __init__
+    self.repo = app.db.invoice_adv
+                ^^^^^^^^^^^^^^^^^^
+AttributeError: 'DB' object has no attribute 'invoice_adv'
+2025-12-26 04:03:04,435 INFO kasapro.ui UI plugin_ui_registered | key='advanced_invoice', title='Faturalar'
+2025-12-26 04:03:04,435 [INFO] kasapro.ui: UI plugin_ui_registered | key='advanced_invoice', title='Faturalar'
+2025-12-26 04:03:04,435 INFO kasapro.ui UI screen_registered | key='banka_hareketleri', title='Banka Hareketleri'
+2025-12-26 04:03:04,435 [INFO] kasapro.ui: UI screen_registered | key='banka_hareketleri', title='Banka Hareketleri'
+2025-12-26 04:03:04,437 INFO kasapro.ui UI frame_created | view='BankaHareketleriFrame'
+2025-12-26 04:03:04,437 [INFO] kasapro.ui: UI frame_created | view='BankaHareketleriFrame'
+2025-12-26 04:03:04,453 INFO kasapro.ui UI screen_created | key='banka_hareketleri', view='BankaScreen'
+2025-12-26 04:03:04,453 [INFO] kasapro.ui: UI screen_created | key='banka_hareketleri', view='BankaScreen'
+2025-12-26 04:03:04,454 INFO kasapro.ui UI plugin_ui_registered | key='banka_hareketleri', title='Banka Hareketleri'
+2025-12-26 04:03:04,454 [INFO] kasapro.ui: UI plugin_ui_registered | key='banka_hareketleri', title='Banka Hareketleri'
+2025-12-26 04:03:04,454 INFO kasapro.ui UI screen_registered | key='fatura', title='Fatura'
+2025-12-26 04:03:04,454 [INFO] kasapro.ui: UI screen_registered | key='fatura', title='Fatura'
+2025-12-26 04:03:04,456 INFO kasapro.ui UI frame_created | view='FaturaFrame'
+2025-12-26 04:03:04,456 [INFO] kasapro.ui: UI frame_created | view='FaturaFrame'
+2025-12-26 04:03:04,510 INFO kasapro.ui UI callback invoked: tanimlar_tab_change
+2025-12-26 04:03:04,510 [INFO] kasapro.ui: UI callback invoked: tanimlar_tab_change
+2025-12-26 04:03:04,511 INFO kasapro.ui UI callback invoked: rapor_araclar_tab_change
+2025-12-26 04:03:04,511 [INFO] kasapro.ui: UI callback invoked: rapor_araclar_tab_change
+2025-12-26 04:03:06,007 INFO kasapro.ui UI screen_created | key='fatura', view='FaturaScreen'
+2025-12-26 04:03:06,007 [INFO] kasapro.ui: UI screen_created | key='fatura', view='FaturaScreen'
+2025-12-26 04:03:06,007 INFO kasapro.ui UI plugin_ui_registered | key='fatura', title='Fatura'
+2025-12-26 04:03:06,007 [INFO] kasapro.ui: UI plugin_ui_registered | key='fatura', title='Fatura'
+2025-12-26 04:03:06,008 INFO kasapro.ui UI screen_registered | key='satis_siparis_rapor', title='Sat˝˛ Sipari˛ Raporlar˝'
+2025-12-26 04:03:06,008 [INFO] kasapro.ui: UI screen_registered | key='satis_siparis_rapor', title='Satƒ±≈ü Sipari≈ü Raporlarƒ±'
+2025-12-26 04:03:06,008 INFO kasapro.ui UI frame_created | view='SatisSiparisRaporFrame'
+2025-12-26 04:03:06,008 [INFO] kasapro.ui: UI frame_created | view='SatisSiparisRaporFrame'
+2025-12-26 04:03:06,022 INFO kasapro.ui UI screen_created | key='satis_siparis_rapor', view='SatisSiparisRaporFrame'
+2025-12-26 04:03:06,022 [INFO] kasapro.ui: UI screen_created | key='satis_siparis_rapor', view='SatisSiparisRaporFrame'
+2025-12-26 04:03:06,023 INFO kasapro.ui UI plugin_ui_registered | key='satis_siparis_rapor', title='Sat˝˛ Sipari˛ Raporlar˝'
+2025-12-26 04:03:06,023 [INFO] kasapro.ui: UI plugin_ui_registered | key='satis_siparis_rapor', title='Satƒ±≈ü Sipari≈ü Raporlarƒ±'
+2025-12-26 04:03:06,023 INFO kasapro.ui UI screen_registered | key='trade_module', title='Geli˛mi˛ Al˝˛/Sat˝˛ (Ticari) Mod¸l¸'
+2025-12-26 04:03:06,023 [INFO] kasapro.ui: UI screen_registered | key='trade_module', title='Geli≈ümi≈ü Alƒ±≈ü/Satƒ±≈ü (Ticari) Mod√ºl√º'
+2025-12-26 04:03:06,024 ERROR kasapro.ui Failed to build screen: trade_module
+Traceback (most recent call last):
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\navigation.py", line 46, in _create_frame
+    frame = spec.factory(self.container, self.controller)
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\plugins\trade_module.py", line 18, in build
+    return TradeModuleFrame(master, app)
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\modules\trade\ui.py", line 46, in __init__
+    app_role=str(getattr(app, "user", {}).get("role", "")),
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'sqlite3.Row' object has no attribute 'get'
+2025-12-26 04:03:06,024 [ERROR] kasapro.ui: Failed to build screen: trade_module
+Traceback (most recent call last):
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\navigation.py", line 46, in _create_frame
+    frame = spec.factory(self.container, self.controller)
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\plugins\trade_module.py", line 18, in build
+    return TradeModuleFrame(master, app)
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\modules\trade\ui.py", line 46, in __init__
+    app_role=str(getattr(app, "user", {}).get("role", "")),
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'sqlite3.Row' object has no attribute 'get'
+2025-12-26 04:03:06,025 INFO kasapro.ui UI plugin_ui_registered | key='trade_module', title='Geli˛mi˛ Al˝˛/Sat˝˛ (Ticari) Mod¸l¸'
+2025-12-26 04:03:06,025 [INFO] kasapro.ui: UI plugin_ui_registered | key='trade_module', title='Geli≈ümi≈ü Alƒ±≈ü/Satƒ±≈ü (Ticari) Mod√ºl√º'
+2025-12-26 04:03:06,025 INFO kasapro.ui UI screen_registered | key='hr', title='›K Mod¸l¸'
+2025-12-26 04:03:06,025 [INFO] kasapro.ui: UI screen_registered | key='hr', title='ƒ∞K Mod√ºl√º'
+2025-12-26 04:03:06,026 INFO kasapro.ui UI frame_created | view='HRFrame'
+2025-12-26 04:03:06,026 [INFO] kasapro.ui: UI frame_created | view='HRFrame'
+2025-12-26 04:03:06,100 INFO kasapro.ui UI screen_created | key='hr', view='HRFrame'
+2025-12-26 04:03:06,100 [INFO] kasapro.ui: UI screen_created | key='hr', view='HRFrame'
+2025-12-26 04:03:06,100 INFO kasapro.ui UI plugin_ui_registered | key='hr', title='›K Mod¸l¸'
+2025-12-26 04:03:06,100 [INFO] kasapro.ui: UI plugin_ui_registered | key='hr', title='ƒ∞K Mod√ºl√º'
+2025-12-26 04:03:06,100 INFO kasapro.ui UI screen_registered | key='diger_giderler', title='ﬁirket Dier Giderler'
+2025-12-26 04:03:06,100 [INFO] kasapro.ui: UI screen_registered | key='diger_giderler', title='≈ûirket Diƒüer Giderler'
+2025-12-26 04:03:06,101 INFO kasapro.ui UI frame_created | view='DigerGiderlerFrame'
+2025-12-26 04:03:06,101 [INFO] kasapro.ui: UI frame_created | view='DigerGiderlerFrame'
+2025-12-26 04:03:06,123 INFO kasapro.ui UI screen_created | key='diger_giderler', view='DigerGiderlerFrame'
+2025-12-26 04:03:06,123 [INFO] kasapro.ui: UI screen_created | key='diger_giderler', view='DigerGiderlerFrame'
+2025-12-26 04:03:06,123 INFO kasapro.ui UI plugin_ui_registered | key='diger_giderler', title='ﬁirket Dier Giderler'
+2025-12-26 04:03:06,123 [INFO] kasapro.ui: UI plugin_ui_registered | key='diger_giderler', title='≈ûirket Diƒüer Giderler'
+2025-12-26 04:03:06,123 INFO kasapro.ui UI screen_registered | key='cari_hareketler', title='Cari Hareketler'
+2025-12-26 04:03:06,123 [INFO] kasapro.ui: UI screen_registered | key='cari_hareketler', title='Cari Hareketler'
+2025-12-26 04:03:06,124 INFO kasapro.ui UI frame_created | view='CariHareketlerFrame'
+2025-12-26 04:03:06,124 [INFO] kasapro.ui: UI frame_created | view='CariHareketlerFrame'
+2025-12-26 04:03:06,131 INFO kasapro.ui UI screen_created | key='cari_hareketler', view='CariHareketlerFrame'
+2025-12-26 04:03:06,131 [INFO] kasapro.ui: UI screen_created | key='cari_hareketler', view='CariHareketlerFrame'
+2025-12-26 04:03:06,131 INFO kasapro.ui UI plugin_ui_registered | key='cari_hareketler', title='Cari Hareketler'
+2025-12-26 04:03:06,131 [INFO] kasapro.ui: UI plugin_ui_registered | key='cari_hareketler', title='Cari Hareketler'
+2025-12-26 04:03:06,132 INFO kasapro.ui UI screen_registered | key='maas_takibi', title='ﬁirket Maa˛ Takibi'
+2025-12-26 04:03:06,132 [INFO] kasapro.ui: UI screen_registered | key='maas_takibi', title='≈ûirket Maa≈ü Takibi'
+2025-12-26 04:03:06,132 INFO kasapro.ui UI frame_created | view='MaasTakibiFrame'
+2025-12-26 04:03:06,132 [INFO] kasapro.ui: UI frame_created | view='MaasTakibiFrame'
+2025-12-26 04:03:06,173 INFO kasapro.ui UI screen_created | key='maas_takibi', view='MaasTakibiFrame'
+2025-12-26 04:03:06,173 [INFO] kasapro.ui: UI screen_created | key='maas_takibi', view='MaasTakibiFrame'
+2025-12-26 04:03:06,173 INFO kasapro.ui UI plugin_ui_registered | key='maas_takibi', title='ﬁirket Maa˛ Takibi'
+2025-12-26 04:03:06,173 [INFO] kasapro.ui: UI plugin_ui_registered | key='maas_takibi', title='≈ûirket Maa≈ü Takibi'
+2025-12-26 04:03:06,173 INFO kasapro.ui UI screen_registered | key='nakliye', title='Nakliye Yˆnetimi'
+2025-12-26 04:03:06,173 [INFO] kasapro.ui: UI screen_registered | key='nakliye', title='Nakliye Y√∂netimi'
+2025-12-26 04:03:06,174 INFO kasapro.ui UI frame_created | view='NakliyeFrame'
+2025-12-26 04:03:06,174 [INFO] kasapro.ui: UI frame_created | view='NakliyeFrame'
+2025-12-26 04:03:06,233 INFO kasapro.ui UI screen_created | key='nakliye', view='NakliyeFrame'
+2025-12-26 04:03:06,233 [INFO] kasapro.ui: UI screen_created | key='nakliye', view='NakliyeFrame'
+2025-12-26 04:03:06,233 INFO kasapro.ui UI plugin_ui_registered | key='nakliye', title='Nakliye Yˆnetimi'
+2025-12-26 04:03:06,233 [INFO] kasapro.ui: UI plugin_ui_registered | key='nakliye', title='Nakliye Y√∂netimi'
+2025-12-26 04:03:06,233 INFO kasapro.ui UI screen_registered | key='cari_hareket_ekle', title='Cari Hareket Ekle'
+2025-12-26 04:03:06,233 [INFO] kasapro.ui: UI screen_registered | key='cari_hareket_ekle', title='Cari Hareket Ekle'
+2025-12-26 04:03:06,234 INFO kasapro.ui UI frame_created | view='CariHareketEkleFrame'
+2025-12-26 04:03:06,234 [INFO] kasapro.ui: UI frame_created | view='CariHareketEkleFrame'
+2025-12-26 04:03:06,244 INFO kasapro.ui UI screen_created | key='cari_hareket_ekle', view='CariHareketEkleFrame'
+2025-12-26 04:03:06,244 [INFO] kasapro.ui: UI screen_created | key='cari_hareket_ekle', view='CariHareketEkleFrame'
+2025-12-26 04:03:06,244 INFO kasapro.ui UI plugin_ui_registered | key='cari_hareket_ekle', title='Cari Hareket Ekle'
+2025-12-26 04:03:06,244 [INFO] kasapro.ui: UI plugin_ui_registered | key='cari_hareket_ekle', title='Cari Hareket Ekle'
+2025-12-26 04:03:06,245 INFO kasapro.ui UI screen_registered | key='maas_meslekler', title='Maa˛ Meslek Yˆnetimi'
+2025-12-26 04:03:06,245 [INFO] kasapro.ui: UI screen_registered | key='maas_meslekler', title='Maa≈ü Meslek Y√∂netimi'
+2025-12-26 04:03:06,245 INFO kasapro.ui UI frame_created | view='MaasMesleklerFrame'
+2025-12-26 04:03:06,245 [INFO] kasapro.ui: UI frame_created | view='MaasMesleklerFrame'
+2025-12-26 04:03:06,255 INFO kasapro.ui UI screen_created | key='maas_meslekler', view='MaasMesleklerFrame'
+2025-12-26 04:03:06,255 [INFO] kasapro.ui: UI screen_created | key='maas_meslekler', view='MaasMesleklerFrame'
+2025-12-26 04:03:06,255 INFO kasapro.ui UI plugin_ui_registered | key='maas_meslekler', title='Maa˛ Meslek Yˆnetimi'
+2025-12-26 04:03:06,255 [INFO] kasapro.ui: UI plugin_ui_registered | key='maas_meslekler', title='Maa≈ü Meslek Y√∂netimi'
+2025-12-26 04:03:06,255 INFO kasapro.ui UI screen_registered | key='dms', title='Dok¸manlar'
+2025-12-26 04:03:06,255 [INFO] kasapro.ui: UI screen_registered | key='dms', title='Dok√ºmanlar'
+2025-12-26 04:03:06,256 ERROR kasapro.ui Failed to build screen: dms
+Traceback (most recent call last):
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\navigation.py", line 46, in _create_frame
+    frame = spec.factory(self.container, self.controller)
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\plugins\dms.py", line 17, in build
+    return DmsHubFrame(master, app)
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\modules\dms\ui\hub.py", line 21, in __init__
+    self.services = app.services.dms
+                    ^^^^^^^^^^^^^^^^
+AttributeError: 'Services' object has no attribute 'dms'. Did you mean: 'wms'?
+2025-12-26 04:03:06,256 [ERROR] kasapro.ui: Failed to build screen: dms
+Traceback (most recent call last):
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\navigation.py", line 46, in _create_frame
+    frame = spec.factory(self.container, self.controller)
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\plugins\dms.py", line 17, in build
+    return DmsHubFrame(master, app)
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\modules\dms\ui\hub.py", line 21, in __init__
+    self.services = app.services.dms
+                    ^^^^^^^^^^^^^^^^
+AttributeError: 'Services' object has no attribute 'dms'. Did you mean: 'wms'?
+2025-12-26 04:03:06,258 INFO kasapro.ui UI plugin_ui_registered | key='dms', title='Dok¸manlar'
+2025-12-26 04:03:06,258 [INFO] kasapro.ui: UI plugin_ui_registered | key='dms', title='Dok√ºmanlar'
+2025-12-26 04:03:06,258 INFO kasapro.ui UI screen_registered | key='hakedis', title='Proje/ﬁantiye > Hakedi˛ Merkezi'
+2025-12-26 04:03:06,258 [INFO] kasapro.ui: UI screen_registered | key='hakedis', title='Proje/≈ûantiye > Hakedi≈ü Merkezi'
+2025-12-26 04:03:06,259 ERROR kasapro.ui Failed to build screen: hakedis
+Traceback (most recent call last):
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\navigation.py", line 46, in _create_frame
+    frame = spec.factory(self.container, self.controller)
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\plugins\hakedis.py", line 18, in build
+    return HakedisFrame(master, app)
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\modules\hakedis\ui.py", line 20, in __init__
+    self.repo = app.db.hakedis
+                ^^^^^^^^^^^^^^
+AttributeError: 'DB' object has no attribute 'hakedis'
+2025-12-26 04:03:06,259 [ERROR] kasapro.ui: Failed to build screen: hakedis
+Traceback (most recent call last):
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\navigation.py", line 46, in _create_frame
+    frame = spec.factory(self.container, self.controller)
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\plugins\hakedis.py", line 18, in build
+    return HakedisFrame(master, app)
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\modules\hakedis\ui.py", line 20, in __init__
+    self.repo = app.db.hakedis
+                ^^^^^^^^^^^^^^
+AttributeError: 'DB' object has no attribute 'hakedis'
+2025-12-26 04:03:06,261 INFO kasapro.ui UI plugin_ui_registered | key='hakedis', title='Proje/ﬁantiye > Hakedi˛ Merkezi'
+2025-12-26 04:03:06,261 [INFO] kasapro.ui: UI plugin_ui_registered | key='hakedis', title='Proje/≈ûantiye > Hakedi≈ü Merkezi'
+2025-12-26 04:03:06,261 INFO kasapro.ui UI screen_registered | key='diagnostics', title='Sistem Testleri'
+2025-12-26 04:03:06,261 [INFO] kasapro.ui: UI screen_registered | key='diagnostics', title='Sistem Testleri'
+2025-12-26 04:03:06,262 INFO kasapro.ui UI frame_created | view='DiagnosticsFrame'
+2025-12-26 04:03:06,262 [INFO] kasapro.ui: UI frame_created | view='DiagnosticsFrame'
+2025-12-26 04:03:06,264 INFO kasapro.ui UI callback_bound | handler='diagnostics_run'
+2025-12-26 04:03:06,264 [INFO] kasapro.ui: UI callback_bound | handler='diagnostics_run'
+2025-12-26 04:03:06,264 INFO kasapro.ui UI callback_bound | handler='diagnostics_clear'
+2025-12-26 04:03:06,264 [INFO] kasapro.ui: UI callback_bound | handler='diagnostics_clear'
+2025-12-26 04:03:06,265 INFO kasapro.ui UI callback_bound | handler='diagnostics_copy'
+2025-12-26 04:03:06,265 [INFO] kasapro.ui: UI callback_bound | handler='diagnostics_copy'
+2025-12-26 04:03:06,267 INFO kasapro.ui UI callback_bound | handler='diagnostics_save_cfg'
+2025-12-26 04:03:06,267 [INFO] kasapro.ui: UI callback_bound | handler='diagnostics_save_cfg'
+2025-12-26 04:03:06,269 INFO kasapro.ui UI screen_created | key='diagnostics', view='DiagnosticsFrame'
+2025-12-26 04:03:06,269 [INFO] kasapro.ui: UI screen_created | key='diagnostics', view='DiagnosticsFrame'
+2025-12-26 04:03:06,269 INFO kasapro.ui UI plugin_ui_registered | key='diagnostics', title='Sistem Testleri'
+2025-12-26 04:03:06,269 [INFO] kasapro.ui: UI plugin_ui_registered | key='diagnostics', title='Sistem Testleri'
+2025-12-26 04:03:06,269 INFO kasapro.ui UI screen_registered | key='kullanicilar', title='Kullan˝c˝lar'
+2025-12-26 04:03:06,269 [INFO] kasapro.ui: UI screen_registered | key='kullanicilar', title='Kullanƒ±cƒ±lar'
+2025-12-26 04:03:06,270 INFO kasapro.ui UI frame_created | view='KullanicilarFrame'
+2025-12-26 04:03:06,270 [INFO] kasapro.ui: UI frame_created | view='KullanicilarFrame'
+2025-12-26 04:03:06,274 INFO kasapro.ui UI callback_bound | handler='users_add'
+2025-12-26 04:03:06,274 [INFO] kasapro.ui: UI callback_bound | handler='users_add'
+2025-12-26 04:03:06,275 INFO kasapro.ui UI callback_bound | handler='users_reset'
+2025-12-26 04:03:06,275 [INFO] kasapro.ui: UI callback_bound | handler='users_reset'
+2025-12-26 04:03:06,284 INFO kasapro.ui UI callback_bound | handler='users_delete'
+2025-12-26 04:03:06,284 [INFO] kasapro.ui: UI callback_bound | handler='users_delete'
+2025-12-26 04:03:06,284 INFO kasapro.ui UI callback_bound | handler='users_refresh'
+2025-12-26 04:03:06,284 [INFO] kasapro.ui: UI callback_bound | handler='users_refresh'
+2025-12-26 04:03:06,286 INFO kasapro.ui UI callback_bound | handler='users_reset_double'
+2025-12-26 04:03:06,286 [INFO] kasapro.ui: UI callback_bound | handler='users_reset_double'
+2025-12-26 04:03:06,286 INFO kasapro.ui UI screen_created | key='kullanicilar', view='KullanicilarFrame'
+2025-12-26 04:03:06,286 [INFO] kasapro.ui: UI screen_created | key='kullanicilar', view='KullanicilarFrame'
+2025-12-26 04:03:06,289 INFO kasapro.ui UI callback_bound | handler='shortcut_help'
+2025-12-26 04:03:06,289 [INFO] kasapro.ui: UI callback_bound | handler='shortcut_help'
+2025-12-26 04:03:06,289 INFO kasapro.ui UI callback_bound | target='root', tk_event='<F1>', handler='open_help'
+2025-12-26 04:03:06,289 [INFO] kasapro.ui: UI callback_bound | target='root', tk_event='<F1>', handler='open_help'
+2025-12-26 04:03:06,289 INFO kasapro.ui UI callback_bound | handler='shortcut_search'
+2025-12-26 04:03:06,289 [INFO] kasapro.ui: UI callback_bound | handler='shortcut_search'
+2025-12-26 04:03:06,289 INFO kasapro.ui UI callback_bound | target='root', tk_event='<Control-f>', handler='show(search)'
+2025-12-26 04:03:06,289 [INFO] kasapro.ui: UI callback_bound | target='root', tk_event='<Control-f>', handler='show(search)'
+2025-12-26 04:03:06,290 INFO kasapro.ui UI screen_shown | key='dashboard'
+2025-12-26 04:03:06,290 [INFO] kasapro.ui: UI screen_shown | key='dashboard'
+2025-12-26 04:03:06,292 INFO kasapro.ui UI callback_bound | handler='on_close'
+2025-12-26 04:03:06,292 [INFO] kasapro.ui: UI callback_bound | handler='on_close'
+2025-12-26 04:03:06,293 INFO kasapro.ui UI callback_bound | target='root', tk_event='WM_DELETE_WINDOW', handler='on_close'
+2025-12-26 04:03:06,293 [INFO] kasapro.ui: UI callback_bound | target='root', tk_event='WM_DELETE_WINDOW', handler='on_close'
+2025-12-26 04:03:08,480 INFO kasapro.ui UI callback invoked: nav:dashboard
+2025-12-26 04:03:08,480 [INFO] kasapro.ui: UI callback invoked: nav:dashboard
+2025-12-26 04:03:08,481 INFO kasapro.ui UI screen_shown | key='dashboard'
+2025-12-26 04:03:08,481 [INFO] kasapro.ui: UI screen_shown | key='dashboard'
+2025-12-26 04:03:10,273 INFO kasapro.ui UI callback invoked: nav:dashboard
+2025-12-26 04:03:10,273 [INFO] kasapro.ui: UI callback invoked: nav:dashboard
+2025-12-26 04:03:10,274 INFO kasapro.ui UI screen_shown | key='dashboard'
+2025-12-26 04:03:10,274 [INFO] kasapro.ui: UI screen_shown | key='dashboard'
+2025-12-26 04:03:10,460 INFO kasapro.ui UI callback invoked: nav:dashboard
+2025-12-26 04:03:10,460 [INFO] kasapro.ui: UI callback invoked: nav:dashboard
+2025-12-26 04:03:10,460 INFO kasapro.ui UI screen_shown | key='dashboard'
+2025-12-26 04:03:10,460 [INFO] kasapro.ui: UI screen_shown | key='dashboard'
+2025-12-26 04:03:11,963 INFO kasapro.ui UI callback invoked: open_settings
+2025-12-26 04:03:11,963 [INFO] kasapro.ui: UI callback invoked: open_settings
+2025-12-26 04:03:28,411 INFO kasapro.ui UI callback invoked: nav:mesajlar
+2025-12-26 04:03:28,411 [INFO] kasapro.ui: UI callback invoked: nav:mesajlar
+2025-12-26 04:03:28,413 INFO kasapro.ui UI screen_shown | key='mesajlar'
+2025-12-26 04:03:28,413 [INFO] kasapro.ui: UI screen_shown | key='mesajlar'
+2025-12-26 04:03:33,358 INFO kasapro.ui UI callback invoked: nav:cari_hareketler
+2025-12-26 04:03:33,358 [INFO] kasapro.ui: UI callback invoked: nav:cari_hareketler
+2025-12-26 04:03:33,359 INFO kasapro.ui UI screen_shown | key='cari_hareketler'
+2025-12-26 04:03:33,359 [INFO] kasapro.ui: UI screen_shown | key='cari_hareketler'
+2025-12-26 04:03:33,772 INFO kasapro.ui UI callback invoked: nav:maas_takibi
+2025-12-26 04:03:33,772 [INFO] kasapro.ui: UI callback invoked: nav:maas_takibi
+2025-12-26 04:03:33,773 INFO kasapro.ui UI screen_shown | key='maas_takibi'
+2025-12-26 04:03:33,773 [INFO] kasapro.ui: UI screen_shown | key='maas_takibi'
+2025-12-26 04:03:41,492 INFO kasapro.ui UI callback invoked: nav:cariler
+2025-12-26 04:03:41,492 [INFO] kasapro.ui: UI callback invoked: nav:cariler
+2025-12-26 04:03:41,493 INFO kasapro.ui UI screen_shown | key='cariler'
+2025-12-26 04:03:41,493 [INFO] kasapro.ui: UI screen_shown | key='cariler'
+2025-12-26 04:03:42,459 INFO kasapro.ui UI callback invoked: nav:tanimlar
+2025-12-26 04:03:42,459 [INFO] kasapro.ui: UI callback invoked: nav:tanimlar
+2025-12-26 04:03:42,460 INFO kasapro.ui UI screen_shown | key='tanimlar'
+2025-12-26 04:03:42,460 [INFO] kasapro.ui: UI screen_shown | key='tanimlar'
+2025-12-26 04:03:43,652 INFO kasapro.ui UI callback invoked: nav:cariler
+2025-12-26 04:03:43,652 [INFO] kasapro.ui: UI callback invoked: nav:cariler
+2025-12-26 04:03:43,653 INFO kasapro.ui UI screen_shown | key='cariler'
+2025-12-26 04:03:43,653 [INFO] kasapro.ui: UI screen_shown | key='cariler'
+2025-12-26 04:03:44,195 INFO kasapro.ui UI callback invoked: nav:tanimlar
+2025-12-26 04:03:44,195 [INFO] kasapro.ui: UI callback invoked: nav:tanimlar
+2025-12-26 04:03:44,196 INFO kasapro.ui UI screen_shown | key='tanimlar'
+2025-12-26 04:03:44,196 [INFO] kasapro.ui: UI screen_shown | key='tanimlar'
+2025-12-26 04:03:46,965 INFO kasapro.ui UI callback invoked: nav:create_center
+2025-12-26 04:03:46,965 [INFO] kasapro.ui: UI callback invoked: nav:create_center
+2025-12-26 04:03:46,965 INFO kasapro.ui UI screen_missing | key='create_center', source='create_center'
+2025-12-26 04:03:46,965 [INFO] kasapro.ui: UI screen_missing | key='create_center', source='create_center'
+2025-12-26 04:03:46,966 INFO kasapro.ui UI screen_shown | key='create_center'
+2025-12-26 04:03:46,966 [INFO] kasapro.ui: UI screen_shown | key='create_center'
+2025-12-26 04:03:48,145 INFO kasapro.ui UI callback invoked: nav:kasa
+2025-12-26 04:03:48,145 [INFO] kasapro.ui: UI callback invoked: nav:kasa
+2025-12-26 04:03:48,145 INFO kasapro.ui UI screen_shown | key='kasa'
+2025-12-26 04:03:48,145 [INFO] kasapro.ui: UI screen_shown | key='kasa'
+2025-12-26 04:03:48,765 INFO kasapro.ui UI callback invoked: nav:mesajlar
+2025-12-26 04:03:48,765 [INFO] kasapro.ui: UI callback invoked: nav:mesajlar
+2025-12-26 04:03:48,766 INFO kasapro.ui UI screen_shown | key='mesajlar'
+2025-12-26 04:03:48,766 [INFO] kasapro.ui: UI screen_shown | key='mesajlar'
+2025-12-26 04:03:49,413 INFO kasapro.ui UI callback invoked: nav:stok
+2025-12-26 04:03:49,413 [INFO] kasapro.ui: UI callback invoked: nav:stok
+2025-12-26 04:03:49,415 INFO kasapro.ui UI screen_shown | key='stok'
+2025-12-26 04:03:49,415 [INFO] kasapro.ui: UI screen_shown | key='stok'
+2025-12-26 04:03:50,032 INFO kasapro.ui UI callback invoked: nav:advanced_invoice
+2025-12-26 04:03:50,032 [INFO] kasapro.ui: UI callback invoked: nav:advanced_invoice
+2025-12-26 04:03:50,033 INFO kasapro.ui UI screen_missing | key='advanced_invoice', source='advanced_invoice'
+2025-12-26 04:03:50,033 [INFO] kasapro.ui: UI screen_missing | key='advanced_invoice', source='advanced_invoice'
+2025-12-26 04:03:50,035 INFO kasapro.ui UI screen_shown | key='advanced_invoice'
+2025-12-26 04:03:50,035 [INFO] kasapro.ui: UI screen_shown | key='advanced_invoice'
+2025-12-26 04:03:51,596 INFO kasapro.ui UI callback invoked: nav:banka_hareketleri
+2025-12-26 04:03:51,596 [INFO] kasapro.ui: UI callback invoked: nav:banka_hareketleri
+2025-12-26 04:03:51,597 INFO kasapro.ui UI screen_shown | key='banka_hareketleri'
+2025-12-26 04:03:51,597 [INFO] kasapro.ui: UI screen_shown | key='banka_hareketleri'
+2025-12-26 04:03:52,067 INFO kasapro.ui UI callback invoked: nav:fatura
+2025-12-26 04:03:52,067 [INFO] kasapro.ui: UI callback invoked: nav:fatura
+2025-12-26 04:03:52,069 INFO kasapro.ui UI screen_shown | key='fatura'
+2025-12-26 04:03:52,069 [INFO] kasapro.ui: UI screen_shown | key='fatura'
+2025-12-26 04:03:53,966 INFO kasapro.ui UI callback invoked: on_close
+2025-12-26 04:03:53,966 [INFO] kasapro.ui: UI callback invoked: on_close

@@ -2667,48 +2667,11 @@ def migrate_schema(conn: sqlite3.Connection, log_fn: Optional[Callable[[str, str
                 updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
             );"""
         )
-        conn.execute(
-            """CREATE TABLE IF NOT EXISTS stok_lokasyon(
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                ad TEXT NOT NULL UNIQUE,
-                aciklama TEXT DEFAULT '',
-                aktif INTEGER NOT NULL DEFAULT 1
-            );"""
-        )
-        conn.execute(
-            """CREATE TABLE IF NOT EXISTS stok_parti(
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                urun_id INTEGER NOT NULL,
-                parti_no TEXT NOT NULL,
-                skt TEXT DEFAULT '',
-                uretim_tarih TEXT DEFAULT '',
-                aciklama TEXT DEFAULT '',
-                UNIQUE(urun_id, parti_no)
-            );"""
-        )
-        conn.execute(
-            """CREATE TABLE IF NOT EXISTS stok_hareket(
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                tarih TEXT NOT NULL,
-                urun_id INTEGER NOT NULL,
-                tip TEXT NOT NULL,
-                miktar REAL NOT NULL DEFAULT 0,
-                birim TEXT DEFAULT 'Adet',
-                kaynak_lokasyon_id INTEGER,
-                hedef_lokasyon_id INTEGER,
-                parti_id INTEGER,
-                referans_tipi TEXT DEFAULT '',
-                referans_id INTEGER,
-                maliyet REAL DEFAULT 0,
-                aciklama TEXT DEFAULT '',
-                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
-            );"""
-        )
         conn.commit()
     except Exception as e:
         if log_fn:
             try:
-                log_fn("Schema Migration Error", f"stok tables: {e}")
+                log_fn("Schema Migration Error", f"stok_urun: {e}")
             except Exception:
                 pass
 
@@ -2902,7 +2865,8 @@ def migrate_schema(conn: sqlite3.Connection, log_fn: Optional[Callable[[str, str
                 manufacture_date TEXT DEFAULT '',
                 status TEXT NOT NULL DEFAULT 'ACTIVE',
                 created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                UNIQUE(company_id, item_id, lot_no)
+                UNIQUE(company_id, item_id, lot_no),
+                FOREIGN KEY(item_id) REFERENCES items(id)
             );"""
         )
         conn.execute(
@@ -2913,7 +2877,8 @@ def migrate_schema(conn: sqlite3.Connection, log_fn: Optional[Callable[[str, str
                 serial_no TEXT NOT NULL,
                 status TEXT NOT NULL DEFAULT 'ACTIVE',
                 created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                UNIQUE(serial_no)
+                UNIQUE(serial_no),
+                FOREIGN KEY(item_id) REFERENCES items(id)
             );"""
         )
         conn.execute(

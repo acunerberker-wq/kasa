@@ -13,17 +13,17 @@ Not: Bu eklenti, mevcut DB fonksiyonlarını kullanır.
 from __future__ import annotations
 
 from datetime import date, datetime, timedelta
-from typing import Any, Dict, List, Optional, Tuple, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Tuple
 
 import tkinter as tk
 from tkinter import ttk, messagebox, filedialog
 
-from ...config import APP_TITLE, HAS_OPENPYXL
 from ...utils import safe_float, fmt_amount
 from ...core.fuzzy import best_substring_similarity, amount_score, combine_scores, combine3_scores, normalize_text
 from ..base import BaseView
 from ..widgets import LabeledEntry, LabeledCombo
 from ..windows import ImportWizard, BankaWorkspaceWindow
+from ...config import APP_TITLE, HAS_OPENPYXL
 
 if TYPE_CHECKING:
     from ...app import App
@@ -984,5 +984,6 @@ class MaasEklentileriFrame(BaseView):
                 pass
 
 
-def build(master, app) -> ttk.Frame:
-    return MaasEklentileriFrame(master, app)
+def build(master, app: "App") -> ttk.Frame:
+    frame = MaasEklentileriFrame(master, app)
+    return frame

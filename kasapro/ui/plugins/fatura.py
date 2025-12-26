@@ -14,13 +14,13 @@ Not: e-Fatura/e-Arşiv entegrasyonu bu modülde sadece alan ve hazırlık olarak
 from __future__ import annotations
 
 from datetime import date, timedelta
-from typing import Any, Dict, List, Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Dict, List, Optional
 
 import tkinter as tk
 from tkinter import ttk, messagebox, filedialog
 
-from ...config import APP_TITLE, HAS_REPORTLAB
-from ...utils import fmt_amount, fmt_tr_date, safe_float, ensure_pdf_fonts
+from ...config import APP_TITLE, HAS_REPORTLAB, HAS_OPENPYXL
+from ...utils import fmt_tr_date, fmt_amount, safe_float
 from ..base import BaseView
 from ..widgets import LabeledEntry, LabeledCombo
 
@@ -474,9 +474,6 @@ class FaturaFrame(BaseView):
             self.s_last.set("0")
             self.s_fmt.set("{yil}{seri}{no_pad}")
             self.s_aktif.set("1")
-        except Exception:
-            pass
-
             self.refresh_series()
         except Exception as e:
             err = ttk.Label(self.tab_settings, text=f"Ayarlar sekme hatası: {str(e)}", foreground="red")
@@ -1482,7 +1479,6 @@ class FaturaFrame(BaseView):
         doc.build(story)
 
 
-def build(master, app):
-    from ..screens.fatura import FaturaScreen
-
-    return FaturaScreen(master, app)
+def build(master, app: "App") -> ttk.Frame:
+    frame = FaturaFrame(master, app)
+    return frame

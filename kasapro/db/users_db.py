@@ -303,8 +303,8 @@ class UsersDB:
                     FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
                 );
             """)
-        except Exception:
-            pass
+        except sqlite3.OperationalError:
+            pass  # Tablo zaten var
 
         # users tablosuna last_company_id ekle (yoksa)
         try:
@@ -312,8 +312,8 @@ class UsersDB:
             if "last_company_id" not in cols:
                 try:
                     self.conn.execute("ALTER TABLE users ADD COLUMN last_company_id INTEGER;")
-                except Exception:
-                    pass
+                except sqlite3.OperationalError:
+                    pass  # Kolon zaten var
         except Exception:
             pass
 
