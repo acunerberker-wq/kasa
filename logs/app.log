@@ -7404,3 +7404,167 @@ Traceback (most recent call last):
     self.integrations_worker = IntegrationWorker(self.services.integrations)
                                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^
 AttributeError: 'Services' object has no attribute 'integrations'
+2025-12-26 05:17:21,605 [ERROR] kasapro.app: Veritabanı hatası
+Traceback (most recent call last):
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\app.py", line 146, in _init_db
+    self.user = self._load_test_user() if self._test_mode else self._login()
+                                                               ~~~~~~~~~~~^^
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\app.py", line 387, in _login
+    w = LoginWindow(self.root, self.usersdb)
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\windows\login.py", line 37, in __init__
+    self.pick_user = LabeledCombo(
+                     ~~~~~~~~~~~~^
+        frm,
+        ^^^^
+    ...<2 lines>...
+        width=18
+        ^^^^^^^^
+    )
+    ^
+TypeError: LabeledCombo.__init__() got an unexpected keyword argument 'label_text'
+2025-12-26 05:17:23,719 [ERROR] kasapro.app: Uygulama başlatma hatası
+Traceback (most recent call last):
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\app.py", line 1451, in main
+    app = App()  # ✅ root otomatik oluşturulur
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\app.py", line 91, in __init__
+    self._init_db()
+    ~~~~~~~~~~~~~^^
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\app.py", line 146, in _init_db
+    self.user = self._load_test_user() if self._test_mode else self._login()
+                                                               ~~~~~~~~~~~^^
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\app.py", line 387, in _login
+    w = LoginWindow(self.root, self.usersdb)
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\windows\login.py", line 37, in __init__
+    self.pick_user = LabeledCombo(
+                     ~~~~~~~~~~~~^
+        frm,
+        ^^^^
+    ...<2 lines>...
+        width=18
+        ^^^^^^^^
+    )
+    ^
+TypeError: LabeledCombo.__init__() got an unexpected keyword argument 'label_text'
+2025-12-26 05:22:02,027 [ERROR] kasapro.app: Veritabanı hatası
+Traceback (most recent call last):
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\app.py", line 146, in _init_db
+    self.user = self._load_test_user() if self._test_mode else self._login()
+                                                               ~~~~~~~~~~~^^
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\app.py", line 387, in _login
+    w = LoginWindow(self.root, self.usersdb)
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\windows\login.py", line 37, in __init__
+    self.pick_user = LabeledCombo(
+                     ~~~~~~~~~~~~^
+        frm,
+        ^^^^
+    ...<2 lines>...
+        width=18
+        ^^^^^^^^
+    )
+    ^
+TypeError: LabeledCombo.__init__() got an unexpected keyword argument 'label_text'
+2025-12-26 05:22:03,859 [ERROR] kasapro.app: Uygulama başlatma hatası
+Traceback (most recent call last):
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\app.py", line 1451, in main
+    app = App()  # ✅ root otomatik oluşturulur
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\app.py", line 91, in __init__
+    self._init_db()
+    ~~~~~~~~~~~~~^^
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\app.py", line 146, in _init_db
+    self.user = self._load_test_user() if self._test_mode else self._login()
+                                                               ~~~~~~~~~~~^^
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\app.py", line 387, in _login
+    w = LoginWindow(self.root, self.usersdb)
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\windows\login.py", line 37, in __init__
+    self.pick_user = LabeledCombo(
+                     ~~~~~~~~~~~~^
+        frm,
+        ^^^^
+    ...<2 lines>...
+        width=18
+        ^^^^^^^^
+    )
+    ^
+TypeError: LabeledCombo.__init__() got an unexpected keyword argument 'label_text'
+2025-12-26 05:23:41,800 [ERROR] kasapro.app: Veritabanı hatası
+Traceback (most recent call last):
+  File "c:\Users\berke\Documents\GitHub\kasa\kasapro\app.py", line 146, in _init_db
+    self.user = self._load_test_user() if self._test_mode else self._login()
+                                                               ~~~~~~~~~~~^^
+  File "c:\Users\berke\Documents\GitHub\kasa\kasapro\app.py", line 387, in _login
+    w = LoginWindow(self.root, self.usersdb)
+  File "c:\Users\berke\Documents\GitHub\kasa\kasapro\ui\windows\login.py", line 37, in __init__
+    self.pick_user = LabeledCombo(
+                     ~~~~~~~~~~~~^
+        frm,
+        ^^^^
+    ...<2 lines>...
+        width=18
+        ^^^^^^^^
+    )
+    ^
+TypeError: LabeledCombo.__init__() got an unexpected keyword argument 'label_text'
+2025-12-26 05:23:43,460 [ERROR] kasapro.app: Uygulama başlatma hatası
+Traceback (most recent call last):
+  File "c:\Users\berke\Documents\GitHub\kasa\kasapro\app.py", line 1451, in main
+    app = App()  # ✅ root otomatik oluşturulur
+  File "c:\Users\berke\Documents\GitHub\kasa\kasapro\app.py", line 91, in __init__
+    self._init_db()
+    ~~~~~~~~~~~~~^^
+  File "c:\Users\berke\Documents\GitHub\kasa\kasapro\app.py", line 146, in _init_db
+    self.user = self._load_test_user() if self._test_mode else self._login()
+                                                               ~~~~~~~~~~~^^
+  File "c:\Users\berke\Documents\GitHub\kasa\kasapro\app.py", line 387, in _login
+    w = LoginWindow(self.root, self.usersdb)
+  File "c:\Users\berke\Documents\GitHub\kasa\kasapro\ui\windows\login.py", line 37, in __init__
+    self.pick_user = LabeledCombo(
+                     ~~~~~~~~~~~~^
+        frm,
+        ^^^^
+    ...<2 lines>...
+        width=18
+        ^^^^^^^^
+    )
+    ^
+TypeError: LabeledCombo.__init__() got an unexpected keyword argument 'label_text'
+2025-12-26 05:24:15,992 [ERROR] kasapro.app: Veritabanı hatası
+Traceback (most recent call last):
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\app.py", line 146, in _init_db
+    self.user = self._load_test_user() if self._test_mode else self._login()
+                                                               ~~~~~~~~~~~^^
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\app.py", line 387, in _login
+    w = LoginWindow(self.root, self.usersdb)
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\windows\login.py", line 37, in __init__
+    self.pick_user = LabeledCombo(
+                     ~~~~~~~~~~~~^
+        frm,
+        ^^^^
+    ...<2 lines>...
+        width=18
+        ^^^^^^^^
+    )
+    ^
+TypeError: LabeledCombo.__init__() got an unexpected keyword argument 'label_text'
+2025-12-26 05:24:17,589 [ERROR] kasapro.app: Uygulama başlatma hatası
+Traceback (most recent call last):
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\app.py", line 1451, in main
+    app = App()  # ✅ root otomatik oluşturulur
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\app.py", line 91, in __init__
+    self._init_db()
+    ~~~~~~~~~~~~~^^
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\app.py", line 146, in _init_db
+    self.user = self._load_test_user() if self._test_mode else self._login()
+                                                               ~~~~~~~~~~~^^
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\app.py", line 387, in _login
+    w = LoginWindow(self.root, self.usersdb)
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\windows\login.py", line 37, in __init__
+    self.pick_user = LabeledCombo(
+                     ~~~~~~~~~~~~^
+        frm,
+        ^^^^
+    ...<2 lines>...
+        width=18
+        ^^^^^^^^
+    )
+    ^
+TypeError: LabeledCombo.__init__() got an unexpected keyword argument 'label_text'
