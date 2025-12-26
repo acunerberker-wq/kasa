@@ -15,3 +15,7 @@
 
 ## Smoke Test
 - `python -m pytest tests/test_smoke.py`
+
+## Profiling / Benchmark
+- Startup + ekran açılış süreleri: `python tools/bench_startup.py`
+- Startup profil (ilk 5 fonksiyon): `python tools/profile_startup.py`

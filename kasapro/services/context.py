@@ -59,7 +59,6 @@ class Services:
     integrations: IntegrationService
 
     @classmethod
-    def build(cls, db: DB, usersdb: UsersDB, context_provider: Callable[[], HRContext]) -> "Services":
     def build(cls, db: DB, usersdb: UsersDB, context_provider) -> "Services":
         exporter = ExportService()
         hr_service = HRService(db, context_provider) if HRService else None
@@ -73,7 +72,6 @@ class Services:
             cari=CariService(db, exporter),
             messages=MessagesService(db, usersdb),
             hakedis=HakedisService(db, exporter),
-            hakedis=HakedisService(db),
             quote_order=QuoteOrderService(db),
             hr=HRService(db, context_provider),
             notes_reminders=NotesRemindersService(db, usersdb),

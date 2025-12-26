@@ -892,7 +892,7 @@ class App:
 
         # Plugin ekranları
         for p in getattr(self, "ui_plugins", []) or []:
-            self.screen_registry.register(p.key, p.build, title=p.page_title)
+            self.screen_registry.register(p.key, p.build, title=p.page_title, create=False)
             log_ui_event("plugin_ui_registered", key=p.key, title=p.page_title)
 
         if self.is_admin:
@@ -1003,7 +1003,7 @@ class App:
             except Exception:
                 target_key = key
 
-        if target_key not in self.frames:
+        if not self.screen_registry.has_spec(target_key):
             log_ui_event("screen_missing", key=target_key, source=key)
             try:
                 messagebox.showwarning(APP_TITLE, f"Ekran bulunamadı: {target_key}")

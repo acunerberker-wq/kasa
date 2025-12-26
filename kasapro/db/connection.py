@@ -27,6 +27,8 @@ class ConnectionProxy:
             try:
                 conn.execute("PRAGMA foreign_keys = ON;")
                 conn.execute("PRAGMA busy_timeout = 5000;")
+                conn.execute("PRAGMA journal_mode = WAL;")
+                conn.execute("PRAGMA synchronous = NORMAL;")
             except Exception:
                 pass
             self._local.conn = conn

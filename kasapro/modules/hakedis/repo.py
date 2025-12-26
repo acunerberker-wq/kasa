@@ -771,16 +771,6 @@ class HakedisRepo:
             (company_id, module),
         ).fetchall()
 
-# -*- coding: utf-8 -*-
-
-from __future__ import annotations
-
-import json
-import sqlite3
-from dataclasses import dataclass
-from datetime import datetime
-from typing import Any, Dict, Iterable, List, Optional, Tuple
-
 
 @dataclass
 class ReportRow:

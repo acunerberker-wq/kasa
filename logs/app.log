@@ -6455,3 +6455,39 @@ AttributeError: 'DB' object has no attribute 'hakedis'
 2025-12-26 07:08:36,270 [INFO] kasapro.ui: UI callback invoked: nav:diagnostics
 2025-12-26 07:08:36,271 [INFO] kasapro.ui: UI screen_shown | key='diagnostics'
 2025-12-26 07:09:13,782 [INFO] kasapro.ui: UI callback invoked: on_close
+2025-12-26 07:24:25,039 [ERROR] kasapro.app: Uygulama başlatma hatası
+Traceback (most recent call last):
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\app.py", line 1324, in main
+    App().run()
+    ~~~^^
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\app.py", line 131, in __init__
+    self.db = DB(db_path)
+              ~~^^^^^^^^^
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\db\main_db.py", line 64, in __init__
+    self.hakedis = HakedisRepo(self.conn, log_fn=self.logs.log)
+                   ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: HakedisRepo.__init__() got an unexpected keyword argument 'log_fn'
+2025-12-26 07:28:19,012 [ERROR] kasapro.app: Uygulama başlatma hatası
+Traceback (most recent call last):
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\app.py", line 1324, in main
+    App().run()
+    ~~~^^
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\app.py", line 131, in __init__
+    self.db = DB(db_path)
+              ~~^^^^^^^^^
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\db\main_db.py", line 64, in __init__
+    self.hakedis = HakedisRepo(self.conn, log_fn=self.logs.log)
+                   ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: HakedisRepo.__init__() got an unexpected keyword argument 'log_fn'
+2025-12-26 07:28:43,225 [ERROR] kasapro.app: Uygulama başlatma hatası
+Traceback (most recent call last):
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\app.py", line 1324, in main
+    App().run()
+    ~~~^^
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\app.py", line 131, in __init__
+    self.db = DB(db_path)
+              ~~^^^^^^^^^
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\db\main_db.py", line 64, in __init__
+    self.hakedis = HakedisRepo(self.conn, log_fn=self.logs.log)
+                   ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: HakedisRepo.__init__() got an unexpected keyword argument 'log_fn'
