@@ -32,7 +32,10 @@ if _modules_path not in sys.path:
     sys.path.insert(0, _modules_path)
 _hr_spec = importlib.util.find_spec("hr.service")
 if _hr_spec:
-    from hr.service import HRService
+    try:
+        from hr.service import HRService
+    except ImportError:
+        HRService = None
 else:
     HRService = None
 
