@@ -44,7 +44,12 @@ class LoginWindow(tk.Toplevel):
         frm.pack(fill=tk.X, padx=18, pady=6)
 
         # Kullanıcı seçimi (liste)
-        self.pick_user = LabeledCombo(frm, "Kullanıcı Seç:", self.usersdb.list_usernames(), 18)
+        self.pick_user = LabeledCombo(
+            frm,
+            label_text="Kullanıcı Seç:",
+            values=usersdb.list_usernames(),
+            width=18
+        )
         self.pick_user.pack(fill=tk.X, pady=6)
         try:
             self.pick_user.cmb.bind("<<ComboboxSelected>>", lambda _e: self._on_pick_user())
@@ -60,11 +65,19 @@ class LoginWindow(tk.Toplevel):
             pass
 
 
-        self.e_user = LabeledEntry(frm, "Kullanıcı:", 18)
-        self.e_user.pack(fill=tk.X, pady=6)
-        self.e_pass = LabeledEntry(frm, "Şifre:", 18)
-        self.e_pass.pack(fill=tk.X, pady=6)
-        self.e_pass.ent.config(show="*")
+        self.e_user = LabeledEntry(
+            frm,
+            label_text="Kullanıcı:",
+            width=18
+        )
+        self.e_user.pack(fill=tk.X, pady=10)
+        self.e_pass = LabeledEntry(
+            frm,
+            label_text="Şifre:",
+            width=18,
+            show="*"
+        )
+        self.e_pass.pack(fill=tk.X, pady=10)
 
         # Başlangıçta seçilen kullanıcıyı kullanıcı alanına yansıt
         try:

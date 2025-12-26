@@ -18,18 +18,18 @@ from typing import Any, Optional, List, Dict, Tuple
 import tkinter as tk
 from tkinter import ttk, messagebox, filedialog
 
-from .config import APP_TITLE, HAS_OPENPYXL, APP_BASE_DIR, DB_FILENAME
-from .utils import _safe_slug, fmt_amount
-from .db.main_db import DB
-from .db.users_db import UsersDB
-from .services import Services
-from .ui.navigation import ScreenRegistry
-from .ui.components import AppShell
-from .ui.theme_tokens import DESIGN_TOKENS
-from .ui.style import apply_modern_style
-from .ui.ui_logging import log_ui_event, wrap_callback
-from .ui.windows import LoginWindow, SettingsWindow, HelpWindow, ImportWizard
-from .ui.frames import (
+from kasapro.config import APP_TITLE, HAS_OPENPYXL, APP_BASE_DIR, DB_FILENAME
+from kasapro.utils import _safe_slug, fmt_amount
+from kasapro.db.main_db import DB
+from kasapro.db.users_db import UsersDB
+from kasapro.services import Services
+from kasapro.ui.navigation import ScreenRegistry
+from kasapro.ui.components import AppShell
+from kasapro.ui.theme_tokens import DESIGN_TOKENS
+from kasapro.ui.style import apply_modern_style
+from kasapro.ui.ui_logging import log_ui_event, wrap_callback
+from kasapro.ui.windows import LoginWindow, SettingsWindow, HelpWindow, ImportWizard
+from kasapro.ui.frames import (
     TanimlarHubFrame,
     RaporAraclarHubFrame,
     KullanicilarFrame,
@@ -38,10 +38,11 @@ from .ui.frames import (
     CreateCenterFrame,
     StockWmsFrame,
 )
-from .ui.screens import DashboardScreen, KasaScreen, CarilerScreen
-from .ui.plugins.loader import discover_ui_plugins
-from .modules.notes_reminders.scheduler import ReminderScheduler
-from .modules.integrations.worker import IntegrationWorker
+from kasapro.ui.screens import DashboardScreen, KasaScreen, CarilerScreen
+from kasapro.ui.plugins.loader import discover_ui_plugins
+from kasapro.modules.notes_reminders.scheduler import ReminderScheduler
+from kasapro.modules.integrations.worker import IntegrationWorker
+from kasapro.ui.widgets import StatusBar, LabeledEntry, LabeledCombo
 
 # Import HRContext for typing
 try:
@@ -56,8 +57,32 @@ except ImportError:
     from typing import Any as HRContext
 
 class App:
-    def __init__(self, root: tk.Tk):
+    def __init__(self, root: tk.Tk | None = None):
+        """Uygulama başlat.
+        
+        Args:
+            root: Tkinter root window. None ise otomatik oluştur.
+        """
+        if root is None:
+            import tkinter as tk
+            root = tk.Tk()
+            root.title("KasaPro v3")
+            root.geometry("1400x900")
+            root.minsize(800, 600)
+        
         self.root = root
+        
+        # Attributes ilk olarak tanımla
+        self._test_mode = False
+        self.db = None
+        self.logger = logging.getLogger(__name__)
+        self.user_id = None
+        self.company_id = None
+        self.current_user = None
+        self.current_company = None
+        self.status_bar = None  # ✅ Attribute tanımla
+        
+        # Initialization çağır
         self._init_window()
         self._init_db()
         self._init_ui()
@@ -66,12 +91,75 @@ class App:
     def _init_window(self) -> None:
         """Pencere özelliklerini ayarla."""
         try:
-            self.root.title("KasaPro v3")
-            self.root.geometry("1400x900")
-            self.root.minsize(800, 600)
+            self.root.title("KasaPro v3 - Muhasebe & İş Yönetim")
+            self.root.geometry("1600x1000")
+            self.root.minsize(1024, 768)
+            
+            # ✅ Tema ayarla
+            self._setup_theme()
+            
+            # ✅ Pencere ikonu (varsa)
+            self._setup_icon()
+            
+            # ✅ Varsayılan font ayarları
+            self._setup_fonts()
+            
         except Exception as e:
-            messagebox.showerror("Hata", f"Pencere kuruluşu başarısız: {e}")
+            self.logger.exception("Pencere kuruluşu başarısız")
             raise
+    
+    def _setup_theme(self) -> None:
+        """Uygulama temasını ayarla."""
+        import tkinter.font as tkFont
+        
+        # Koyu tema (modern, profesyonel)
+        style = ttk.Style()
+        style.theme_use('clam')
+        
+        # Renkler
+        bg_primary = "#1e1e1e"      # Koyu arka plan
+        bg_secondary = "#2d2d2d"    # İkincil arka plan
+        fg_primary = "#ffffff"      # Ana metin
+        fg_secondary = "#cccccc"    # İkincil metin
+        accent = "#007acc"          # Vurgulama rengi
+        
+        style.configure('TFrame', background=bg_primary, foreground=fg_primary)
+        style.configure('TLabel', background=bg_primary, foreground=fg_primary)
+        style.configure('TButton', background=bg_secondary, foreground=fg_primary)
+        style.map('TButton',
+            background=[('active', accent)],
+            foreground=[('active', fg_primary)]
+        )
+        style.configure('TNotebook', background=bg_primary, foreground=fg_primary)
+        style.configure('TNotebook.Tab', background=bg_secondary, foreground=fg_primary)
+        style.map('TNotebook.Tab',
+            background=[('selected', accent)],
+            foreground=[('selected', fg_primary)]
+        )
+        
+        self.root.configure(bg=bg_primary)
+    
+    def _setup_icon(self) -> None:
+        """Pencere ikonunu ayarla."""
+        import os
+        try:
+            icon_path = os.path.join(
+                os.path.dirname(__file__),
+                'assets', 'icon.ico'
+            )
+            if os.path.exists(icon_path):
+                self.root.iconbitmap(icon_path)
+        except Exception:
+            pass  # Icon yok, devam et
+    
+    def _setup_fonts(self) -> None:
+        """Font ayarlarını tanımla."""
+        import tkinter.font as tkFont
+        
+        self.font_heading = tkFont.Font(family="Segoe UI", size=14, weight="bold")
+        self.font_normal = tkFont.Font(family="Segoe UI", size=10)
+        self.font_small = tkFont.Font(family="Segoe UI", size=9)
+        self.font_mono = tkFont.Font(family="Courier New", size=9)
     
     def _init_db(self) -> None:
         """Veritabanı bağlantısını aç."""
@@ -137,31 +225,29 @@ class App:
             except Exception:
                 pass
         except Exception as e:
+            self.logger.exception("Veritabanı hatası")
             messagebox.showerror("Hata", f"Veritabanı hatası: {e}")
             raise
     
     def _init_ui(self) -> None:
         """UI bileşenlerini oluştur."""
         try:
-            # Tema/Fontları login penceresinde de uygula
-            try:
-                apply_modern_style(self.root)
-            except Exception:
-                pass
-
-            # Giriş penceresi görünürken ana pencereyi gizle (bazı sistemlerde
-            # login penceresi arka planda kalabiliyor).
-            try:
-                self.root.withdraw()
-            except Exception:
-                pass
-
-            self.frames: Dict[str, ttk.Frame] = {}
-            self._build_ui()
-            self._schedule_sales_order_summary()
-            self._start_reminder_scheduler()
-
-            # Login başarılı -> ana pencereyi göster
+            # Menü çubuğu
+            self._create_menu_bar()
+            
+            # Ana container
+            main_container = ttk.Frame(self.root)
+            main_container.pack(fill=tk.BOTH, expand=True)
+            
+            # Sidebar
+            self._create_sidebar(main_container)
+            
+            # Content area
+            self._create_content_area(main_container)
+            
+            # ✅ Status bar oluştur
+            self.status_bar = StatusBar(self.root)
+            
             if not self._test_mode:
                 try:
                     self.root.deiconify()
@@ -170,8 +256,87 @@ class App:
                 except Exception:
                     pass
         except Exception as e:
-            messagebox.showerror("Hata", f"UI kuruluşu başarısız: {e}")
+            self.logger.exception("UI kuruluşu başarısız")
             raise
+    
+    def _create_menu_bar(self) -> None:
+        """Menü çubuğunu oluştur."""
+        try:
+            menubar = tk.Menu(self.root)
+            self.root.config(menu=menubar)
+            
+            # Dosya menüsü
+            file_menu = tk.Menu(menubar, tearoff=0)
+            menubar.add_cascade(label="📁 Dosya", menu=file_menu)
+            file_menu.add_command(label="🏢 Şirket Seç", command=self._select_company)
+            file_menu.add_separator()
+            file_menu.add_command(label="🚪 Çıkış", command=self.root.quit)
+            
+            # Düzen menüsü
+            edit_menu = tk.Menu(menubar, tearoff=0)
+            menubar.add_cascade(label="✏️ Düzen", menu=edit_menu)
+            edit_menu.add_command(label="⚙️ Ayarlar", command=self._show_settings)
+            
+            # Yardım menüsü
+            help_menu = tk.Menu(menubar, tearoff=0)
+            menubar.add_cascade(label="❓ Yardım", menu=help_menu)
+            help_menu.add_command(label="ℹ️ Hakkında", command=self._show_about)
+        except Exception as e:
+            self.logger.exception("Menü çubuğu oluşturma hatası")
+    
+    def _create_sidebar(self, parent: ttk.Frame) -> None:
+        """Sol sidebar'ı oluştur."""
+        try:
+            sidebar = ttk.Frame(parent, width=250)
+            sidebar.pack(side=tk.LEFT, fill=tk.Y, padx=10, pady=10)
+            sidebar.pack_propagate(False)
+            
+            title = ttk.Label(
+                sidebar,
+                text="🏢 KasaPro",
+                font=("Segoe UI", 12, "bold"),
+            )
+            title.pack(pady=10)
+            
+            self.nav_frame = ttk.Frame(sidebar)
+            self.nav_frame.pack(fill=tk.BOTH, expand=True)
+        except Exception as e:
+            self.logger.exception("Sidebar oluşturma hatası")
+    
+    def _create_content_area(self, parent: ttk.Frame) -> None:
+        """Sağ içerik alanını oluştur."""
+        try:
+            content = ttk.Frame(parent)
+            content.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+            
+            self.notebook = ttk.Notebook(content)
+            self.notebook.pack(fill=tk.BOTH, expand=True)
+        except Exception as e:
+            self.logger.exception("Content area oluşturma hatası")
+    
+    def _select_company(self) -> None:
+        """Şirket seçme dialog'u."""
+        try:
+            pass  # İşlevi uygula
+        except Exception as e:
+            self.logger.exception("Şirket seçme hatası")
+    
+    def _show_settings(self) -> None:
+        """Ayarlar penceresini aç."""
+        try:
+            pass  # İşlevi uygula
+        except Exception as e:
+            self.logger.exception("Ayarlar açma hatası")
+    
+    def _show_about(self) -> None:
+        """Hakkında penceresini aç."""
+        try:
+            messagebox.showinfo(
+                "Hakkında",
+                "KasaPro v3\nMuhasebe & İş Yönetim Sistemi"
+            )
+        except Exception as e:
+            self.logger.exception("Hakkında gösterme hatası")
     
     def _start_services(self) -> None:
         """Arka plan hizmetlerini başlat."""
@@ -179,7 +344,7 @@ class App:
             self._schedule_sales_order_summary()
             self._start_reminder_scheduler()
         except Exception as e:
-            messagebox.showerror("Hata", f"Hizmetler başlatılamadı: {e}")
+            self.logger.warning(f"Hizmetler başlatılamadı: {e}")
             # Non-critical, don't raise
 
     def _schedule_sales_order_summary(self) -> None:
@@ -1287,17 +1452,19 @@ class App:
         self.root.mainloop()
 
 
-def main():
+def main() -> None:
+    """Ana uygulamayı başlat."""
+    import logging
+    
+    logger = logging.getLogger(__name__)
+    
     try:
-        App().run()
-    except SystemExit:
-        raise
+        app = App()  # ✅ root otomatik oluşturulur
+        app.root.mainloop()
+        
     except Exception as e:
-        logging.getLogger(__name__).exception("Uygulama başlatma hatası")
-        try:
-            messagebox.showerror(APP_TITLE, f"Hata:\n{e}")
-        except Exception:
-            pass
+        logger.exception("Uygulama başlatma hatası")
+        raise
 
 if __name__ == "__main__":
     main()
