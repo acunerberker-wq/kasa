@@ -64,5 +64,5 @@ class Services:
             messages=MessagesService(db, usersdb),
             notes_reminders=NotesRemindersService(db, usersdb),
             wms=WmsService(db),
-            integrations=IntegrationService(db),
+            integrations=IntegrationService(db, context_provider),
         )
