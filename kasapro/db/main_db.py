@@ -33,7 +33,6 @@ from .repos import (
     NotesRemindersRepo,
     WMSRepo,
 )
-from .repos.dms_repo import DmsRepo
 from ..modules.hakedis.repo import HakedisRepo
 
 
@@ -64,9 +63,6 @@ class DB:
         self.messages = MessagesRepo(self.conn)
         self.notes_reminders = NotesRemindersRepo(self.conn)
         self.wms = WMSRepo(self.conn, log_fn=self.logs.log)
-        self.dms = DmsRepo(self.conn)
-        self.hakedis = HakedisRepo(self.conn)
-        self.invoice_adv = AdvancedInvoiceRepo(self.conn)
 
         migrate_schema(self.conn, log_fn=self._safe_log)
         seed_defaults(self.conn, log_fn=self._safe_log)

@@ -1492,6 +1492,4 @@ class FaturaFrame(BaseView):
 
 
 def build(master, app):
-    from ..screens.fatura import FaturaScreen
-
-    return FaturaScreen(master, app)
+    return FaturaFrame(master, app)

@@ -10,7 +10,7 @@ import importlib.util
 import os
 import sys
 from dataclasses import dataclass
-from typing import Callable, Optional, Any
+from typing import Callable, Optional
 
 from ..db.main_db import DB
 from ..db.users_db import UsersDB
@@ -52,18 +52,12 @@ class Services:
     messages: MessagesService
     notes_reminders: NotesRemindersService
     wms: WmsService
-    dms: DmsService
-    integrations: IntegrationService
-    hakedis: HakedisService
-    hr: Optional[Any]
 
     @classmethod
     def build(cls, db: DB, usersdb: UsersDB, context_provider) -> "Services":
         exporter = ExportService()
         hr_service = HRService(db, context_provider) if HRService else None
         hakedis_service = HakedisService(db)
-        dms_service = DmsService(db)
-        integrations_service = IntegrationService(db, context_provider)
         return cls(
             db=db,
             usersdb=usersdb,
@@ -74,8 +68,4 @@ class Services:
             messages=MessagesService(db, usersdb),
             notes_reminders=NotesRemindersService(db, usersdb),
             wms=WmsService(db),
-            dms=dms_service,
-            integrations=integrations_service,
-            hakedis=hakedis_service,
-            hr=hr_service,
         )
