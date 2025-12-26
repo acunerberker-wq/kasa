@@ -20,6 +20,7 @@ from .settings_service import SettingsService
 from .company_users_service import CompanyUsersService
 from .cari_service import CariService
 from .messages_service import MessagesService
+from modules.hakedis.service import HakedisService
 from ..modules.hakedis.service import HakedisService
 from ..modules.quote_order.service import QuoteOrderService
 from modules.hr.service import HRService, HRContext
@@ -50,6 +51,7 @@ class Services:
     cari: CariService
     messages: MessagesService
     hakedis: HakedisService
+    hakedis: HakedisService
     quote_order: QuoteOrderService
     hr: HRService
     notes_reminders: NotesRemindersService
@@ -70,6 +72,7 @@ class Services:
             company_users=CompanyUsersService(db),
             cari=CariService(db, exporter),
             messages=MessagesService(db, usersdb),
+            hakedis=HakedisService(db, exporter),
             hakedis=HakedisService(db),
             quote_order=QuoteOrderService(db),
             hr=HRService(db, context_provider),

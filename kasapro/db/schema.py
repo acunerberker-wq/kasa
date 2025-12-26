@@ -819,6 +819,146 @@ def init_schema(conn: sqlite3.Connection) -> None:
     );""")
 
     # -----------------
+    # Hakediş Hazırlama Merkezi
+    # -----------------
+    c.execute(
+        """
+    CREATE TABLE IF NOT EXISTS hakedis_project(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        idare TEXT DEFAULT '',
+        yuklenici TEXT DEFAULT '',
+        isin_adi TEXT DEFAULT '',
+        sozlesme_bedeli REAL DEFAULT 0,
+        baslangic TEXT DEFAULT '',
+        bitis TEXT DEFAULT '',
+        sure_gun INTEGER DEFAULT 0,
+        artis_eksilis REAL DEFAULT 0,
+        avans REAL DEFAULT 0,
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    );"""
+    )
+
+    c.execute(
+        """
+    CREATE TABLE IF NOT EXISTS hakedis_position(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        project_id INTEGER NOT NULL,
+        kod TEXT DEFAULT '',
+        aciklama TEXT DEFAULT '',
+        birim TEXT DEFAULT '',
+        sozlesme_miktar REAL DEFAULT 0,
+        birim_fiyat REAL DEFAULT 0,
+        FOREIGN KEY(project_id) REFERENCES hakedis_project(id) ON DELETE CASCADE
+    );"""
+    )
+
+    c.execute(
+        """
+    CREATE TABLE IF NOT EXISTS hakedis_period(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        project_id INTEGER NOT NULL,
+        hakedis_no TEXT DEFAULT '',
+        ay INTEGER DEFAULT 1,
+        yil INTEGER DEFAULT 2000,
+        tarih_bas TEXT DEFAULT '',
+        tarih_bit TEXT DEFAULT '',
+        status TEXT NOT NULL DEFAULT 'Taslak',
+        FOREIGN KEY(project_id) REFERENCES hakedis_project(id) ON DELETE CASCADE
+    );"""
+    )
+
+    c.execute(
+        """
+    CREATE TABLE IF NOT EXISTS hakedis_measurement(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        period_id INTEGER NOT NULL,
+        position_id INTEGER NOT NULL,
+        onceki_miktar REAL DEFAULT 0,
+        bu_donem_miktar REAL DEFAULT 0,
+        kumulatif_miktar REAL DEFAULT 0,
+        UNIQUE(period_id, position_id),
+        FOREIGN KEY(period_id) REFERENCES hakedis_period(id) ON DELETE CASCADE,
+        FOREIGN KEY(position_id) REFERENCES hakedis_position(id) ON DELETE CASCADE
+    );"""
+    )
+
+    c.execute(
+        """
+    CREATE TABLE IF NOT EXISTS hakedis_attachment(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        period_id INTEGER NOT NULL,
+        filename TEXT NOT NULL,
+        stored_name TEXT NOT NULL,
+        size_bytes INTEGER DEFAULT 0,
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY(period_id) REFERENCES hakedis_period(id) ON DELETE CASCADE
+    );"""
+    )
+
+    c.execute(
+        """
+    CREATE TABLE IF NOT EXISTS hakedis_deduction(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        period_id INTEGER NOT NULL,
+        ad TEXT NOT NULL,
+        tip TEXT NOT NULL DEFAULT 'tutar',
+        deger REAL DEFAULT 0,
+        hesaplanan_tutar REAL DEFAULT 0,
+        FOREIGN KEY(period_id) REFERENCES hakedis_period(id) ON DELETE CASCADE
+    );"""
+    )
+
+    c.execute(
+        """
+    CREATE TABLE IF NOT EXISTS hakedis_indices_cache(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        source TEXT NOT NULL,
+        dataset_key TEXT NOT NULL,
+        payload_json TEXT NOT NULL,
+        fetched_at TEXT NOT NULL,
+        UNIQUE(source, dataset_key)
+    );"""
+    )
+
+    c.execute(
+        """
+    CREATE TABLE IF NOT EXISTS hakedis_index_selection(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        project_id INTEGER NOT NULL,
+        dataset_key TEXT NOT NULL,
+        enabled INTEGER NOT NULL DEFAULT 1,
+        UNIQUE(project_id, dataset_key),
+        FOREIGN KEY(project_id) REFERENCES hakedis_project(id) ON DELETE CASCADE
+    );"""
+    )
+
+    c.execute(
+        """
+    CREATE TABLE IF NOT EXISTS hakedis_audit_log(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        ts TEXT NOT NULL,
+        user_id INTEGER,
+        action TEXT NOT NULL,
+        entity TEXT NOT NULL,
+        entity_id INTEGER,
+        detail TEXT DEFAULT ''
+    );"""
+    )
+
+    c.execute(
+        """
+    CREATE TABLE IF NOT EXISTS hakedis_user_roles(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        project_id INTEGER NOT NULL,
+        user_id INTEGER NOT NULL,
+        role TEXT NOT NULL,
+        UNIQUE(project_id, user_id),
+        FOREIGN KEY(project_id) REFERENCES hakedis_project(id) ON DELETE CASCADE
+    );"""
+    )
+
+    # -----------------
     # İnsan Kaynakları (İK)
     # -----------------
     c.execute("""
@@ -2452,6 +2592,145 @@ def migrate_schema(conn: sqlite3.Connection, log_fn: Optional[Callable[[str, str
 
     # banka_hareket (eski tablolar için kolon garantisi)
     _ensure_column(conn, "banka_hareket", "import_grup", "TEXT DEFAULT ''", log_fn)
+
+    # -----------------
+    # Hakediş Hazırlama Merkezi tabloları
+    # -----------------
+    try:
+        conn.execute(
+            """
+        CREATE TABLE IF NOT EXISTS hakedis_project(
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            idare TEXT DEFAULT '',
+            yuklenici TEXT DEFAULT '',
+            isin_adi TEXT DEFAULT '',
+            sozlesme_bedeli REAL DEFAULT 0,
+            baslangic TEXT DEFAULT '',
+            bitis TEXT DEFAULT '',
+            sure_gun INTEGER DEFAULT 0,
+            artis_eksilis REAL DEFAULT 0,
+            avans REAL DEFAULT 0,
+            created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+        );"""
+        )
+        conn.execute(
+            """
+        CREATE TABLE IF NOT EXISTS hakedis_position(
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            project_id INTEGER NOT NULL,
+            kod TEXT DEFAULT '',
+            aciklama TEXT DEFAULT '',
+            birim TEXT DEFAULT '',
+            sozlesme_miktar REAL DEFAULT 0,
+            birim_fiyat REAL DEFAULT 0,
+            FOREIGN KEY(project_id) REFERENCES hakedis_project(id) ON DELETE CASCADE
+        );"""
+        )
+        conn.execute(
+            """
+        CREATE TABLE IF NOT EXISTS hakedis_period(
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            project_id INTEGER NOT NULL,
+            hakedis_no TEXT DEFAULT '',
+            ay INTEGER DEFAULT 1,
+            yil INTEGER DEFAULT 2000,
+            tarih_bas TEXT DEFAULT '',
+            tarih_bit TEXT DEFAULT '',
+            status TEXT NOT NULL DEFAULT 'Taslak',
+            FOREIGN KEY(project_id) REFERENCES hakedis_project(id) ON DELETE CASCADE
+        );"""
+        )
+        conn.execute(
+            """
+        CREATE TABLE IF NOT EXISTS hakedis_measurement(
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            period_id INTEGER NOT NULL,
+            position_id INTEGER NOT NULL,
+            onceki_miktar REAL DEFAULT 0,
+            bu_donem_miktar REAL DEFAULT 0,
+            kumulatif_miktar REAL DEFAULT 0,
+            UNIQUE(period_id, position_id),
+            FOREIGN KEY(period_id) REFERENCES hakedis_period(id) ON DELETE CASCADE,
+            FOREIGN KEY(position_id) REFERENCES hakedis_position(id) ON DELETE CASCADE
+        );"""
+        )
+        conn.execute(
+            """
+        CREATE TABLE IF NOT EXISTS hakedis_attachment(
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            period_id INTEGER NOT NULL,
+            filename TEXT NOT NULL,
+            stored_name TEXT NOT NULL,
+            size_bytes INTEGER DEFAULT 0,
+            created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY(period_id) REFERENCES hakedis_period(id) ON DELETE CASCADE
+        );"""
+        )
+        conn.execute(
+            """
+        CREATE TABLE IF NOT EXISTS hakedis_deduction(
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            period_id INTEGER NOT NULL,
+            ad TEXT NOT NULL,
+            tip TEXT NOT NULL DEFAULT 'tutar',
+            deger REAL DEFAULT 0,
+            hesaplanan_tutar REAL DEFAULT 0,
+            FOREIGN KEY(period_id) REFERENCES hakedis_period(id) ON DELETE CASCADE
+        );"""
+        )
+        conn.execute(
+            """
+        CREATE TABLE IF NOT EXISTS hakedis_indices_cache(
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            source TEXT NOT NULL,
+            dataset_key TEXT NOT NULL,
+            payload_json TEXT NOT NULL,
+            fetched_at TEXT NOT NULL,
+            UNIQUE(source, dataset_key)
+        );"""
+        )
+        conn.execute(
+            """
+        CREATE TABLE IF NOT EXISTS hakedis_index_selection(
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            project_id INTEGER NOT NULL,
+            dataset_key TEXT NOT NULL,
+            enabled INTEGER NOT NULL DEFAULT 1,
+            UNIQUE(project_id, dataset_key),
+            FOREIGN KEY(project_id) REFERENCES hakedis_project(id) ON DELETE CASCADE
+        );"""
+        )
+        conn.execute(
+            """
+        CREATE TABLE IF NOT EXISTS hakedis_audit_log(
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            ts TEXT NOT NULL,
+            user_id INTEGER,
+            action TEXT NOT NULL,
+            entity TEXT NOT NULL,
+            entity_id INTEGER,
+            detail TEXT DEFAULT ''
+        );"""
+        )
+        conn.execute(
+            """
+        CREATE TABLE IF NOT EXISTS hakedis_user_roles(
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            project_id INTEGER NOT NULL,
+            user_id INTEGER NOT NULL,
+            role TEXT NOT NULL,
+            UNIQUE(project_id, user_id),
+            FOREIGN KEY(project_id) REFERENCES hakedis_project(id) ON DELETE CASCADE
+        );"""
+        )
+        conn.commit()
+    except Exception as e:
+        if log_fn:
+            try:
+                log_fn("Schema Migration Error", f"hakedis tables: {e}")
+            except Exception:
+                pass
 
     # satın alma tabloları (eski DB'ler için)
     try:

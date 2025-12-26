@@ -6,6 +6,224 @@ import os
 import tempfile
 import unittest
 
+from kasapro.config import DATA_DIRNAME
+from kasapro.db.main_db import DB
+from kasapro.utils import now_iso
+from modules.hakedis.service import HakedisService
+from modules.hakedis.providers.hakedis_org import IndexRow, parse_indices_html, serialize_indices
+
+
+class HakedisModuleTests(unittest.TestCase):
+    def setUp(self) -> None:
+        self.tmpdir = tempfile.TemporaryDirectory()
+        self.db_path = os.path.join(self.tmpdir.name, "hakedis.db")
+        self.db = DB(self.db_path)
+        self.service = HakedisService(self.db)
+
+    def tearDown(self) -> None:
+        self.db.close()
+        self.tmpdir.cleanup()
+
+    def _create_project_with_position(self):
+        project_id = self.service.create_project(
+            user_id=None,
+            idare="İdare",
+            yuklenici="Yüklenici",
+            isin_adi="Test İş",
+            sozlesme_bedeli=1000,
+            baslangic="2024-01-01",
+            bitis="2024-12-31",
+            sure_gun=365,
+            artis_eksilis=0,
+            avans=0,
+        )
+        pos_id = self.service.add_position(
+            user_id=None,
+            project_id=project_id,
+            kod="PZ-001",
+            aciklama="Poz açıklama",
+            birim="m3",
+            sozlesme_miktar=100,
+            birim_fiyat=100,
+        )
+        return project_id, pos_id
+
+    def test_cumulative_measurement(self) -> None:
+        project_id, pos_id = self._create_project_with_position()
+        p1 = self.service.add_period(
+            user_id=None,
+            project_id=project_id,
+            hakedis_no="1",
+            ay=1,
+            yil=2024,
+            tarih_bas="2024-01-01",
+            tarih_bit="2024-01-31",
+            status="Taslak",
+        )
+        self.service.record_measurement(None, p1, pos_id, 10)
+        p2 = self.service.add_period(
+            user_id=None,
+            project_id=project_id,
+            hakedis_no="2",
+            ay=2,
+            yil=2024,
+            tarih_bas="2024-02-01",
+            tarih_bit="2024-02-29",
+            status="Taslak",
+        )
+        self.service.record_measurement(None, p2, pos_id, 5)
+        rows = self.service.repo.list_measurements(p2)
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(rows[0]["onceki_miktar"], 10)
+        self.assertEqual(rows[0]["bu_donem_miktar"], 5)
+        self.assertEqual(rows[0]["kumulatif_miktar"], 15)
+
+    def test_previous_period_carryover(self) -> None:
+        project_id, pos_id = self._create_project_with_position()
+        p1 = self.service.add_period(
+            user_id=None,
+            project_id=project_id,
+            hakedis_no="1",
+            ay=1,
+            yil=2024,
+            tarih_bas="2024-01-01",
+            tarih_bit="2024-01-31",
+            status="Taslak",
+        )
+        self.service.record_measurement(None, p1, pos_id, 3)
+        p2 = self.service.add_period(
+            user_id=None,
+            project_id=project_id,
+            hakedis_no="2",
+            ay=2,
+            yil=2024,
+            tarih_bas="2024-02-01",
+            tarih_bit="2024-02-29",
+            status="Taslak",
+        )
+        self.service.record_measurement(None, p2, pos_id, 2)
+        summary = self.service.period_summary(p2)
+        self.assertEqual(summary["previous_total"], 300)
+        self.assertEqual(summary["this_total"], 200)
+        self.assertEqual(summary["cumulative_total"], 500)
+
+    def test_deductions_total(self) -> None:
+        project_id, _pos_id = self._create_project_with_position()
+        period_id = self.service.add_period(
+            user_id=None,
+            project_id=project_id,
+            hakedis_no="1",
+            ay=1,
+            yil=2024,
+            tarih_bas="2024-01-01",
+            tarih_bit="2024-01-31",
+            status="Taslak",
+        )
+        base_total = 1000
+        self.service.add_deduction(None, period_id, "Avans Mahsubu", "oran", 10, base_total)
+        self.service.add_deduction(None, period_id, "Ceza", "tutar", 50, base_total)
+        total = self.service.calculate_deductions_total(period_id, base_total)
+        self.assertEqual(total, 150)
+
+    def test_attachment_security(self) -> None:
+        project_id, _pos_id = self._create_project_with_position()
+        period_id = self.service.add_period(
+            user_id=None,
+            project_id=project_id,
+            hakedis_no="1",
+            ay=1,
+            yil=2024,
+            tarih_bas="2024-01-01",
+            tarih_bit="2024-01-31",
+            status="Taslak",
+        )
+        src_path = os.path.join(self.tmpdir.name, "demo.txt")
+        with open(src_path, "w", encoding="utf-8") as handle:
+            handle.write("demo")
+        original, stored, _size = self.service.save_attachment(period_id, src_path)
+        self.assertEqual(original, "demo.txt")
+        stored_path = self.service.get_attachment_path(stored)
+        self.assertTrue(os.path.exists(stored_path))
+        base = os.path.splitext(os.path.basename(self.db_path))[0]
+        root = os.path.join(os.path.dirname(self.db_path), DATA_DIRNAME, "attachments", base, "hakedis")
+        self.assertEqual(os.path.commonpath([root, stored_path]), root)
+        safe_path = self.service.get_attachment_path("../evil.txt")
+        self.assertIn("evil", os.path.basename(safe_path))
+
+    def test_index_parse(self) -> None:
+        html = """
+        <h2>Yapım işleri endeksleri</h2>
+        <table>
+            <tr><td>2024-01</td><td>120,5</td></tr>
+            <tr><td>2024-02</td><td>121,0</td></tr>
+        </table>
+        <h2>Yİ-ÜFE</h2>
+        <table>
+            <tr><td>2024-01</td><td>210.0</td></tr>
+        </table>
+        """
+        parsed = parse_indices_html(html, ["Yapım işleri endeksleri"])
+        self.assertIn("Yapım işleri endeksleri", parsed)
+        self.assertEqual(len(parsed["Yapım işleri endeksleri"]), 2)
+        self.assertAlmostEqual(parsed["Yapım işleri endeksleri"][0].value, 120.5)
+
+    def test_index_cache_fallback(self) -> None:
+        payload = serialize_indices({"Yİ-ÜFE": [IndexRow(period="2024-01", value=200.0)]})
+        self.service.repo.upsert_indices_cache("hakedis_org", "Yİ-ÜFE", payload, now_iso())
+
+        def failing(_selected):
+            raise RuntimeError("network down")
+
+        indices = self.service.fetch_indices_with_cache(["Yİ-ÜFE"], allow_network=True, fetcher=failing)
+        self.assertIn("Yİ-ÜFE", indices)
+        self.assertEqual(indices["Yİ-ÜFE"][0].value, 200.0)
+
+    def test_status_transitions(self) -> None:
+        project_id, _pos_id = self._create_project_with_position()
+        user_id = 1
+        self.service.repo.set_user_role(project_id, user_id, "hazirlayan")
+        period_id = self.service.add_period(
+            user_id=user_id,
+            project_id=project_id,
+            hakedis_no="1",
+            ay=1,
+            yil=2024,
+            tarih_bas="2024-01-01",
+            tarih_bit="2024-01-31",
+            status="Taslak",
+        )
+        self.service.update_period_status(user_id, project_id, period_id, "Kontrole Gönderildi")
+        with self.assertRaises(ValueError):
+            self.service.update_period_status(user_id, project_id, period_id, "Tahakkuk")
+
+    def test_exports(self) -> None:
+        project_id, pos_id = self._create_project_with_position()
+        period_id = self.service.add_period(
+            user_id=None,
+            project_id=project_id,
+            hakedis_no="1",
+            ay=1,
+            yil=2024,
+            tarih_bas="2024-01-01",
+            tarih_bit="2024-01-31",
+            status="Taslak",
+        )
+        self.service.record_measurement(None, period_id, pos_id, 2)
+        out_dir = os.path.join(self.tmpdir.name, "exports")
+        result = self.service.export_reports(period_id, out_dir)
+        for key, path in result.items():
+            if not path:
+                continue
+            self.assertTrue(os.path.exists(path), f"{key} çıktısı yok")
+
+# -*- coding: utf-8 -*-
+
+from __future__ import annotations
+
+import os
+import tempfile
+import unittest
+
 from kasapro.db.main_db import DB
 from kasapro.modules.hakedis.engine import HakedisEngine
 from kasapro.modules.hakedis.indices import HakedisOrgProvider

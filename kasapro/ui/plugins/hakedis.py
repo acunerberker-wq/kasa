@@ -4,6 +4,26 @@ from __future__ import annotations
 
 from tkinter import ttk
 
+from modules.hakedis.ui import HakedisFrame
+
+
+PLUGIN_META = {
+    "key": "hakedis",
+    "nav_text": "🧾 Hakediş",
+    "page_title": "Hakediş Hazırlama Merkezi",
+    "order": 35,
+}
+
+
+def build(master: ttk.Frame, app) -> ttk.Frame:
+    return HakedisFrame(master, app)
+
+# -*- coding: utf-8 -*-
+
+from __future__ import annotations
+
+from tkinter import ttk
+
 from ...modules.hakedis.ui import HakedisFrame
 
 PLUGIN_META = {
