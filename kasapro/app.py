@@ -467,6 +467,23 @@ class App:
         except Exception:
             pass
 
+    def update_status(self, message: str, temporary: bool = False, duration_ms: int = 5000):
+        """Update the status bar message.
+        
+        Args:
+            message: The message to display in the status bar
+            temporary: If True, restore the default message after duration_ms
+            duration_ms: Duration in milliseconds before restoring default message (only if temporary=True)
+        """
+        try:
+            if hasattr(self, 'status_var'):
+                self.status_var.set(message)
+                if temporary:
+                    default_msg = "F1: Yardım  •  Ctrl+F: Global Arama  •  Çift tık: Düzenle"
+                    self.root.after(duration_ms, lambda: self.status_var.set(default_msg))
+        except Exception:
+            pass
+
     def show_toast(self, text: str, duration_ms: int = 3500):
         try:
             toast = tk.Toplevel(self.root)
@@ -634,6 +651,8 @@ class App:
             self.db.log("Şirket", f"Aktif şirket: {self.active_company_name}")
         except Exception:
             pass
+
+        self.update_status(f"✓ Şirket değiştirildi: {self.active_company_name}", temporary=True, duration_ms=4000)
 
         try:
             self._last_unread_count = None
@@ -1243,6 +1262,7 @@ class App:
             self.db.log('Yedek', dst)
         except Exception:
             pass
+        self.update_status(f"✓ Yedek alındı: {os.path.basename(dst)}", temporary=True)
         messagebox.showinfo(APP_TITLE, f"Yedek alındı:\n{dst}")
 
     def restore_db(self):
@@ -1275,6 +1295,7 @@ class App:
             self.db.log('Restore', os.path.basename(p))
         except Exception:
             pass
+        self.update_status(f"✓ Veritabanı geri yüklendi: {os.path.basename(p)}", temporary=True)
         messagebox.showinfo(APP_TITLE, 'Geri yüklendi. Uygulamayı yeniden başlatman önerilir.')
 
     def import_excel(self):
