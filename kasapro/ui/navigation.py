@@ -52,6 +52,9 @@ class ScreenRegistry:
             return None
 
     def show(self, key: str) -> None:
+        if key not in self.frames:
+            self._logger.warning("UI screen missing: %s", key)
+            return
         for k, f in self.frames.items():
             if k == key:
                 f.pack(fill=tk.BOTH, expand=True)

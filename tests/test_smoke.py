@@ -311,6 +311,16 @@ class SmokeTests(unittest.TestCase):
         finally:
             app.on_close()
 
+    @unittest.skipUnless(_can_start_tk(), "Tkinter ekranı başlatılamıyor (headless ortam).")
+    def test_ui_core_screens_available(self) -> None:
+        """Ana menüdeki kritik ekranların yüklendiğini doğrula."""
+        app = App(base_dir=self.base_dir, test_mode=True)
+        try:
+            self.assertIn("entegrasyonlar", app.frames)
+            self.assertIn("satis_raporlari", app.frames)
+        finally:
+            app.on_close()
+
     def test_repo_performance(self) -> None:
         """Repo metodlarının makul sürede çalıştığını test eder."""
         import time

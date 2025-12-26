@@ -7,3 +7,8 @@ requires-python = ">=3.9"
 
 [project.scripts]
 kasapro = "kasapro.app:main"
+
+[project.optional-dependencies]
+excel = ["openpyxl>=3.1.0"]
+pdf = ["reportlab>=4.0.0"]
+ui = ["tksheet>=6.0.0"]

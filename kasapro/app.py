@@ -35,6 +35,7 @@ from .ui.frames import (
     MessagesFrame,
     IntegrationsHubFrame,
     CreateCenterFrame,
+    SatisRaporlariFrame,
     StockWmsFrame,
 )
 from .ui.plugins.loader import discover_ui_plugins
@@ -782,7 +783,6 @@ class App:
 
         # Rapor & Araçlar hub iç sekme yönlendirmeleri (eski kısayollar uyumlu kalsın)
         self._nav_routes["raporlar"] = {"target": "rapor_araclar", "after": "hub_tab", "tab": "raporlar"}
-        self._nav_routes["satis_raporlari"] = {"target": "rapor_araclar", "after": "hub_tab", "tab": "satis_raporlari"}
         self._nav_routes["search"] = {"target": "rapor_araclar", "after": "hub_tab", "tab": "search"}
         self._nav_routes["loglar"] = {"target": "rapor_araclar", "after": "hub_tab", "tab": "loglar"}
         self._nav_routes["notlar_hatirlatmalar"] = {"target": "rapor_araclar", "after": "hub_tab", "tab": "notlar_hatirlatmalar"}
@@ -872,6 +872,8 @@ class App:
         self.screen_registry.register("mesajlar", lambda parent, app: MessagesFrame(parent, app), title="Mesajlar")
         self.screen_registry.register("tanimlar", lambda parent, app: TanimlarHubFrame(parent, app), title="Tanımlar")
         self.screen_registry.register("stok_wms", lambda parent, app: StockWmsFrame(parent, app), title="Stok/WMS")
+        self.screen_registry.register("entegrasyonlar", lambda parent, app: IntegrationsHubFrame(parent, app), title="Entegrasyonlar")
+        self.screen_registry.register("satis_raporlari", lambda parent, app: SatisRaporlariFrame(parent, app), title="Satış Raporları")
         self.screen_registry.register(
             "rapor_araclar",
             lambda parent, app: RaporAraclarHubFrame(parent, app),
