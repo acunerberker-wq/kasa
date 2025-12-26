@@ -697,6 +697,221 @@ def init_schema(conn: sqlite3.Connection) -> None:
     );""")
 
     # -----------------
+    # İnsan Kaynakları (İK)
+    # -----------------
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS hr_departments(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        company_id INTEGER NOT NULL,
+        name TEXT NOT NULL,
+        active INTEGER NOT NULL DEFAULT 1,
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(company_id, name)
+    );""")
+
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS hr_positions(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        company_id INTEGER NOT NULL,
+        department_id INTEGER,
+        name TEXT NOT NULL,
+        active INTEGER NOT NULL DEFAULT 1,
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(company_id, name),
+        FOREIGN KEY(department_id) REFERENCES hr_departments(id)
+    );""")
+
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS hr_employees(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        company_id INTEGER NOT NULL,
+        employee_no TEXT NOT NULL,
+        first_name TEXT NOT NULL,
+        last_name TEXT NOT NULL,
+        phone TEXT DEFAULT '',
+        email TEXT DEFAULT '',
+        department_id INTEGER,
+        position_id INTEGER,
+        start_date TEXT DEFAULT '',
+        end_date TEXT DEFAULT '',
+        status TEXT NOT NULL DEFAULT 'aktif',
+        tckn TEXT DEFAULT '',
+        iban TEXT DEFAULT '',
+        address TEXT DEFAULT '',
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(company_id, employee_no),
+        FOREIGN KEY(department_id) REFERENCES hr_departments(id),
+        FOREIGN KEY(position_id) REFERENCES hr_positions(id)
+    );""")
+
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS hr_salary_history(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        company_id INTEGER NOT NULL,
+        employee_id INTEGER NOT NULL,
+        amount REAL NOT NULL DEFAULT 0,
+        currency TEXT DEFAULT 'TL',
+        effective_date TEXT NOT NULL,
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY(employee_id) REFERENCES hr_employees(id)
+    );""")
+
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS hr_documents(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        company_id INTEGER NOT NULL,
+        employee_id INTEGER NOT NULL,
+        doc_type TEXT NOT NULL,
+        filename TEXT NOT NULL,
+        stored_name TEXT NOT NULL,
+        size_bytes INTEGER NOT NULL DEFAULT 0,
+        uploaded_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        active INTEGER NOT NULL DEFAULT 1,
+        FOREIGN KEY(employee_id) REFERENCES hr_employees(id)
+    );""")
+
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS hr_leave_types(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        company_id INTEGER NOT NULL,
+        name TEXT NOT NULL,
+        annual_days REAL NOT NULL DEFAULT 0,
+        active INTEGER NOT NULL DEFAULT 1,
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(company_id, name)
+    );""")
+
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS hr_leave_balances(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        company_id INTEGER NOT NULL,
+        employee_id INTEGER NOT NULL,
+        year INTEGER NOT NULL,
+        total_days REAL NOT NULL DEFAULT 0,
+        used_days REAL NOT NULL DEFAULT 0,
+        updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(company_id, employee_id, year),
+        FOREIGN KEY(employee_id) REFERENCES hr_employees(id)
+    );""")
+
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS hr_leave_requests(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        company_id INTEGER NOT NULL,
+        employee_id INTEGER NOT NULL,
+        leave_type_id INTEGER NOT NULL,
+        start_date TEXT NOT NULL,
+        end_date TEXT NOT NULL,
+        total_days REAL NOT NULL DEFAULT 0,
+        status TEXT NOT NULL DEFAULT 'pending_manager',
+        manager_username TEXT DEFAULT '',
+        hr_username TEXT DEFAULT '',
+        notes TEXT DEFAULT '',
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY(employee_id) REFERENCES hr_employees(id),
+        FOREIGN KEY(leave_type_id) REFERENCES hr_leave_types(id)
+    );""")
+
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS hr_shifts(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        company_id INTEGER NOT NULL,
+        name TEXT NOT NULL,
+        start_time TEXT DEFAULT '',
+        end_time TEXT DEFAULT '',
+        break_minutes INTEGER NOT NULL DEFAULT 0,
+        active INTEGER NOT NULL DEFAULT 1,
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(company_id, name)
+    );""")
+
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS hr_timesheets(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        company_id INTEGER NOT NULL,
+        employee_id INTEGER NOT NULL,
+        work_date TEXT NOT NULL,
+        status TEXT NOT NULL,
+        shift_id INTEGER,
+        check_in TEXT DEFAULT '',
+        check_out TEXT DEFAULT '',
+        notes TEXT DEFAULT '',
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(company_id, employee_id, work_date),
+        FOREIGN KEY(employee_id) REFERENCES hr_employees(id),
+        FOREIGN KEY(shift_id) REFERENCES hr_shifts(id)
+    );""")
+
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS hr_overtime_requests(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        company_id INTEGER NOT NULL,
+        employee_id INTEGER NOT NULL,
+        work_date TEXT NOT NULL,
+        hours REAL NOT NULL,
+        status TEXT NOT NULL DEFAULT 'pending',
+        approved_by TEXT DEFAULT '',
+        notes TEXT DEFAULT '',
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY(employee_id) REFERENCES hr_employees(id)
+    );""")
+
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS hr_payroll_periods(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        company_id INTEGER NOT NULL,
+        year INTEGER NOT NULL,
+        month INTEGER NOT NULL,
+        locked INTEGER NOT NULL DEFAULT 0,
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(company_id, year, month)
+    );""")
+
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS hr_payroll_items(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        company_id INTEGER NOT NULL,
+        period_id INTEGER NOT NULL,
+        employee_id INTEGER NOT NULL,
+        item_type TEXT NOT NULL,
+        description TEXT DEFAULT '',
+        amount REAL NOT NULL DEFAULT 0,
+        currency TEXT DEFAULT 'TL',
+        is_void INTEGER NOT NULL DEFAULT 0,
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY(period_id) REFERENCES hr_payroll_periods(id),
+        FOREIGN KEY(employee_id) REFERENCES hr_employees(id)
+    );""")
+
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS hr_user_roles(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        company_id INTEGER NOT NULL,
+        username TEXT NOT NULL,
+        role TEXT NOT NULL,
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(company_id, username)
+    );""")
+
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS hr_audit_log(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        company_id INTEGER NOT NULL,
+        entity_type TEXT NOT NULL,
+        entity_id INTEGER,
+        action TEXT NOT NULL,
+        actor_username TEXT DEFAULT '',
+        actor_role TEXT DEFAULT '',
+        detail TEXT DEFAULT '',
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    );""")
+
+    # -----------------
     # Entegrasyonlar (Core)
     # -----------------
     c.execute("""
@@ -3270,6 +3485,24 @@ def migrate_schema(conn: sqlite3.Connection, log_fn: Optional[Callable[[str, str
     _ensure_index(conn, "idx_stok_hareket_urun_id", "stok_hareket", "urun_id", log_fn)
     _ensure_index(conn, "idx_stok_hareket_tarih", "stok_hareket", "tarih", log_fn)
     _ensure_index(conn, "idx_kasa_hareket_tip_tarih", "kasa_hareket", "tip, tarih", log_fn)
+    _ensure_index(conn, "idx_hr_departments_company", "hr_departments", "company_id", log_fn)
+    _ensure_index(conn, "idx_hr_positions_company", "hr_positions", "company_id", log_fn)
+    _ensure_index(conn, "idx_hr_employees_company", "hr_employees", "company_id", log_fn)
+    _ensure_index(conn, "idx_hr_employees_department", "hr_employees", "department_id", log_fn)
+    _ensure_index(conn, "idx_hr_salary_history_employee", "hr_salary_history", "employee_id", log_fn)
+    _ensure_index(conn, "idx_hr_documents_employee", "hr_documents", "employee_id", log_fn)
+    _ensure_index(conn, "idx_hr_leave_types_company", "hr_leave_types", "company_id", log_fn)
+    _ensure_index(conn, "idx_hr_leave_requests_employee", "hr_leave_requests", "employee_id", log_fn)
+    _ensure_index(conn, "idx_hr_leave_requests_dates", "hr_leave_requests", "start_date, end_date", log_fn)
+    _ensure_index(conn, "idx_hr_leave_balances_employee_year", "hr_leave_balances", "employee_id, year", log_fn)
+    _ensure_index(conn, "idx_hr_shifts_company", "hr_shifts", "company_id", log_fn)
+    _ensure_index(conn, "idx_hr_timesheets_company_date", "hr_timesheets", "company_id, work_date", log_fn)
+    _ensure_index(conn, "idx_hr_overtime_company_date", "hr_overtime_requests", "company_id, work_date", log_fn)
+    _ensure_index(conn, "idx_hr_payroll_periods_company", "hr_payroll_periods", "company_id", log_fn)
+    _ensure_index(conn, "idx_hr_payroll_items_period", "hr_payroll_items", "period_id", log_fn)
+    _ensure_index(conn, "idx_hr_payroll_items_employee", "hr_payroll_items", "employee_id", log_fn)
+    _ensure_index(conn, "idx_hr_user_roles_company", "hr_user_roles", "company_id", log_fn)
+    _ensure_index(conn, "idx_hr_audit_company", "hr_audit_log", "company_id, created_at", log_fn)
     _ensure_index(conn, "idx_notes_company_owner", "notes", "company_id, owner_user_id", log_fn)
     _ensure_index(conn, "idx_notes_status", "notes", "status", log_fn)
     _ensure_index(conn, "idx_reminders_due_at", "reminders", "due_at", log_fn)

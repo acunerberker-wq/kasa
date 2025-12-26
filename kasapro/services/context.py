@@ -9,6 +9,7 @@ from __future__ import annotations
 import sys
 import os
 from dataclasses import dataclass
+from typing import Callable
 from typing import Callable, Optional
 
 from ..db.main_db import DB
@@ -19,6 +20,7 @@ from .settings_service import SettingsService
 from .company_users_service import CompanyUsersService
 from .cari_service import CariService
 from .messages_service import MessagesService
+from modules.hr.service import HRService, HRContext
 from .wms_service import WmsService
 from ..modules.notes_reminders.service import NotesRemindersService
 from ..modules.dms.service import DmsService
@@ -45,11 +47,13 @@ class Services:
     company_users: CompanyUsersService
     cari: CariService
     messages: MessagesService
+    hr: HRService
     notes_reminders: NotesRemindersService
     wms: WmsService
     integrations: IntegrationService
 
     @classmethod
+    def build(cls, db: DB, usersdb: UsersDB, context_provider: Callable[[], HRContext]) -> "Services":
     def build(cls, db: DB, usersdb: UsersDB, context_provider) -> "Services":
         exporter = ExportService()
         hr_service = HRService(db, context_provider) if HRService else None
@@ -62,6 +66,7 @@ class Services:
             company_users=CompanyUsersService(db),
             cari=CariService(db, exporter),
             messages=MessagesService(db, usersdb),
+            hr=HRService(db, context_provider),
             notes_reminders=NotesRemindersService(db, usersdb),
             wms=WmsService(db),
             integrations=IntegrationService(db, context_provider),

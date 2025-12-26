@@ -39,6 +39,7 @@ from .ui.frames import (
     StockWmsFrame,
 )
 from .ui.plugins.loader import discover_ui_plugins
+from modules.hr.service import HRContext
 from .modules.notes_reminders.scheduler import ReminderScheduler
 from .modules.integrations.worker import IntegrationWorker
 
@@ -130,6 +131,7 @@ class App:
         self.db = DB(db_path)
         # Servis katmanı (UI -> services -> DB)
         self.services = Services.build(self.db, self.usersdb, context_provider=self._hr_context)
+        self.services = Services.build(self.db, self.usersdb, context_provider=self._hr_context)
         self.integrations_worker = IntegrationWorker(self.services.integrations)
         try:
             cname = getattr(self, "active_company_name", "")
@@ -193,6 +195,14 @@ class App:
                 return
 
         threading.Thread(target=worker, daemon=True).start()
+
+    def _hr_context(self) -> HRContext:
+        company_id = int(getattr(self, "active_company_id", None) or 1)
+        return HRContext(
+            company_id=company_id,
+            actor_username=str(self.user["username"]),
+            actor_role=str(self.user["role"]),
+        )
 
     def _install_exception_handlers(self) -> None:
         logger = logging.getLogger(__name__)
