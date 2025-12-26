@@ -15,34 +15,121 @@ from ...db.users_db import UsersDB
 from ...utils import center_window
 
 
-# ---- RENK PALET (Light Theme - ana uygulama ile uyumlu) ----
+# ---- RENK PALET (Mockups dark theme) ----
 COLORS = {
-    "bg_dark": "#F5F6FA",           # Ana arka plan
-    "bg_mid": "#EEF2F7",            # Orta arka plan
-    "card_bg": "#FFFFFF",           # Kart zemini
-    "card_border": "#DCE3EE",       # Kart kenarlik/golge
-    "input_bg": "#F8FAFC",          # Input arka plan
-    "input_border": "#E2E8F0",      # Input kenarlik
-    "input_focus": "#2563EB",       # Focus rengi
-    "input_focus_solid": "#2563EB", # Focus solid
-    "input_focus_bg": "#FFFFFF",    # Focus arka plan
-    "text_primary": "#0F172A",      # Ana metin
-    "text_secondary": "#475569",    # Ikincil metin
-    "text_muted": "#6B7280",        # Soluk metin
-    "text_placeholder": "#94A3B8",  # Placeholder
-    "accent": "#2563EB",            # Aksan
-    "accent_dark": "#1E40AF",       # Aksan koyu
-    "accent_hover": "#1D4ED8",      # Hover
-    "accent_glow": "#DBEAFE",       # Hafif vurgulu cizgi
-    "btn_border": "#BFDBFE",        # Buton kenarlik
-    "link": "#2563EB",              # Link
-    "link_hover": "#1D4ED8",        # Link hover
-    "divider": "#E5E7EB",           # Divider
-    "dropdown_bg": "#FFFFFF",       # Dropdown
-    "selection": "#DBEAFE",         # Selection
+    "bg_dark": "#0b111b",           # Ana arka plan
+    "bg_mid": "#121826",            # Orta arka plan
+    "card_bg": "#121826",           # Kart zemini
+    "card_border": "#1b2536",       # Kart kenarlik
+    "input_bg": "#0f1522",          # Input arka plan
+    "input_border": "#1f2736",      # Input kenarlik
+    "input_focus": "#7c5cff",       # Focus rengi
+    "input_focus_solid": "#7c5cff", # Focus solid
+    "input_focus_bg": "#111827",    # Focus arka plan
+    "text_primary": "#e6e9f2",      # Ana metin
+    "text_secondary": "#c2c9d6",    # Ikincil metin
+    "text_muted": "#9aa3b2",        # Soluk metin
+    "text_placeholder": "#7f8898",  # Placeholder
+    "accent": "#7c5cff",            # Aksan
+    "accent_dark": "#6a4cf2",       # Aksan koyu
+    "accent_hover": "#8d75ff",      # Hover
+    "accent_glow": "#2b2147",       # Hafif vurgulu cizgi
+    "btn_border": "#3b2f63",        # Buton kenarlik
+    "link": "#b8b1ff",              # Link
+    "link_hover": "#d4cfff",        # Link hover
+    "divider": "#1f2a3a",           # Divider
+    "dropdown_bg": "#151e2e",       # Dropdown
+    "selection": "#242a3b",         # Selection
 }
 
 BASE_FONT = "Segoe UI" if sys.platform.startswith("win") else "Calibri"
+
+
+def _round_rect_points(x1: float, y1: float, x2: float, y2: float, r: float) -> list[float]:
+    return [
+        x1 + r, y1,
+        x2 - r, y1,
+        x2, y1,
+        x2, y1 + r,
+        x2, y2 - r,
+        x2, y2,
+        x2 - r, y2,
+        x1 + r, y2,
+        x1, y2,
+        x1, y2 - r,
+        x1, y1 + r,
+        x1, y1,
+    ]
+
+
+class RoundedBox(tk.Canvas):
+    def __init__(
+        self,
+        master: tk.Misc,
+        radius: int,
+        bg_color: str,
+        border_color: str,
+        border_width: int = 1,
+        padding: int = 0,
+        **kwargs,
+    ):
+        super().__init__(
+            master,
+            highlightthickness=0,
+            bd=0,
+            bg=master.cget("bg"),
+            **kwargs,
+        )
+        self.radius = radius
+        self.bg_color = bg_color
+        self.border_color = border_color
+        self.border_width = border_width
+        self.padding = padding
+
+        self.inner = tk.Frame(self, bg=self.bg_color)
+        self._window = self.create_window(0, 0, anchor="nw", window=self.inner)
+        self.bind("<Configure>", self._redraw)
+
+    def _redraw(self, _event=None):
+        self.delete("round")
+        w = self.winfo_width()
+        h = self.winfo_height()
+        if w <= 2 or h <= 2:
+            return
+        bw = max(0, int(self.border_width))
+        half = bw / 2 if bw else 0
+        r = min(self.radius, (w - bw) / 2, (h - bw) / 2)
+        if r < 0:
+            r = 0
+        points = _round_rect_points(half, half, w - half, h - half, r)
+        self.create_polygon(
+            points,
+            smooth=True,
+            fill=self.bg_color,
+            outline=self.border_color if bw else self.bg_color,
+            width=bw,
+            tags="round",
+        )
+        inner_pad = self.padding + bw
+        inner_w = max(1, w - 2 * inner_pad)
+        inner_h = max(1, h - 2 * inner_pad)
+        self.coords(self._window, inner_pad, inner_pad)
+        self.itemconfigure(self._window, width=inner_w, height=inner_h)
+
+    def set_colors(self, bg_color: Optional[str] = None, border_color: Optional[str] = None) -> None:
+        if bg_color is not None:
+            self.bg_color = bg_color
+            self.inner.configure(bg=bg_color)
+        if border_color is not None:
+            self.border_color = border_color
+        self._redraw()
+
+    def fit_to_inner(self) -> None:
+        self.update_idletasks()
+        w = self.inner.winfo_reqwidth() + 2 * (self.padding + self.border_width)
+        h = self.inner.winfo_reqheight() + 2 * (self.padding + self.border_width)
+        self.configure(width=w, height=h)
+        self._redraw()
 
 
 class ModernEntry(tk.Frame):
@@ -55,23 +142,27 @@ class ModernEntry(tk.Frame):
         self._show = show
         self._has_focus = False
         
-        # Dış çerçeve (border efekti için) - Qt: border-radius: 10px
-        self.outer = tk.Frame(self, bg=COLORS["input_border"], padx=1, pady=1)
-        self.outer.pack(fill=tk.X)
-        
-        # İç frame - Qt: padding: 10px 12px
-        self.inner = tk.Frame(self.outer, bg=COLORS["input_bg"], padx=12, pady=10)
-        self.inner.pack(fill=tk.X)
+        self.box = RoundedBox(
+            self,
+            radius=14,
+            bg_color=COLORS["input_bg"],
+            border_color=COLORS["input_border"],
+            border_width=1,
+            padding=10,
+            height=44,
+        )
+        self.box.pack(fill=tk.X)
         
         # Entry widget - Qt: font-size: 14px, color: rgba(240,245,255,220)
         self.entry = tk.Entry(
-            self.inner,
+            self.box.inner,
             font=(BASE_FONT, 12),
             bg=COLORS["input_bg"],
             fg=COLORS["text_placeholder"],
             insertbackground=COLORS["text_primary"],
             relief=tk.FLAT,
             highlightthickness=0,
+            bd=0,
             show="" if not show else "",
         )
         self.entry.pack(fill=tk.X)
@@ -84,8 +175,7 @@ class ModernEntry(tk.Frame):
     def _on_focus_in(self, _event):
         self._has_focus = True
         # Qt: border: 1px solid rgba(90, 150, 255, 160), background: rgba(255,255,255,12)
-        self.outer.configure(bg=COLORS["input_focus_solid"])
-        self.inner.configure(bg=COLORS["input_focus_bg"])
+        self.box.set_colors(bg_color=COLORS["input_focus_bg"], border_color=COLORS["input_focus_solid"])
         self.entry.configure(bg=COLORS["input_focus_bg"])
         if self.entry.get() == self.placeholder:
             self.entry.delete(0, tk.END)
@@ -95,8 +185,7 @@ class ModernEntry(tk.Frame):
     
     def _on_focus_out(self, _event):
         self._has_focus = False
-        self.outer.configure(bg=COLORS["input_border"])
-        self.inner.configure(bg=COLORS["input_bg"])
+        self.box.set_colors(bg_color=COLORS["input_bg"], border_color=COLORS["input_border"])
         self.entry.configure(bg=COLORS["input_bg"])
         if not self.entry.get():
             self.entry.insert(0, self.placeholder)
@@ -124,13 +213,16 @@ class ModernCombobox(tk.Frame):
     def __init__(self, master, values: list, placeholder: str = "Seç...", **kwargs):
         super().__init__(master, bg=COLORS["card_bg"], **kwargs)
         
-        # Dış çerçeve - Qt: border: 1px solid rgba(255,255,255,22), border-radius: 10px
-        self.outer = tk.Frame(self, bg=COLORS["input_border"], padx=1, pady=1)
-        self.outer.pack(fill=tk.X)
-        
-        # İç frame - Qt: padding: 10px 12px
-        self.inner = tk.Frame(self.outer, bg=COLORS["input_bg"], padx=12, pady=10)
-        self.inner.pack(fill=tk.X)
+        self.box = RoundedBox(
+            self,
+            radius=14,
+            bg_color=COLORS["input_bg"],
+            border_color=COLORS["input_border"],
+            border_width=1,
+            padding=8,
+            height=44,
+        )
+        self.box.pack(fill=tk.X)
         
         # Dropdown listbox styling - Qt: QAbstractItemView
         # Qt: background: rgba(18, 26, 42, 230), selection-background-color: rgba(70, 130, 255, 120)
@@ -149,7 +241,8 @@ class ModernCombobox(tk.Frame):
             foreground=COLORS["text_primary"],
             arrowcolor=COLORS["text_muted"],
             borderwidth=0,
-            padding=5,
+            relief="flat",
+            padding=4,
         )
         style.map("Modern.TCombobox",
             fieldbackground=[("readonly", COLORS["input_bg"])],
@@ -158,7 +251,7 @@ class ModernCombobox(tk.Frame):
         )
         
         self.combo = ttk.Combobox(
-            self.inner,
+            self.box.inner,
             values=values,
             state="readonly",
             font=(BASE_FONT, 12),
@@ -170,8 +263,8 @@ class ModernCombobox(tk.Frame):
             self.combo.set(placeholder)
         
         # Focus efektleri - Qt: border: 1px solid rgba(90, 150, 255, 160)
-        self.combo.bind("<FocusIn>", lambda _: self.outer.configure(bg=COLORS["input_focus_solid"]))
-        self.combo.bind("<FocusOut>", lambda _: self.outer.configure(bg=COLORS["input_border"]))
+        self.combo.bind("<FocusIn>", lambda _: self.box.set_colors(border_color=COLORS["input_focus_solid"]))
+        self.combo.bind("<FocusOut>", lambda _: self.box.set_colors(border_color=COLORS["input_border"]))
     
     def get(self) -> str:
         return self.combo.get()
@@ -200,9 +293,8 @@ class ModernCheckbox(tk.Frame):
         self.indicator = tk.Canvas(
             self.check_frame,
             width=18, height=18,
-            bg=COLORS["input_bg"],
-            highlightthickness=1,
-            highlightbackground=COLORS["input_border"],
+            bg=COLORS["card_bg"],
+            highlightthickness=0,
         )
         self.indicator.pack(side=tk.LEFT, padx=(0, 10))
         
@@ -229,15 +321,18 @@ class ModernCheckbox(tk.Frame):
         self._update_indicator()
     
     def _update_indicator(self):
-        self.indicator.delete("check")
+        self.indicator.delete("all")
         if self.var.get():
-            # Qt checked: background: rgba(70, 130, 255, 160), border: 1px solid rgba(120, 170, 255, 200)
-            self.indicator.configure(bg=COLORS["accent"], highlightbackground=COLORS["accent_hover"])
+            border = COLORS["accent_hover"]
+            fill = COLORS["accent"]
             # Draw checkmark
+            self.indicator.create_oval(1, 1, 17, 17, outline=border, width=1, fill=fill, tags="box")
             self.indicator.create_line(4, 9, 7, 13, fill="white", width=2, tags="check")
             self.indicator.create_line(7, 13, 14, 5, fill="white", width=2, tags="check")
         else:
-            self.indicator.configure(bg=COLORS["input_bg"], highlightbackground=COLORS["input_border"])
+            border = COLORS["input_border"]
+            fill = COLORS["input_bg"]
+            self.indicator.create_oval(1, 1, 17, 17, outline=border, width=1, fill=fill, tags="box")
     
     def get(self) -> bool:
         return self.var.get()
@@ -251,14 +346,21 @@ class ModernButton(tk.Frame):
         
         self.command = command
         
-        # Border frame - Qt: border: 1px solid rgba(140, 190, 255, 90), border-radius: 10px
-        self.border = tk.Frame(self, bg=COLORS["btn_border"], padx=1, pady=1)
-        self.border.pack(fill=tk.X)
+        self.box = RoundedBox(
+            self,
+            radius=14,
+            bg_color=COLORS["accent"],
+            border_color=COLORS["btn_border"],
+            border_width=1,
+            padding=1,
+            height=48,
+        )
+        self.box.pack(fill=tk.X)
         
         # Button - Qt: background gradient rgba(55, 140, 255) -> rgba(20, 90, 210)
         # Qt: font-size: 18px, padding: 12px 14px, color: rgba(255,255,255,240)
         self.btn = tk.Label(
-            self.border,
+            self.box.inner,
             text=text,
             font=(BASE_FONT, 13, "bold"),
             bg=COLORS["accent"],
@@ -277,19 +379,23 @@ class ModernButton(tk.Frame):
     
     def _on_enter(self, _event):
         # Qt hover: rgba(70, 160, 255) -> rgba(25, 105, 230)
-        self.btn.configure(bg=COLORS["accent_hover"])
+        self._set_state(COLORS["accent_hover"])
     
     def _on_leave(self, _event):
-        self.btn.configure(bg=COLORS["accent"])
+        self._set_state(COLORS["accent"])
     
     def _on_click(self, _event):
         # Qt pressed: rgba(20, 90, 210)
-        self.btn.configure(bg=COLORS["accent_dark"])
+        self._set_state(COLORS["accent_dark"])
     
     def _on_release(self, _event):
-        self.btn.configure(bg=COLORS["accent"])
+        self._set_state(COLORS["accent"])
         if self.command:
             self.command()
+
+    def _set_state(self, bg_color: str) -> None:
+        self.box.set_colors(bg_color=bg_color)
+        self.btn.configure(bg=bg_color)
 
 
 class LoginWindow(tk.Toplevel):
@@ -320,22 +426,29 @@ class LoginWindow(tk.Toplevel):
     
     def _build_ui(self):
         """Ana UI yapısını oluştur - Qt LoginWindow stiline uygun."""
+        # Background glow
+        self._bg_canvas = tk.Canvas(self, bg=COLORS["bg_dark"], highlightthickness=0, bd=0)
+        self._bg_canvas.place(x=0, y=0, relwidth=1, relheight=1)
+        tk.Misc.lower(self._bg_canvas)
+        self.bind("<Configure>", self._draw_background)
+        self._draw_background()
+
         # Ana container (merkeze hizalama için)
         main_container = tk.Frame(self, bg=COLORS["bg_dark"])
         main_container.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
         
         # Glass Card - Qt: minimumSize 720x460, padding 48/42/48/34, spacing 16
         # Qt: background: rgba(18, 26, 42, 165), border: 1px solid rgba(255,255,255,30), border-radius: 16px
-        card_border = tk.Frame(main_container, bg=COLORS["card_border"], padx=2, pady=2)  # border
-        card_border.pack()
-        
-        card = tk.Frame(
-            card_border,
-            bg=COLORS["card_bg"],
-            padx=40,
-            pady=36,
+        card_box = RoundedBox(
+            main_container,
+            radius=18,
+            bg_color=COLORS["card_bg"],
+            border_color=COLORS["card_border"],
+            border_width=1,
+            padding=24,
         )
-        card.pack()
+        card_box.pack()
+        card = card_box.inner
         
         # ---- BRAND ROW ---- Qt: spacing 12
         brand_frame = tk.Frame(card, bg=COLORS["card_bg"])
@@ -344,10 +457,10 @@ class LoginWindow(tk.Toplevel):
         # Logo - Qt: 36x36, gradient mavi, border-radius: 10px
         logo = tk.Canvas(brand_frame, width=36, height=36, bg=COLORS["card_bg"], highlightthickness=0)
         logo.pack(side=tk.LEFT, padx=(0, 12))
-        # Gradient simulation - Qt: rgba(70,160,255) -> rgba(30,110,230)
+        # Gradient simulation - Qt: rgba(124,92,255) -> rgba(90,70,220)
         logo.create_rectangle(0, 0, 36, 36, fill=COLORS["accent"], outline="")
-        logo.create_rectangle(3, 3, 33, 18, fill="#3b82f6", outline="")
-        logo.create_rectangle(3, 3, 18, 33, fill="#60a5fa", outline="")
+        logo.create_rectangle(3, 3, 33, 18, fill="#9b86ff", outline="")
+        logo.create_rectangle(3, 3, 18, 33, fill="#5f44db", outline="")
         
         # App name - Qt: font-size: 22px, font-weight: 700, color: rgba(240,245,255,220)
         app_name = tk.Label(
@@ -454,6 +567,27 @@ class LoginWindow(tk.Toplevel):
             fg=COLORS["text_muted"],
         )
         note_label.pack(pady=(16, 0))
+        card_box.fit_to_inner()
+
+    def _draw_background(self, _event=None):
+        canvas = getattr(self, "_bg_canvas", None)
+        if not canvas:
+            return
+        w = max(1, self.winfo_width())
+        h = max(1, self.winfo_height())
+        canvas.delete("bg")
+        canvas.create_rectangle(0, 0, w, h, fill=COLORS["bg_dark"], outline="", tags="bg")
+        glow_w = int(w * 0.9)
+        glow_h = int(h * 0.7)
+        canvas.create_oval(
+            -int(glow_w * 0.25),
+            -int(glow_h * 0.55),
+            glow_w,
+            glow_h,
+            fill=COLORS["accent_glow"],
+            outline="",
+            tags="bg",
+        )
     
     def _setup_events(self):
         """Event bindings."""
