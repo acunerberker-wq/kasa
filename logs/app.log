@@ -7387,3 +7387,20 @@ Traceback (most recent call last):
     self.status_bar = StatusBar(self.root)
                       ^^^^^^^^^
 NameError: name 'StatusBar' is not defined
+2025-12-26 05:09:39,056 [ERROR] kasapro.app: Veritabanı hatası
+Traceback (most recent call last):
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\app.py", line 215, in _init_db
+    self.integrations_worker = IntegrationWorker(self.services.integrations)
+                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'Services' object has no attribute 'integrations'
+2025-12-26 05:09:40,526 [ERROR] kasapro.app: Uygulama başlatma hatası
+Traceback (most recent call last):
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\app.py", line 1478, in main
+    app = App()  # ✅ root otomatik oluşturulur
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\app.py", line 84, in __init__
+    self._init_db()
+    ~~~~~~~~~~~~~^^
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\app.py", line 215, in _init_db
+    self.integrations_worker = IntegrationWorker(self.services.integrations)
+                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'Services' object has no attribute 'integrations'
