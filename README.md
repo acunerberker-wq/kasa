@@ -17,7 +17,12 @@ Aynı klasördeki `kasapro.ini` ile data/log konumlarını ve log seviyesini de�
 
 ## Loglama
 
-`logs/kasapro.log` dosyasına döner (RotatingFile: 5MB x 3). Log dizini `kasapro.ini` ile değiştirilebilir.
+`logs/app.log` dosyasına döner (RotatingFile: 5MB x 3). Log dizini `kasapro.ini` ile değiştirilebilir.
+
+## Hızlı Doğrulama (Self-Check)
+
+- `python -m kasapro.self_check`
+- UI kontrolü için: `python -m kasapro.self_check --ui`
 
 ## Opsiyonel bağımlılıklar
 

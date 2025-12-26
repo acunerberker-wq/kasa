@@ -7,19 +7,37 @@ import logging
 import os
 from typing import Any, Callable
 
+from ..config import APP_BASE_DIR, APP_TITLE, LOG_DIRNAME
+
+try:
+    from tkinter import messagebox
+except Exception:  # pragma: no cover - Tk import may fail in headless tests
+    messagebox = None
+
 
 def _ensure_ui_logger() -> None:
     logger = logging.getLogger("kasapro.ui")
-    if any(isinstance(h, logging.FileHandler) and getattr(h, "baseFilename", "").endswith("app.log") for h in logger.handlers):
+    logger.setLevel(logging.INFO)
+    if logger.handlers:
         return
-    log_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "..", "logs", "app.log")
-    log_path = os.path.abspath(log_path)
-    os.makedirs(os.path.dirname(log_path), exist_ok=True)
-    handler = logging.FileHandler(log_path)
+
+    root = logging.getLogger()
+    root_log_paths = {
+        getattr(h, "baseFilename", "")
+        for h in root.handlers
+        if isinstance(h, logging.FileHandler)
+    }
+    desired_path = os.path.abspath(os.path.join(APP_BASE_DIR, LOG_DIRNAME, "app.log"))
+    if desired_path in root_log_paths:
+        logger.propagate = True
+        return
+
+    os.makedirs(os.path.dirname(desired_path), exist_ok=True)
+    handler = logging.FileHandler(desired_path, encoding="utf-8")
     formatter = logging.Formatter("%(asctime)s %(levelname)s %(name)s %(message)s")
     handler.setFormatter(formatter)
     logger.addHandler(handler)
-    logger.setLevel(logging.INFO)
+    logger.propagate = False
 
 
 def get_ui_logger() -> logging.Logger:
@@ -43,6 +61,15 @@ def wrap_callback(name: str, func: Callable[..., Any]) -> Callable[..., Any]:
     def wrapper(*args: Any, **kwargs: Any) -> Any:
         logger = get_ui_logger()
         logger.info("UI callback invoked: %s", name)
-        return func(*args, **kwargs)
+        try:
+            return func(*args, **kwargs)
+        except Exception as exc:
+            logger.exception("UI callback failed: %s", name)
+            if messagebox is not None:
+                try:
+                    messagebox.showerror(APP_TITLE, "İşlem sırasında hata oluştu. Detaylar loglandı.")
+                except Exception:
+                    pass
+            return None
 
     return wrapper

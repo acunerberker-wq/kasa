@@ -3,8 +3,10 @@
 
 from __future__ import annotations
 
+import logging
 import os
 import re
+import threading
 from datetime import datetime, date
 from typing import Any, Optional, List, Dict, Tuple, TYPE_CHECKING, Callable
 
@@ -19,6 +21,7 @@ from ...utils import (
     safe_float,
     norm_header,
 )
+from ...db.main_db import DB
 
 # Maaş/isim eşleştirme için fuzzy yardımcılar
 from ...core.fuzzy import best_substring_similarity, normalize_text, similarity
@@ -87,10 +90,17 @@ class ImportWizard(tk.Toplevel):
             return
 
         self.openpyxl = openpyxl
-        self.wb = openpyxl.load_workbook(xlsx_path, data_only=True)
+        try:
+            self.wb = openpyxl.load_workbook(xlsx_path, data_only=True)
+        except Exception as exc:
+            logging.getLogger(__name__).exception("Excel yükleme başarısız: %s", xlsx_path)
+            messagebox.showerror(APP_TITLE, f"Excel dosyası açılamadı:\n{exc}")
+            self.destroy()
+            return
         self.sheetnames = self.wb.sheetnames[:]
         self.result_counts: Optional[Dict[str, int]] = None
         self.mappings: Dict[str, Dict[str, Any]] = {}
+        self._import_in_progress = False
 
         self._build()
         center_window(self, app.root)
@@ -227,8 +237,10 @@ class ImportWizard(tk.Toplevel):
         if self.mode in ("full", "cariler", "cari", "carihareket", "kasa", "kasahareket"):
             ttk.Checkbutton(bottom, text="İçe aktarma sırasında cari yoksa otomatik oluştur", variable=self.var_create_missing_cari).pack(side=tk.LEFT)
 
-        ttk.Button(bottom, text="İptal", command=self._cancel).pack(side=tk.RIGHT, padx=6)
-        ttk.Button(bottom, text="İçe Aktar", command=self._do_import).pack(side=tk.RIGHT, padx=6)
+        self.btn_cancel = ttk.Button(bottom, text="İptal", command=self._cancel)
+        self.btn_cancel.pack(side=tk.RIGHT, padx=6)
+        self.btn_import = ttk.Button(bottom, text="İçe Aktar", command=self._do_import)
+        self.btn_import.pack(side=tk.RIGHT, padx=6)
 
     def _guess_sheet(self, tab_name: str) -> str:
         t = tab_name.lower()
@@ -791,10 +803,20 @@ class ImportWizard(tk.Toplevel):
         return str(var.get() or "") if isinstance(var, tk.StringVar) else ""
 
     def _cancel(self):
+        if self._import_in_progress:
+            return
         self.result_counts = None
         self.destroy()
 
     def _do_import(self):
+        if self._import_in_progress:
+            return
+        plan = self._build_import_plan()
+        if plan is None:
+            return
+        self._start_background_import(plan)
+
+    def _build_import_plan(self) -> Optional[Dict[str, Dict[str, Any]]]:
         plan: Dict[str, Dict[str, Any]] = {}
         for tab_name, info in self.mappings.items():
             cols = {}
@@ -824,20 +846,20 @@ class ImportWizard(tk.Toplevel):
         if ch_plan and ch_plan.get("sheet") and ch_plan.get("sheet") != "(Atla)":
             if plan["CariHareket"]["cols"].get("cari") is None or plan["CariHareket"]["cols"].get("tutar") is None:
                 messagebox.showerror(APP_TITLE, "CariHareket için en az 'Cari' ve 'Tutar' kolonlarını seçmelisin.")
-                return
+                return None
 
         kh_plan = plan.get("KasaHareket")
         if kh_plan and kh_plan.get("sheet") and kh_plan.get("sheet") != "(Atla)":
             if plan["KasaHareket"]["cols"].get("tutar") is None:
                 messagebox.showerror(APP_TITLE, "KasaHareket için en az 'Tutar' kolonunu seçmelisin.")
-                return
+                return None
 
         bh_plan = plan.get("BankaHareket")
         if bh_plan and bh_plan.get("sheet") and bh_plan.get("sheet") != "(Atla)":
             cols = plan["BankaHareket"]["cols"]
             if cols.get("tutar") is None and cols.get("borc") is None and cols.get("alacak") is None:
                 messagebox.showerror(APP_TITLE, "BankaHareket için en az 'Tutar' veya 'Borç/Alacak' kolonlarını seçmelisin.")
-                return
+                return None
 
         mp_plan = plan.get("MaasOdeme")
         if mp_plan and mp_plan.get("sheet") and mp_plan.get("sheet") != "(Atla)":
@@ -846,10 +868,10 @@ class ImportWizard(tk.Toplevel):
             if fixed_on:
                 if cols.get("tutar") is None:
                     messagebox.showerror(APP_TITLE, "MaasOdeme için en az 'Tutar' kolonunu seçmelisin.")
-                    return
+                    return None
                 if not str(mp_plan.get("fixed_employee") or "").strip():
                     messagebox.showerror(APP_TITLE, "Bir çalışan seçmelisin.")
-                    return
+                    return None
 
                 only_sel = bool(mp_plan.get("only_selected"))
                 rowmatch = list(mp_plan.get("rowmatch_rows") or [])
@@ -859,42 +881,77 @@ class ImportWizard(tk.Toplevel):
                 if only_sel:
                     if not selected:
                         messagebox.showerror(APP_TITLE, "Sadece seçili satırlar içe aktar seçili ama tabloda satır seçmedin.")
-                        return
+                        return None
                 else:
                     if not rowmatch:
                         messagebox.showerror(APP_TITLE, "Önce çalışanı seçip 'Excel'de Ara' ile satırı/satırları getir.")
-                        return
+                        return None
 
             else:
                 if cols.get("calisan") is None or cols.get("tutar") is None:
                     messagebox.showerror(APP_TITLE, "MaasOdeme için en az 'Çalışan' ve 'Tutar' kolonlarını seçmelisin.")
-                    return
+                    return None
             donem = str(self.context.get("donem") or "").strip()
             if not donem:
                 messagebox.showerror(APP_TITLE, "Maaş import için dönem (YYYY-MM) seçilmemiş.")
-                return
+                return None
 
+        return plan
+
+    def _start_background_import(self, plan: Dict[str, Dict[str, Any]]) -> None:
+        self._import_in_progress = True
+        self._set_busy(True)
+        create_missing = bool(self.var_create_missing_cari.get())
+        db_path = getattr(self.app.db, "path", "")
+        logger = logging.getLogger(__name__)
+
+        def worker() -> None:
+            try:
+                db = DB(db_path)
+                counts = self._run_import(plan, create_missing_cari=create_missing, db=db)
+                db.close()
+                self.after(0, lambda: self._finish_import_success(counts))
+            except Exception as exc:
+                logger.exception("Excel import failed")
+                self.after(0, lambda: self._finish_import_error(exc))
+
+        threading.Thread(target=worker, daemon=True).start()
+
+    def _set_busy(self, is_busy: bool) -> None:
         try:
-            counts = self._run_import(plan, create_missing_cari=self.var_create_missing_cari.get())
-            self.result_counts = counts
-            # Mesajı dinamik oluştur (mode'lara göre)
-            msg_lines = []
-            if "cariler" in counts:
-                msg_lines.append(f"Cariler: {counts['cariler']}")
-            if "cari_hareket" in counts:
-                msg_lines.append(f"Cari Hareket: {counts['cari_hareket']}")
-            if "kasa" in counts:
-                msg_lines.append(f"Kasa: {counts['kasa']}")
-            if "banka" in counts:
-                msg_lines.append(f"Banka: {counts['banka']}")
-            if "maas" in counts:
-                msg_lines.append(f"Maaş: {counts['maas']}")
-            messagebox.showinfo(APP_TITLE, "İçe aktarıldı:\n" + "\n".join(msg_lines))
-            self.destroy()
-        except Exception as e:
-            messagebox.showerror(APP_TITLE, str(e))
+            if hasattr(self, "btn_import"):
+                self.btn_import.config(state=tk.DISABLED if is_busy else tk.NORMAL)
+            if hasattr(self, "btn_cancel"):
+                self.btn_cancel.config(state=tk.DISABLED if is_busy else tk.NORMAL)
+            self.config(cursor="watch" if is_busy else "")
+        except Exception:
+            pass
 
-    def _run_import(self, plan: Dict[str, Dict[str, Any]], create_missing_cari: bool) -> Dict[str, int]:
+    def _finish_import_success(self, counts: Dict[str, int]) -> None:
+        self._import_in_progress = False
+        self._set_busy(False)
+        self.result_counts = counts
+        msg_lines = []
+        if "cariler" in counts:
+            msg_lines.append(f"Cariler: {counts['cariler']}")
+        if "cari_hareket" in counts:
+            msg_lines.append(f"Cari Hareket: {counts['cari_hareket']}")
+        if "kasa" in counts:
+            msg_lines.append(f"Kasa: {counts['kasa']}")
+        if "banka" in counts:
+            msg_lines.append(f"Banka: {counts['banka']}")
+        if "maas" in counts:
+            msg_lines.append(f"Maaş: {counts['maas']}")
+        messagebox.showinfo(APP_TITLE, "İçe aktarıldı:\n" + "\n".join(msg_lines))
+        self.destroy()
+
+    def _finish_import_error(self, exc: Exception) -> None:
+        self._import_in_progress = False
+        self._set_busy(False)
+        messagebox.showerror(APP_TITLE, f"İçe aktarma sırasında hata oluştu:\n{exc}")
+
+    def _run_import(self, plan: Dict[str, Dict[str, Any]], create_missing_cari: bool, db: Optional[DB] = None) -> Dict[str, int]:
+        db = db or self.db
         counts = {"cariler": 0, "cari_hareket": 0, "kasa": 0, "banka": 0, "maas": 0}
         bank_ids: List[int] = []
 
@@ -917,7 +974,7 @@ class ImportWizard(tk.Toplevel):
                     tel = str(cell(ws, r, c.get("telefon")) or "")
                     notlar = str(cell(ws, r, c.get("notlar")) or "")
                     acilis = safe_float(cell(ws, r, c.get("acilis")))
-                    self.db.cari_upsert(str(ad), tur, tel, notlar, acilis)
+                    db.cari_upsert(str(ad), tur, tel, notlar, acilis)
                     counts["cariler"] += 1
 
         ch = plan.get("CariHareket")
@@ -934,11 +991,11 @@ class ImportWizard(tk.Toplevel):
                     continue
 
                 cari_name = str(cari).strip()
-                c_row = self.db.cari_get_by_name(cari_name)
+                c_row = db.cari_get_by_name(cari_name)
                 if not c_row:
                     if not create_missing_cari:
                         continue
-                    cari_id = self.db.cari_upsert(cari_name)
+                    cari_id = db.cari_upsert(cari_name)
                 else:
                     cari_id = int(c_row["id"])
 
@@ -949,11 +1006,11 @@ class ImportWizard(tk.Toplevel):
                 odeme = str(cell(ws, r, c.get("odeme")) or "")
                 belge = str(cell(ws, r, c.get("belge")) or "")
                 if not belge.strip():
-                    belge = self.db.next_belge_no("C")
+                    belge = db.next_belge_no("C")
                 etiket = str(cell(ws, r, c.get("etiket")) or "")
                 aciklama = str(cell(ws, r, c.get("aciklama")) or "")
 
-                self.db.cari_hareket_add(tarih, cari_id, tipn, safe_float(tutar), para, aciklama, odeme, belge, etiket)
+                db.cari_hareket_add(tarih, cari_id, tipn, safe_float(tutar), para, aciklama, odeme, belge, etiket)
                 counts["cari_hareket"] += 1
 
         kh = plan.get("KasaHareket")
@@ -974,7 +1031,7 @@ class ImportWizard(tk.Toplevel):
                 kategori = str(cell(ws, r, c.get("kategori")) or "")
                 belge = str(cell(ws, r, c.get("belge")) or "")
                 if not belge.strip():
-                    belge = self.db.next_belge_no("K")
+                    belge = db.next_belge_no("K")
                 etiket = str(cell(ws, r, c.get("etiket")) or "")
                 aciklama = str(cell(ws, r, c.get("aciklama")) or "")
 
@@ -982,14 +1039,14 @@ class ImportWizard(tk.Toplevel):
                 cari = cell(ws, r, c.get("cari"))
                 if cari and str(cari).strip():
                     cari_name = str(cari).strip()
-                    c_row = self.db.cari_get_by_name(cari_name)
-                    if not c_row:
-                        if create_missing_cari:
-                            cari_id = self.db.cari_upsert(cari_name)
-                    else:
-                        cari_id = int(c_row["id"])
+                c_row = db.cari_get_by_name(cari_name)
+                if not c_row:
+                    if create_missing_cari:
+                        cari_id = db.cari_upsert(cari_name)
+                else:
+                    cari_id = int(c_row["id"])
 
-                self.db.kasa_add(tarih, tipn, safe_float(tutar), para, odeme, kategori, cari_id, aciklama, belge, etiket)
+                db.kasa_add(tarih, tipn, safe_float(tutar), para, odeme, kategori, cari_id, aciklama, belge, etiket)
                 counts["kasa"] += 1
 
         # Banka hareketleri
@@ -1008,7 +1065,7 @@ class ImportWizard(tk.Toplevel):
                 referans = str(cell(ws, r, c.get("referans")) or "")
                 belge = str(cell(ws, r, c.get("belge")) or "")
                 if not belge.strip():
-                    belge = self.db.next_belge_no("B")
+                    belge = db.next_belge_no("B")
                 etiket = str(cell(ws, r, c.get("etiket")) or "")
                 bakiye = cell(ws, r, c.get("bakiye"))
 
@@ -1031,7 +1088,7 @@ class ImportWizard(tk.Toplevel):
                 else:
                     continue
 
-                hid = self.db.banka_add(
+                hid = db.banka_add(
 
                     tarih,
                     banka=banka,
@@ -1110,7 +1167,7 @@ class ImportWizard(tk.Toplevel):
                 if fixed_emp and total != 0:
                     ad_norm = self._resolve_employee_name(str(fixed_emp).strip())
                     aciklama = " | ".join(list(dict.fromkeys(notes)))
-                    self.db.maas_odeme_upsert_from_excel(
+                    db.maas_odeme_upsert_from_excel(
                         donem,
                         str(ad_norm).strip(),
                         float(total),
@@ -1133,7 +1190,7 @@ class ImportWizard(tk.Toplevel):
                     odendi = _paid(cell(ws, r, c.get("odendi")))
                     odeme_tarihi = cell(ws, r, c.get("odeme_tarihi"))
                     aciklama = str(cell(ws, r, c.get("aciklama")) or "")
-                    self.db.maas_odeme_upsert_from_excel(
+                    db.maas_odeme_upsert_from_excel(
                         donem,
                         str(ad_norm).strip(),
                         float(tutar),
@@ -1144,7 +1201,7 @@ class ImportWizard(tk.Toplevel):
                     )
                     counts["maas"] += 1
 
-        self.db.log("Excel Import Wizard", f"{os.path.basename(self.xlsx_path)} | {counts}")
+        db.log("Excel Import Wizard", f"{os.path.basename(self.xlsx_path)} | {counts}")
         self.last_import_bank_ids = list(bank_ids)
         return counts
 

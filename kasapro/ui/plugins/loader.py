@@ -25,19 +25,32 @@ from typing import Callable, Dict, List, Optional
 
 from tkinter import ttk
 
+from ...config import APP_BASE_DIR, LOG_DIRNAME
+
 
 def _ensure_plugin_logger() -> logging.Logger:
     logger = logging.getLogger("kasapro.ui.plugins")
-    if any(isinstance(h, logging.FileHandler) and getattr(h, "baseFilename", "").endswith("app.log") for h in logger.handlers):
+    logger.setLevel(logging.INFO)
+    if logger.handlers:
         return logger
-    log_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "..", "..", "logs", "app.log")
-    log_path = os.path.abspath(log_path)
-    os.makedirs(os.path.dirname(log_path), exist_ok=True)
-    handler = logging.FileHandler(log_path)
+
+    root = logging.getLogger()
+    root_log_paths = {
+        getattr(h, "baseFilename", "")
+        for h in root.handlers
+        if isinstance(h, logging.FileHandler)
+    }
+    desired_path = os.path.abspath(os.path.join(APP_BASE_DIR, LOG_DIRNAME, "app.log"))
+    if desired_path in root_log_paths:
+        logger.propagate = True
+        return logger
+
+    os.makedirs(os.path.dirname(desired_path), exist_ok=True)
+    handler = logging.FileHandler(desired_path, encoding="utf-8")
     formatter = logging.Formatter("%(asctime)s %(levelname)s %(name)s %(message)s")
     handler.setFormatter(formatter)
     logger.addHandler(handler)
-    logger.setLevel(logging.INFO)
+    logger.propagate = False
     return logger
 
 

@@ -196,22 +196,37 @@ class App:
     def _install_exception_handlers(self) -> None:
         logger = logging.getLogger(__name__)
 
+        def show_error(msg: str) -> None:
+            try:
+                if threading.current_thread() is threading.main_thread():
+                    messagebox.showerror(APP_TITLE, msg)
+                else:
+                    self.root.after(0, lambda: messagebox.showerror(APP_TITLE, msg))
+            except Exception:
+                pass
+
         def handle_exception(exc_type, exc, tb):
             logger.exception("Unhandled exception", exc_info=(exc_type, exc, tb))
             try:
-                messagebox.showerror(APP_TITLE, f"Beklenmeyen hata:\n{exc}")
+                show_error(f"Beklenmeyen hata oluştu.\nDetaylar loglandı.\n\n{exc}")
             except Exception:
                 pass
 
         def handle_tk_exception(exc, val, tb):
             logger.exception("Tkinter callback exception", exc_info=(exc, val, tb))
             try:
-                messagebox.showerror(APP_TITLE, f"Arayüz hatası:\n{val}")
+                show_error(f"Arayüz hatası oluştu.\nDetaylar loglandı.\n\n{val}")
             except Exception:
                 pass
 
         sys.excepthook = handle_exception
         self.root.report_callback_exception = handle_tk_exception
+        if hasattr(threading, "excepthook"):
+            def handle_thread_exception(args: threading.ExceptHookArgs) -> None:
+                logger.exception("Thread exception", exc_info=(args.exc_type, args.exc_value, args.exc_traceback))
+                show_error(f"Arka plan işleminde hata oluştu.\nDetaylar loglandı.\n\n{args.exc_value}")
+
+            threading.excepthook = handle_thread_exception
 
     def _load_test_user(self) -> sqlite3.Row:
         user = self.usersdb.get_user_by_username("admin")
