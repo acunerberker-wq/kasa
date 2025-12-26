@@ -12,6 +12,7 @@ from typing import Any, Dict, List, Optional
 from .connection import connect
 from .schema import init_schema, migrate_schema, seed_defaults
 from ..modules.invoice.repo import AdvancedInvoiceRepo
+from ..modules.hakedis.repo import HakedisRepo
 from .repos import (
     LogsRepo,
     SettingsRepo,
@@ -31,7 +32,7 @@ from .repos import (
     MessagesRepo,
     HRRepo,
 )
-from modules.hakedis.repo import HakedisRepo
+from .repos.dms_repo import DmsRepo
 
 
 
@@ -63,6 +64,7 @@ class DB:
         self.hakedis = HakedisRepo(self.conn)
         self.hr = HRRepo(self.conn)
         self.invoice_adv = AdvancedInvoiceRepo(self.conn)
+        self.dms = DmsRepo(self.conn)
 
         migrate_schema(self.conn, log_fn=self._safe_log)
         seed_defaults(self.conn, log_fn=self._safe_log)

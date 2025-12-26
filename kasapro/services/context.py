@@ -9,7 +9,6 @@ from __future__ import annotations
 import sys
 import os
 from dataclasses import dataclass
-from typing import Callable
 from typing import Callable, Optional
 
 from ..db.main_db import DB
@@ -20,15 +19,12 @@ from .settings_service import SettingsService
 from .company_users_service import CompanyUsersService
 from .cari_service import CariService
 from .messages_service import MessagesService
-from modules.hakedis.service import HakedisService
 from ..modules.hakedis.service import HakedisService
 from ..modules.quote_order.service import QuoteOrderService
-from modules.hr.service import HRService, HRContext
 from .wms_service import WmsService
 from ..modules.notes_reminders.service import NotesRemindersService
 from ..modules.dms.service import DmsService
 from ..modules.integrations.service import IntegrationService
-from ..modules.hakedis.service import HakedisService
 
 # HR modülü için dinamik import (modules/ klasöründen)
 try:
@@ -51,18 +47,17 @@ class Services:
     cari: CariService
     messages: MessagesService
     hakedis: HakedisService
-    hakedis: HakedisService
     quote_order: QuoteOrderService
     hr: HRService
     notes_reminders: NotesRemindersService
     wms: WmsService
+    dms: DmsService
     integrations: IntegrationService
 
     @classmethod
     def build(cls, db: DB, usersdb: UsersDB, context_provider) -> "Services":
         exporter = ExportService()
         hr_service = HRService(db, context_provider) if HRService else None
-        hakedis_service = HakedisService(db)
         return cls(
             db=db,
             usersdb=usersdb,
@@ -73,8 +68,9 @@ class Services:
             messages=MessagesService(db, usersdb),
             hakedis=HakedisService(db, exporter),
             quote_order=QuoteOrderService(db),
-            hr=HRService(db, context_provider),
+            hr=hr_service,
             notes_reminders=NotesRemindersService(db, usersdb),
             wms=WmsService(db),
+            dms=DmsService(db),
             integrations=IntegrationService(db, context_provider),
         )
