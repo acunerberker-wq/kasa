@@ -20,6 +20,7 @@ from .settings_service import SettingsService
 from .company_users_service import CompanyUsersService
 from .cari_service import CariService
 from .messages_service import MessagesService
+from ..modules.quote_order.service import QuoteOrderService
 from modules.hr.service import HRService, HRContext
 from .wms_service import WmsService
 from ..modules.notes_reminders.service import NotesRemindersService
@@ -47,6 +48,7 @@ class Services:
     company_users: CompanyUsersService
     cari: CariService
     messages: MessagesService
+    quote_order: QuoteOrderService
     hr: HRService
     notes_reminders: NotesRemindersService
     wms: WmsService
@@ -66,6 +68,7 @@ class Services:
             company_users=CompanyUsersService(db),
             cari=CariService(db, exporter),
             messages=MessagesService(db, usersdb),
+            quote_order=QuoteOrderService(db),
             hr=HRService(db, context_provider),
             notes_reminders=NotesRemindersService(db, usersdb),
             wms=WmsService(db),

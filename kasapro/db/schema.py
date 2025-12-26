@@ -688,6 +688,128 @@ def init_schema(conn: sqlite3.Connection) -> None:
     );"""
     )
 
+    # -----------------
+    # Teklif & Sipariş (Quote-Order)
+    # -----------------
+    c.execute(
+        """
+    CREATE TABLE IF NOT EXISTS series_counters(
+        name TEXT PRIMARY KEY,
+        prefix TEXT DEFAULT '',
+        last_no INTEGER NOT NULL DEFAULT 0,
+        padding INTEGER NOT NULL DEFAULT 6,
+        format TEXT DEFAULT '{prefix}{no_pad}'
+    );"""
+    )
+
+    c.execute(
+        """
+    CREATE TABLE IF NOT EXISTS quotes(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        quote_no TEXT NOT NULL,
+        version INTEGER NOT NULL DEFAULT 1,
+        status TEXT NOT NULL DEFAULT 'DRAFT',
+        quote_group_id INTEGER,
+        cari_id INTEGER,
+        cari_ad TEXT DEFAULT '',
+        valid_until TEXT DEFAULT '',
+        para TEXT DEFAULT 'TL',
+        kur REAL DEFAULT 1,
+        ara_toplam REAL DEFAULT 0,
+        iskonto_toplam REAL DEFAULT 0,
+        genel_iskonto_oran REAL DEFAULT 0,
+        genel_iskonto_tutar REAL DEFAULT 0,
+        kdv_toplam REAL DEFAULT 0,
+        genel_toplam REAL DEFAULT 0,
+        notlar TEXT DEFAULT '',
+        locked INTEGER NOT NULL DEFAULT 0,
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(quote_no, version),
+        FOREIGN KEY(cari_id) REFERENCES cariler(id)
+    );"""
+    )
+
+    c.execute(
+        """
+    CREATE TABLE IF NOT EXISTS quote_lines(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        quote_id INTEGER NOT NULL,
+        line_no INTEGER NOT NULL DEFAULT 1,
+        urun TEXT DEFAULT '',
+        aciklama TEXT DEFAULT '',
+        miktar REAL DEFAULT 0,
+        birim TEXT DEFAULT 'Adet',
+        birim_fiyat REAL DEFAULT 0,
+        iskonto_oran REAL DEFAULT 0,
+        iskonto_tutar REAL DEFAULT 0,
+        kdv_oran REAL DEFAULT 20,
+        kdv_tutar REAL DEFAULT 0,
+        toplam REAL DEFAULT 0,
+        FOREIGN KEY(quote_id) REFERENCES quotes(id) ON DELETE CASCADE
+    );"""
+    )
+
+    c.execute(
+        """
+    CREATE TABLE IF NOT EXISTS sales_orders(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        order_no TEXT NOT NULL UNIQUE,
+        quote_id INTEGER,
+        status TEXT NOT NULL DEFAULT 'DRAFT',
+        cari_id INTEGER,
+        cari_ad TEXT DEFAULT '',
+        para TEXT DEFAULT 'TL',
+        kur REAL DEFAULT 1,
+        ara_toplam REAL DEFAULT 0,
+        iskonto_toplam REAL DEFAULT 0,
+        kdv_toplam REAL DEFAULT 0,
+        genel_toplam REAL DEFAULT 0,
+        notlar TEXT DEFAULT '',
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY(quote_id) REFERENCES quotes(id),
+        FOREIGN KEY(cari_id) REFERENCES cariler(id)
+    );"""
+    )
+
+    c.execute(
+        """
+    CREATE TABLE IF NOT EXISTS sales_order_lines(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        order_id INTEGER NOT NULL,
+        line_no INTEGER NOT NULL DEFAULT 1,
+        urun TEXT DEFAULT '',
+        aciklama TEXT DEFAULT '',
+        miktar_siparis REAL DEFAULT 0,
+        miktar_sevk REAL DEFAULT 0,
+        miktar_fatura REAL DEFAULT 0,
+        birim TEXT DEFAULT 'Adet',
+        birim_fiyat REAL DEFAULT 0,
+        iskonto_oran REAL DEFAULT 0,
+        iskonto_tutar REAL DEFAULT 0,
+        kdv_oran REAL DEFAULT 20,
+        kdv_tutar REAL DEFAULT 0,
+        toplam REAL DEFAULT 0,
+        FOREIGN KEY(order_id) REFERENCES sales_orders(id) ON DELETE CASCADE
+    );"""
+    )
+
+    c.execute(
+        """
+    CREATE TABLE IF NOT EXISTS audit_log(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        ts TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        entity_type TEXT NOT NULL,
+        entity_id INTEGER NOT NULL,
+        action TEXT NOT NULL,
+        user_id INTEGER,
+        username TEXT DEFAULT '',
+        role TEXT DEFAULT '',
+        note TEXT DEFAULT ''
+    );"""
+    )
+
     c.execute("""
     CREATE TABLE IF NOT EXISTS logs(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -2927,6 +3049,122 @@ def migrate_schema(conn: sqlite3.Connection, log_fn: Optional[Callable[[str, str
             except Exception:
                 pass
 
+    # Teklif & Sipariş (Quote-Order) tabloları
+    try:
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS series_counters(
+                name TEXT PRIMARY KEY,
+                prefix TEXT DEFAULT '',
+                last_no INTEGER NOT NULL DEFAULT 0,
+                padding INTEGER NOT NULL DEFAULT 6,
+                format TEXT DEFAULT '{prefix}{no_pad}'
+            );"""
+        )
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS quotes(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                quote_no TEXT NOT NULL,
+                version INTEGER NOT NULL DEFAULT 1,
+                status TEXT NOT NULL DEFAULT 'DRAFT',
+                quote_group_id INTEGER,
+                cari_id INTEGER,
+                cari_ad TEXT DEFAULT '',
+                valid_until TEXT DEFAULT '',
+                para TEXT DEFAULT 'TL',
+                kur REAL DEFAULT 1,
+                ara_toplam REAL DEFAULT 0,
+                iskonto_toplam REAL DEFAULT 0,
+                genel_iskonto_oran REAL DEFAULT 0,
+                genel_iskonto_tutar REAL DEFAULT 0,
+                kdv_toplam REAL DEFAULT 0,
+                genel_toplam REAL DEFAULT 0,
+                notlar TEXT DEFAULT '',
+                locked INTEGER NOT NULL DEFAULT 0,
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                UNIQUE(quote_no, version)
+            );"""
+        )
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS quote_lines(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                quote_id INTEGER NOT NULL,
+                line_no INTEGER NOT NULL DEFAULT 1,
+                urun TEXT DEFAULT '',
+                aciklama TEXT DEFAULT '',
+                miktar REAL DEFAULT 0,
+                birim TEXT DEFAULT 'Adet',
+                birim_fiyat REAL DEFAULT 0,
+                iskonto_oran REAL DEFAULT 0,
+                iskonto_tutar REAL DEFAULT 0,
+                kdv_oran REAL DEFAULT 20,
+                kdv_tutar REAL DEFAULT 0,
+                toplam REAL DEFAULT 0,
+                FOREIGN KEY(quote_id) REFERENCES quotes(id) ON DELETE CASCADE
+            );"""
+        )
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS sales_orders(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                order_no TEXT NOT NULL UNIQUE,
+                quote_id INTEGER,
+                status TEXT NOT NULL DEFAULT 'DRAFT',
+                cari_id INTEGER,
+                cari_ad TEXT DEFAULT '',
+                para TEXT DEFAULT 'TL',
+                kur REAL DEFAULT 1,
+                ara_toplam REAL DEFAULT 0,
+                iskonto_toplam REAL DEFAULT 0,
+                kdv_toplam REAL DEFAULT 0,
+                genel_toplam REAL DEFAULT 0,
+                notlar TEXT DEFAULT '',
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY(quote_id) REFERENCES quotes(id),
+                FOREIGN KEY(cari_id) REFERENCES cariler(id)
+            );"""
+        )
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS sales_order_lines(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                order_id INTEGER NOT NULL,
+                line_no INTEGER NOT NULL DEFAULT 1,
+                urun TEXT DEFAULT '',
+                aciklama TEXT DEFAULT '',
+                miktar_siparis REAL DEFAULT 0,
+                miktar_sevk REAL DEFAULT 0,
+                miktar_fatura REAL DEFAULT 0,
+                birim TEXT DEFAULT 'Adet',
+                birim_fiyat REAL DEFAULT 0,
+                iskonto_oran REAL DEFAULT 0,
+                iskonto_tutar REAL DEFAULT 0,
+                kdv_oran REAL DEFAULT 20,
+                kdv_tutar REAL DEFAULT 0,
+                toplam REAL DEFAULT 0,
+                FOREIGN KEY(order_id) REFERENCES sales_orders(id) ON DELETE CASCADE
+            );"""
+        )
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS audit_log(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                ts TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                entity_type TEXT NOT NULL,
+                entity_id INTEGER NOT NULL,
+                action TEXT NOT NULL,
+                user_id INTEGER,
+                username TEXT DEFAULT '',
+                role TEXT DEFAULT '',
+                note TEXT DEFAULT ''
+            );"""
+        )
+        conn.commit()
+    except Exception as e:
+        if log_fn:
+            try:
+                log_fn("Schema Migration Error", f"quote_order tables: {e}")
+            except Exception:
+                pass
+
     # -----------------
     # WMS / Stok Çekirdek (eski DB'ler için)
     # -----------------
@@ -3485,6 +3723,15 @@ def migrate_schema(conn: sqlite3.Connection, log_fn: Optional[Callable[[str, str
     _ensure_index(conn, "idx_stok_hareket_urun_id", "stok_hareket", "urun_id", log_fn)
     _ensure_index(conn, "idx_stok_hareket_tarih", "stok_hareket", "tarih", log_fn)
     _ensure_index(conn, "idx_kasa_hareket_tip_tarih", "kasa_hareket", "tip, tarih", log_fn)
+    _ensure_index(conn, "idx_quotes_no_version", "quotes", "quote_no, version", log_fn)
+    _ensure_index(conn, "idx_quotes_status", "quotes", "status", log_fn)
+    _ensure_index(conn, "idx_quotes_valid_until", "quotes", "valid_until", log_fn)
+    _ensure_index(conn, "idx_quote_lines_quote_id", "quote_lines", "quote_id", log_fn)
+    _ensure_index(conn, "idx_sales_orders_status", "sales_orders", "status", log_fn)
+    _ensure_index(conn, "idx_sales_orders_quote_id", "sales_orders", "quote_id", log_fn)
+    _ensure_index(conn, "idx_sales_order_lines_order_id", "sales_order_lines", "order_id", log_fn)
+    _ensure_index(conn, "idx_audit_log_entity", "audit_log", "entity_type, entity_id", log_fn)
+    _ensure_index(conn, "idx_audit_log_ts", "audit_log", "ts", log_fn)
     _ensure_index(conn, "idx_hr_departments_company", "hr_departments", "company_id", log_fn)
     _ensure_index(conn, "idx_hr_positions_company", "hr_positions", "company_id", log_fn)
     _ensure_index(conn, "idx_hr_employees_company", "hr_employees", "company_id", log_fn)
@@ -3558,5 +3805,19 @@ def seed_defaults(conn: sqlite3.Connection, log_fn: Optional[Callable[[str, str]
             _set("stock_units", json.dumps(DEFAULT_STOCK_UNITS, ensure_ascii=False))
         if not _get("stock_categories"):
             _set("stock_categories", json.dumps(DEFAULT_STOCK_CATEGORIES, ensure_ascii=False))
+    except Exception:
+        pass
+
+    # series counters defaults
+    try:
+        conn.execute(
+            "INSERT OR IGNORE INTO series_counters(name,prefix,last_no,padding,format) VALUES(?,?,?,?,?)",
+            ("quote_no", "Q", 0, 6, "{prefix}{no_pad}"),
+        )
+        conn.execute(
+            "INSERT OR IGNORE INTO series_counters(name,prefix,last_no,padding,format) VALUES(?,?,?,?,?)",
+            ("order_no", "SO", 0, 6, "{prefix}{no_pad}"),
+        )
+        conn.commit()
     except Exception:
         pass
