@@ -61,8 +61,8 @@ class DB:
         self.satis_siparis = SatisSiparisRepo(self.conn)
         self.messages = MessagesRepo(self.conn)
         self.hakedis = HakedisRepo(self.conn)
-        self.hakedis = HakedisRepo(self.conn, log_fn=self.logs.log)
         self.hr = HRRepo(self.conn)
+        self.invoice_adv = AdvancedInvoiceRepo(self.conn)
 
         migrate_schema(self.conn, log_fn=self._safe_log)
         seed_defaults(self.conn, log_fn=self._safe_log)

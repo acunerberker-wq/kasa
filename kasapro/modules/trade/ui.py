@@ -40,10 +40,17 @@ class TradeModuleFrame(ttk.Frame):
         super().__init__(master)
         self.app = app
         self._report_queue: queue.Queue = queue.Queue()
+        user = getattr(app, "user", None)
+        if user is None:
+            app_role = ""
+        elif hasattr(user, "get"):
+            app_role = str(user.get("role", ""))
+        else:
+            app_role = str(user["role"] if "role" in user.keys() else "")
         user_ctx = TradeUserContext(
             user_id=getattr(app, "data_owner_user_id", None),
             username=str(getattr(app, "data_owner_username", "")),
-            app_role=str(getattr(app, "user", {}).get("role", "")),
+            app_role=app_role,
         )
         company_id = getattr(app, "active_company_id", None)
         self.service = TradeService(app.db, user_ctx, company_id=company_id)

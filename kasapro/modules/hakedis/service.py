@@ -10,12 +10,14 @@ from typing import Dict, Iterable, Optional, Sequence, Tuple
 
 from ...config import MESSAGE_ATTACHMENT_MAX_BYTES
 from ...db.main_db import DB
+from ...services.export_service import ExportService
 from .indices import HakedisOrgProvider
 
 
 class HakedisService:
-    def __init__(self, db: DB):
+    def __init__(self, db: DB, exporter: Optional[ExportService] = None):
         self.db = db
+        self.exporter = exporter
         self.provider = HakedisOrgProvider()
 
     def _attachments_root(self) -> str:

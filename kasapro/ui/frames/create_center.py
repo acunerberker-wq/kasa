@@ -149,7 +149,13 @@ class CreateCenterFrame(BaseView):
         return [spec for spec in allowed if query in spec.label.lower()]
 
     def _allowed_forms(self) -> List[FormSpec]:
-        role = str(getattr(self.app, "user", {}).get("role", "")).lower()
+        user = getattr(self.app, "user", None)
+        if user is None:
+            role = ""
+        elif hasattr(user, "get"):
+            role = str(user.get("role", "")).lower()
+        else:
+            role = str(user["role"] if "role" in user.keys() else "").lower()
         allowed = []
         for spec in self._registry:
             if not spec.roles_allowed:
