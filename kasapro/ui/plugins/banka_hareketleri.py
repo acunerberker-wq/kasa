@@ -591,6 +591,45 @@ class BankaHareketleriFrame(BaseView):
             if ids:
                 self.open_workspace(ids=list(ids))
 
+    def _load_table(self) -> None:
+        """Banka hareketlerini yükle."""
+        try:
+            rows = self.app.banka_repo.list_all(limit=500, offset=0)
+            self.table.clear()
+            
+            if not rows:
+                # Boş durum için bilgilendirme
+                self.table.insert_row(
+                    values=["Kayıt bulunamadı", "", "", "", ""],
+                    tags=("empty",)
+                )
+                return
+            
+            for row in rows:
+                self.table.insert_row(
+                    values=[
+                        row.id,
+                        fmt_tr_date(row.tarih),
+                        row.banka,
+                        row.hesap,
+                        row.tip,
+                        fmt_amount(row.tutar),
+                        row.para,
+                        row.aciklama,
+                        row.referans,
+                        row.belge,
+                        row.etiket,
+                        fmt_amount(row.bakiye),
+                    ]
+                )
+        except Exception as e:
+            messagebox.showerror(
+                "Hata",
+                f"Banka hareketleri yüklenemedi:\n{e}"
+            )
+            import logging
+            logging.exception("Banka tablosu yükleme hatası")
+
 
 def build(master, app: "App") -> ttk.Frame:
     frame = BankaHareketleriFrame(master, app)

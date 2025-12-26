@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import sqlite3
 from typing import Any, Dict, List, Optional
+import threading
 
 from .connection import connect
 from .schema import init_schema, migrate_schema, seed_defaults
@@ -1250,3 +1251,41 @@ class DB:
 
     def fatura_odeme_toplam(self, fid: int) -> float:
         return self.fatura.odeme_toplam(fid)
+
+
+class MainDB:
+    _thread_local = threading.local()
+    
+    @property
+    def conn(self) -> sqlite3.Connection:
+        """Thread-safe bağlantı al."""
+        if not hasattr(self._thread_local, 'connection'):
+            self._thread_local.connection = sqlite3.connect(
+                self.db_file,
+                timeout=10,
+                check_same_thread=False,
+            )
+            self._thread_local.connection.row_factory = sqlite3.Row
+        
+        # Bağlantı kapalıysa yeniden aç
+        try:
+            self._thread_local.connection.execute("SELECT 1")
+        except sqlite3.ProgrammingError:
+            self._thread_local.connection = sqlite3.connect(
+                self.db_file,
+                timeout=10,
+                check_same_thread=False,
+            )
+            self._thread_local.connection.row_factory = sqlite3.Row
+        
+        return self._thread_local.connection
+    
+    def close(self) -> None:
+        """Bağlantıyı güvenli şekilde kapat."""
+        if hasattr(self._thread_local, 'connection'):
+            try:
+                self._thread_local.connection.close()
+            except Exception:
+                pass
+            finally:
+                del self._thread_local.connection

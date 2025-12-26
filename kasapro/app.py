@@ -56,104 +56,131 @@ except ImportError:
     from typing import Any as HRContext
 
 class App:
-    def __init__(self, base_dir: Optional[str] = None, test_mode: bool = False):
-        self.root = tk.Tk()
-        self.root.title(APP_TITLE)
-        self.root.geometry("1320x780")
-        self.root.minsize(1120, 650)
-        self._test_mode = test_mode
-        self._install_exception_handlers()
-
-        # Tema/Fontları login penceresinde de uygula
+    def __init__(self, root: tk.Tk):
+        self.root = root
+        self._init_window()
+        self._init_db()
+        self._init_ui()
+        self._start_services()
+    
+    def _init_window(self) -> None:
+        """Pencere özelliklerini ayarla."""
         try:
-            apply_modern_style(self.root)
-        except Exception:
-            pass
-
-        # Giriş penceresi görünürken ana pencereyi gizle (bazı sistemlerde
-        # login penceresi arka planda kalabiliyor).
+            self.root.title("KasaPro v3")
+            self.root.geometry("1400x900")
+            self.root.minsize(800, 600)
+        except Exception as e:
+            messagebox.showerror("Hata", f"Pencere kuruluşu başarısız: {e}")
+            raise
+    
+    def _init_db(self) -> None:
+        """Veritabanı bağlantısını aç."""
         try:
-            self.root.withdraw()
-        except Exception:
-            pass
+            self.base_dir = APP_BASE_DIR
+            self.usersdb = UsersDB(self.base_dir)
 
-        self.base_dir = base_dir or APP_BASE_DIR
-        self.usersdb = UsersDB(self.base_dir)
-
-        if self._test_mode:
-            self.user = self._load_test_user()
-        else:
             self.user = self._login()
-        if not self.user:
+            if not self.user:
+                try:
+                    self.usersdb.close()
+                except Exception:
+                    pass
+                self.root.destroy()
+                raise SystemExit(0)
+
+            # Aktif veri sahibi (kullanıcı) + aktif şirket (her şirketin kendi DB'si vardır)
+            self.is_admin = (self.user["role"] == "admin")
+            self.data_owner_username = str(self.user["username"])
             try:
-                self.usersdb.close()
+                self.data_owner_user_id = int(self.user["id"])
             except Exception:
-                pass
-            self.root.destroy()
-            raise SystemExit(0)
+                self.data_owner_user_id = None
 
-        # Aktif veri sahibi (kullanıcı) + aktif şirket (her şirketin kendi DB'si vardır)
-        self.is_admin = (self.user["role"] == "admin")
-        self.data_owner_username = str(self.user["username"])
-        try:
-            self.data_owner_user_id = int(self.user["id"])
-        except Exception:
-            self.data_owner_user_id = None
-
-        # Şirket: son kullanılan (yoksa ilk)
-        self.active_company = None
-        try:
-            self.active_company = self.usersdb.get_active_company_for_user(self.user)
-        except Exception:
+            # Şirket: son kullanılan (yoksa ilk)
             self.active_company = None
+            try:
+                self.active_company = self.usersdb.get_active_company_for_user(self.user)
+            except Exception:
+                self.active_company = None
 
-        if self.active_company:
-            db_path = self.usersdb.get_company_db_path(self.active_company)
-            try:
-                self.active_company_id = int(self.active_company["id"])
-            except Exception:
-                self.active_company_id = None
-            try:
-                self.active_company_name = str(self.active_company["name"])
-            except Exception:
-                self.active_company_name = ""
-            try:
-                if self.data_owner_user_id and self.active_company_id:
-                    self.usersdb.set_last_company_id(int(self.data_owner_user_id), int(self.active_company_id))
-            except Exception:
-                pass
-        else:
-            # Güvenlik: çok eski kurulumlarda şirket kaydı yoksa user DB'si ile devam et
-            db_path = self.usersdb.get_user_db_path(self.user)
-            self.active_company_id = None
-            self.active_company_name = "1. Şirket"
-
-        self.db = DB(db_path)
-        # Servis katmanı (UI -> services -> DB)
-        self.services = Services.build(self.db, self.usersdb, context_provider=self._hr_context)
-        self.integrations_worker = IntegrationWorker(self.services.integrations)
-        try:
-            cname = getattr(self, "active_company_name", "")
-            if cname:
-                self.db.log("Login", f"{self.user['username']} ({self.user['role']}) / {cname}")
+            if self.active_company:
+                db_path = self.usersdb.get_company_db_path(self.active_company)
+                try:
+                    self.active_company_id = int(self.active_company["id"])
+                except Exception:
+                    self.active_company_id = None
+                try:
+                    self.active_company_name = str(self.active_company["name"])
+                except Exception:
+                    self.active_company_name = ""
+                try:
+                    if self.data_owner_user_id and self.active_company_id:
+                        self.usersdb.set_last_company_id(int(self.data_owner_user_id), int(self.active_company_id))
+                except Exception:
+                    pass
             else:
-                self.db.log("Login", f"{self.user['username']} ({self.user['role']})")
-        except Exception:
-            pass
+                # Güvenlik: çok eski kurulumlarda şirket kaydı yoksa user DB'si ile devam et
+                db_path = self.usersdb.get_user_db_path(self.user)
+                self.active_company_id = None
+                self.active_company_name = "1. Şirket"
 
-        self.frames: Dict[str, ttk.Frame] = {}
-        self._build_ui()
-        self._schedule_sales_order_summary()
-        self._start_reminder_scheduler()
-
-        # Login başarılı -> ana pencereyi göster
-        if not self._test_mode:
+            self.db = DB(db_path)
+            # Servis katmanı (UI -> services -> DB)
+            self.services = Services.build(self.db, self.usersdb, context_provider=self._hr_context)
+            self.integrations_worker = IntegrationWorker(self.services.integrations)
             try:
-                self.root.deiconify()
-                self.root.lift()
-                self.root.after(80, self.root.lift)
+                cname = getattr(self, "active_company_name", "")
+                if cname:
+                    self.db.log("Login", f"{self.user['username']} ({self.user['role']}) / {cname}")
+                else:
+                    self.db.log("Login", f"{self.user['username']} ({self.user['role']})")
             except Exception:
                 pass
+        except Exception as e:
+            messagebox.showerror("Hata", f"Veritabanı hatası: {e}")
+            raise
+    
+    def _init_ui(self) -> None:
+        """UI bileşenlerini oluştur."""
+        try:
+            # Tema/Fontları login penceresinde de uygula
+            try:
+                apply_modern_style(self.root)
+            except Exception:
+                pass
+
+            # Giriş penceresi görünürken ana pencereyi gizle (bazı sistemlerde
+            # login penceresi arka planda kalabiliyor).
+            try:
+                self.root.withdraw()
+            except Exception:
+                pass
+
+            self.frames: Dict[str, ttk.Frame] = {}
+            self._build_ui()
+            self._schedule_sales_order_summary()
+            self._start_reminder_scheduler()
+
+            # Login başarılı -> ana pencereyi göster
+            if not self._test_mode:
+                try:
+                    self.root.deiconify()
+                    self.root.lift()
+                    self.root.after(80, self.root.lift)
+                except Exception:
+                    pass
+        except Exception as e:
+            messagebox.showerror("Hata", f"UI kuruluşu başarısız: {e}")
+            raise
+    
+    def _start_services(self) -> None:
+        """Arka plan hizmetlerini başlat."""
+        try:
+            self._schedule_sales_order_summary()
+            self._start_reminder_scheduler()
+        except Exception as e:
+            messagebox.showerror("Hata", f"Hizmetler başlatılamadı: {e}")
+            # Non-critical, don't raise
 
     def _schedule_sales_order_summary(self) -> None:
         try:
@@ -616,18 +643,8 @@ class App:
             pass
         try:
             for key in ("cari_hareket_ekle", "cari_hareketler"):
-                if key in self.frames:
-                    fr = self.frames[key]
-                    try:
-                        if hasattr(fr, "reload_cari"):
-                            fr.reload_cari()  # type: ignore
-                    except Exception:
-                        pass
-                    try:
-                        if hasattr(fr, "refresh"):
-                            fr.refresh()  # type: ignore
-                    except Exception:
-                        pass
+                if key in self.frames and hasattr(self.frames[key], "reload_cari"):
+                    self.frames[key].reload_cari()  # type: ignore
         except Exception:
             pass
         try:

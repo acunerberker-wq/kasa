@@ -278,202 +278,52 @@ class MaasEklentileriFrame(BaseView):
             pass
 
 
-    def _auto_record_name_matches(self, period: str, *, date_from: str = "", date_to: str = "", name_min: float = 0.78) -> tuple[int, int]:
-        """İçe aktarımdan sonra, çalışan ad-soyad + (varsa) aynı gün/aynı tutar yakınlığı ile
-        banka hareketlerini tarar ve 'maas_hesap_hareket' tablosuna geçmiş kaydı açar.
-
-        Dönüş: (eklenen_kayıt_sayısı, otomatik_link_sayısı)
-        """
-        period = (period or "").strip() or _current_period()
-        if not date_from or not date_to:
-            date_from, date_to = self._period_to_range(period)
-
+    def _auto_record_name_matches(self, period: str) -> int:
+        """Maaş-Banka eşleştirmesi yap."""
+        if not self.app.maas_repo or not self.app.banka_repo:
+            return 0
+        
         try:
-            pay_rows = self.app.db.maas_odeme_list(donem=period, odendi=None, include_inactive=True)  # type: ignore
-        except Exception:
-            pay_rows = []
-        if not pay_rows:
-            return (0, 0)
-
-        try:
-            bank_rows = self.app.db.banka_list(date_from=date_from, date_to=date_to, tip="Çıkış", limit=15000)
-        except Exception:
-            bank_rows = []
-        bank_rows = list(bank_rows or [])
-        if not bank_rows:
-            return (0, 0)
-
-        def _get(r: Any, k: str, d: Any = "") -> Any:
-            if isinstance(r, dict):
-                return r.get(k, d)
-            try:
-                return r[k]
-            except Exception:
-                return d
-
-        token_index: dict[str, list[int]] = {}
-        bank_by_id: dict[int, tuple[Any, str, str, float, Any]] = {}  # id -> (row, norm_desc, para, abs_tutar, tarih)
-        amount_buckets: dict[int, list[int]] = {}
-
-        for b in bank_rows:
-            try:
-                bid = int(_get(b, "id", 0) or 0)
-            except Exception:
-                continue
-            if bid <= 0:
-                continue
-            desc = str(_get(b, "aciklama", "") or "")
-            nd = normalize_text(desc)
-            para = str(_get(b, "para", "") or "")
-            try:
-                btutar = abs(float(_get(b, "tutar", 0.0) or 0.0))
-            except Exception:
-                btutar = 0.0
-            btarih = _get(b, "tarih", "")
-            bank_by_id[bid] = (b, nd, para, btutar, btarih)
-            for tok in set(nd.split()):
-                if len(tok) >= 3:
-                    token_index.setdefault(tok, []).append(bid)
-            try:
-                buck = int(round(btutar))
-            except Exception:
-                buck = 0
-            if buck > 0:
-                amount_buckets.setdefault(buck, []).append(bid)
-
-        used_bank_ids: set[int] = set()
-        for pr in pay_rows:
-            try:
-                ub = int(_get(pr, "banka_hareket_id", 0) or 0)
-            except Exception:
-                ub = 0
-            if ub:
-                used_bank_ids.add(int(ub))
-
-        added = 0
-        auto_linked = 0
-
-        for pr in pay_rows:
-            try:
-                oid = int(_get(pr, "id"))
-                cid = int(_get(pr, "calisan_id"))
-                emp_name = str(_get(pr, "calisan_ad", "") or "")
-                expected = abs(float(_get(pr, "tutar", 0.0) or 0.0))
-                epara = str(_get(pr, "para", "TL") or "TL")
-                existing_link = int(_get(pr, "banka_hareket_id", 0) or 0)
-                pay_date = _get(pr, "odeme_tarihi", "")
-            except Exception:
-                continue
-
-            nname = normalize_text(emp_name)
-            tokens = [t for t in nname.split() if len(t) >= 3]
-            anchor = max(tokens, key=len) if tokens else ""
-            name_cand_ids = token_index.get(anchor, []) if anchor else []
-
-            # aynı gün/aynı tutar için aday seti (tarih yoksa pas)
-            amtdate_cand: set[int] = set()
-            if self._to_date(pay_date) is not None and expected > 0:
-                tol_amt = max(2.0, expected * 0.03)
-                lo = int(round(max(0.0, expected - tol_amt)))
-                hi = int(round(expected + tol_amt))
-                for buck in range(lo, hi + 1):
-                    for bid in amount_buckets.get(buck, []) or []:
-                        amtdate_cand.add(int(bid))
-
-            best_link: tuple[float, Optional[int], float, float, float, str] = (0.0, None, 0.0, 0.0, 0.0, "")
-            second_link = 0.0
-
-            def _score_and_store(bid: int, *, mode: str, do_store: bool = True) -> Optional[tuple[float, float, float, float]]:
-                nonlocal added, best_link, second_link
-                if bid not in bank_by_id:
-                    return None
-                brow, _nd, bpara, btutar, btarih = bank_by_id[bid]
-                desc = str(_get(brow, "aciklama", "") or "")
-                name_sc = float(best_substring_similarity(emp_name, desc))
-                thr = float(name_min + (0.08 if len(nname.split()) < 2 else 0.0))
-                if mode == "name" and name_sc < thr:
-                    return None
-                try:
-                    if epara and bpara and str(epara).strip().upper() != str(bpara).strip().upper():
-                        return None
-                except Exception:
-                    pass
-
-                amt_sc = float(amount_score(btutar, expected, abs_tol=2.0, pct_tol=0.03)) if expected > 0 else 0.0
-                date_sc = float(self._date_score(btarih, pay_date)) if self._to_date(pay_date) is not None else 0.0
-
-                if self._to_date(pay_date) is not None:
-                    if name_sc >= 0.78:
-                        score = float(combine3_scores(name_sc, amt_sc, date_sc, w_a=0.55, w_b=0.25, w_c=0.20))
-                    elif date_sc >= 0.85:
-                        score = float(combine3_scores(name_sc, amt_sc, date_sc, w_a=0.15, w_b=0.55, w_c=0.30))
-                    else:
-                        score = float(combine3_scores(name_sc, amt_sc, date_sc, w_a=0.25, w_b=0.65, w_c=0.10))
-                else:
-                    score = float(combine_scores(name_sc, amt_sc, w_name=0.85 if mode == "name" else 0.55, w_amt=0.15 if mode == "name" else 0.45))
-
-                if do_store:
+            salaries = self.app.maas_repo.list_by_period(period)
+            bank_rows = self.app.banka_repo.list_all(limit=1000)
+            
+            matched_count = 0
+            matched_bank_ids = set()  # Tekrarlama önle
+            
+            for salary in salaries:
+                if not salary:
+                    continue
+                
+                best_match = None
+                best_score = 0.70
+                
+                for bank_row in bank_rows:
+                    if bank_row["id"] in matched_bank_ids:
+                        continue  # Zaten eşleştirilmiş
+                    
+                    score = self._calculate_match_score(salary, bank_row)
+                    
+                    if score > best_score:
+                        best_score = score
+                        best_match = bank_row
+                
+                if best_match:
                     try:
-                        rid = int(
-                            self.app.db.maas_hesap_hareket_add(
-                                donem=period,
-                                calisan_id=cid,
-                                banka_hareket_id=int(bid),
-                                odeme_id=oid,
-                                match_score=float(score),
-                                match_type=("auto_name_scan" if mode == "name" else "auto_amt_date_scan"),
-                            )
-                            or 0
-                        )  # type: ignore
-                        if rid:
-                            added += 1
-                    except Exception:
-                        pass
-
-                if bid not in used_bank_ids and existing_link == 0:
-                    if score > best_link[0]:
-                        second_link = best_link[0]
-                        best_link = (score, bid, name_sc, amt_sc, date_sc, mode)
-                    elif score > second_link:
-                        second_link = score
-
-                return (score, name_sc, amt_sc, date_sc)
-
-            for bid in name_cand_ids[:300]:
-                _score_and_store(int(bid), mode="name")
-
-            if amtdate_cand:
-                tmp: list[tuple[float, int]] = []
-                for bid in list(amtdate_cand)[:1200]:
-                    res = _score_and_store(int(bid), mode="amtdate", do_store=False)
-                    if res is None:
-                        continue
-                    sc, _ns, _as, ds = res
-                    if sc >= 0.70 and ds >= 0.35:
-                        tmp.append((sc, int(bid)))
-                tmp.sort(key=lambda x: x[0], reverse=True)
-                for _sc, bid in tmp[:6]:
-                    _score_and_store(int(bid), mode="amtdate", do_store=True)
-
-            if existing_link or best_link[1] is None:
-                continue
-
-            score, bid_opt, name_sc, amt_sc, date_sc, mode = best_link
-            if bid_opt is None:
-                continue
-            bid = int(bid_opt)
-            strong_by_name = (name_sc >= 0.90)
-            strong_by_date_amt = (amt_sc >= 0.92 and date_sc >= 0.92)
-            if score >= 0.92 and (score - second_link) >= 0.07 and (strong_by_name or strong_by_date_amt):
-                try:
-                    note = "auto_name_scan" if mode == "name" else "auto_amt_date"
-                    self.app.db.maas_odeme_link_bank(oid, bid, score=float(score), note=note)  # type: ignore
-                    used_bank_ids.add(bid)
-                    auto_linked += 1
-                except Exception:
-                    pass
-
-        return (added, auto_linked)
+                        self.app.maas_repo.link_to_bank(
+                            salary_id=salary["id"],
+                            bank_id=best_match["id"],
+                            score=best_score,
+                        )
+                        matched_bank_ids.add(best_match["id"])
+                        matched_count += 1
+                    except Exception as e:
+                        import logging
+                        logging.error(f"Eşleştirme hatası: {e}")
+            
+            return matched_count
+        except Exception as e:
+            messagebox.showerror("Hata", f"Maaş eşleştirmesi başarısız:\n{e}")
+            return 0
 
     def suggest_salary_matches(self):
         period = (self.m_period.get() or "").strip()

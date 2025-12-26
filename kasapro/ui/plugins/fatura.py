@@ -476,9 +476,21 @@ class FaturaFrame(BaseView):
             self.s_aktif.set("1")
             self.refresh_series()
         except Exception as e:
-            err = ttk.Label(self.tab_settings, text=f"Ayarlar sekme hatası: {str(e)}", foreground="red")
-            err.pack(padx=10, pady=10)
-            messagebox.showerror(APP_TITLE, f"Ayarlar sekmesi oluşturulamadı:\n{str(e)}")
+            # Hata mesajını tab'a ekle
+            frame_err = ttk.Frame(self.tab_settings)
+            frame_err.pack(padx=10, pady=10, fill=tk.BOTH, expand=True)
+            
+            lbl = ttk.Label(
+                frame_err,
+                text=f"⚠️ Ayarlar sekmesi oluşturulamadı:\n{str(e)}",
+                foreground="red",
+                justify=tk.LEFT,
+            )
+            lbl.pack(padx=10, pady=10)
+            
+            import logging
+            logging.exception("Fatura ayarları tab hatası")
+
 
     # -----------------
     # Tab: Rapor
