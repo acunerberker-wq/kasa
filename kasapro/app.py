@@ -18,18 +18,18 @@ from typing import Any, Optional, List, Dict, Tuple
 import tkinter as tk
 from tkinter import ttk, messagebox, filedialog
 
-from kasapro.config import APP_TITLE, HAS_OPENPYXL, APP_BASE_DIR, DB_FILENAME
-from kasapro.utils import _safe_slug, fmt_amount
-from kasapro.db.main_db import DB
-from kasapro.db.users_db import UsersDB
-from kasapro.services import Services
-from kasapro.ui.navigation import ScreenRegistry
-from kasapro.ui.components import AppShell
-from kasapro.ui.theme_tokens import DESIGN_TOKENS
-from kasapro.ui.style import apply_modern_style
-from kasapro.ui.ui_logging import log_ui_event, wrap_callback
-from kasapro.ui.windows import LoginWindow, SettingsWindow, HelpWindow, ImportWizard
-from kasapro.ui.frames import (
+from .config import APP_TITLE, HAS_OPENPYXL, APP_BASE_DIR, DB_FILENAME
+from .utils import _safe_slug, fmt_amount
+from .db.main_db import DB
+from .db.users_db import UsersDB
+from .services import Services
+from .ui.navigation import ScreenRegistry
+from .ui.components import AppShell
+from .ui.theme_tokens import DESIGN_TOKENS
+from .ui.style import apply_modern_style
+from .ui.ui_logging import log_ui_event, wrap_callback
+from .ui.windows import LoginWindow, SettingsWindow, HelpWindow, ImportWizard
+from .ui.frames import (
     TanimlarHubFrame,
     RaporAraclarHubFrame,
     KullanicilarFrame,
@@ -38,11 +38,10 @@ from kasapro.ui.frames import (
     CreateCenterFrame,
     StockWmsFrame,
 )
-from kasapro.ui.screens import DashboardScreen, KasaScreen, CarilerScreen
-from kasapro.ui.plugins.loader import discover_ui_plugins
-from kasapro.modules.notes_reminders.scheduler import ReminderScheduler
-from kasapro.modules.integrations.worker import IntegrationWorker
-from kasapro.ui.widgets import StatusBar, LabeledEntry, LabeledCombo
+from .ui.screens import DashboardScreen, KasaScreen, CarilerScreen
+from .ui.plugins.loader import discover_ui_plugins
+from .modules.notes_reminders.scheduler import ReminderScheduler
+from .modules.integrations.worker import IntegrationWorker
 
 # Import HRContext for typing
 try:
@@ -387,6 +386,12 @@ class App:
 
         threading.Thread(target=worker, daemon=True).start()
 
+    def _get_kasa_frame(self):
+        frame = self.frames.get("kasa")
+        if frame is None:
+            return None
+        return getattr(frame, "kasa_frame", frame)
+
     def _install_exception_handlers(self) -> None:
         logger = logging.getLogger(__name__)
 
@@ -630,8 +635,9 @@ class App:
         except Exception:
             pass
         try:
-            if "kasa" in self.frames and hasattr(self.frames["kasa"], "refresh"):
-                self.frames["kasa"].refresh()  # type: ignore
+            kasa_frame = self._get_kasa_frame()
+            if kasa_frame is not None and hasattr(kasa_frame, "refresh"):
+                kasa_frame.refresh()  # type: ignore
         except Exception:
             pass
         try:
@@ -802,8 +808,9 @@ class App:
         except Exception:
             pass
         try:
-            if "kasa" in self.frames and hasattr(self.frames["kasa"], "refresh"):
-                self.frames["kasa"].refresh()  # type: ignore
+            kasa_frame = self._get_kasa_frame()
+            if kasa_frame is not None and hasattr(kasa_frame, "refresh"):
+                kasa_frame.refresh()  # type: ignore
         except Exception:
             pass
         try:
@@ -1048,8 +1055,11 @@ class App:
         except Exception:
             pass
         try:
-            self.frames["kasa"].reload_cari_combo()  # type: ignore
-            self.frames["kasa"].refresh()  # type: ignore
+            kasa_frame = self._get_kasa_frame()
+            if kasa_frame is not None and hasattr(kasa_frame, "reload_cari_combo"):
+                kasa_frame.reload_cari_combo()  # type: ignore
+            if kasa_frame is not None and hasattr(kasa_frame, "refresh"):
+                kasa_frame.refresh()  # type: ignore
         except Exception:
             pass
 
@@ -1193,7 +1203,9 @@ class App:
             except Exception:
                 pass
             try:
-                self.frames["kasa"].reload_cari_combo()  # type: ignore
+                kasa_frame = self._get_kasa_frame()
+                if kasa_frame is not None and hasattr(kasa_frame, "reload_cari_combo"):
+                    kasa_frame.reload_cari_combo()  # type: ignore
             except Exception:
                 pass
             if key in ("rapor_araclar", "raporlar", "satis_raporlari", "search", "loglar"):
@@ -1301,7 +1313,9 @@ class App:
             except Exception:
                 pass
             try:
-                self.frames["kasa"].refresh()  # type: ignore
+                kasa_frame = self._get_kasa_frame()
+                if kasa_frame is not None and hasattr(kasa_frame, "refresh"):
+                    kasa_frame.refresh()  # type: ignore
             except Exception:
                 pass
             try:

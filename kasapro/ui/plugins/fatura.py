@@ -1491,6 +1491,7 @@ class FaturaFrame(BaseView):
         doc.build(story)
 
 
-def build(master, app: "App") -> ttk.Frame:
-    frame = FaturaFrame(master, app)
-    return frame
+def build(master, app):
+    from ..screens.fatura import FaturaScreen
+
+    return FaturaScreen(master, app)

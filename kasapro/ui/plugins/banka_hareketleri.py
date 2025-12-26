@@ -632,5 +632,6 @@ class BankaHareketleriFrame(BaseView):
 
 
 def build(master, app: "App") -> ttk.Frame:
-    frame = BankaHareketleriFrame(master, app)
-    return frame
+    from ..screens.banka import BankaScreen
+
+    return BankaScreen(master, app)
