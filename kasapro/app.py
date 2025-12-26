@@ -24,11 +24,12 @@ from .db.main_db import DB
 from .db.users_db import UsersDB
 from .services import Services
 from .ui.navigation import ScreenRegistry
+from .ui.components import AppShell
+from .ui.theme_tokens import DESIGN_TOKENS
 from .ui.style import apply_modern_style
 from .ui.ui_logging import log_ui_event, wrap_callback
 from .ui.windows import LoginWindow, SettingsWindow, HelpWindow, ImportWizard
 from .ui.frames import (
-    KasaFrame,
     TanimlarHubFrame,
     RaporAraclarHubFrame,
     KullanicilarFrame,
@@ -37,6 +38,7 @@ from .ui.frames import (
     CreateCenterFrame,
     StockWmsFrame,
 )
+from .ui.screens import DashboardScreen, KasaScreen, CarilerScreen
 from .ui.plugins.loader import discover_ui_plugins
 from .modules.notes_reminders.scheduler import ReminderScheduler
 from .modules.integrations.worker import IntegrationWorker
@@ -641,60 +643,37 @@ class App:
         except Exception:
             self._ui_colors = {}
 
-        container = ttk.Frame(self.root, style="TFrame")
-        container.pack(fill=tk.BOTH, expand=True)
-        log_ui_event("container_created", view="root_container")
+        self._app_shell = AppShell(self.root, sidebar_width=DESIGN_TOKENS["layout"]["sidebar_width"])
+        log_ui_event("container_created", view="app_shell")
 
-        # Sol menü
-        nav = ttk.Frame(container, style="Sidebar.TFrame", width=270)
-        nav.pack(side=tk.LEFT, fill=tk.Y)
-        try:
-            nav.pack_propagate(False)
-        except Exception:
-            pass
+        nav = self._app_shell.sidebar
+        content = self._app_shell.content
+        topbar = self._app_shell.topbar
 
-        # Sağ içerik
-        content = ttk.Frame(container, style="TFrame")
-        content.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)
+        self.lbl_page_title = topbar.title_label
+        self.lbl_page_sub = topbar.subtitle_label
 
-        # Üst bar (sayfa başlığı + hızlı aksiyon)
-        topbar = ttk.Frame(content, style="Topbar.TFrame")
-        topbar.pack(fill=tk.X, padx=12, pady=(12, 8))
-
-        self.lbl_page_title = ttk.Label(topbar, text="Kasa", style="TopTitle.TLabel")
-        self.lbl_page_title.pack(side=tk.LEFT, padx=(10, 10), pady=8)
-
-        self.lbl_page_sub = ttk.Label(topbar, text="", style="TopSub.TLabel")
-        self.lbl_page_sub.pack(side=tk.LEFT, pady=10)
-
-        # Hızlı butonlar
         ttk.Button(
-            topbar,
+            topbar.actions,
             text="❓",
             width=3,
             command=wrap_callback("open_help", self.open_help),
-        ).pack(side=tk.RIGHT, padx=(6, 10), pady=8)
+        ).pack(side=tk.RIGHT, padx=(6, 0))
         ttk.Button(
-            topbar,
+            topbar.actions,
             text="⚙️",
             width=3,
             command=wrap_callback("open_settings", self.open_settings),
-        ).pack(side=tk.RIGHT, padx=6, pady=8)
+        ).pack(side=tk.RIGHT, padx=6)
 
-        # İçerik gövdesi (ekranlar buraya gelecek)
-        body = ttk.Frame(content, style="TFrame")
-        body.pack(fill=tk.BOTH, expand=True, padx=12, pady=(0, 12))
-        self.screen_registry = ScreenRegistry(body, self)
+        self.screen_registry = ScreenRegistry(self._app_shell.body, self)
         self.frames = self.screen_registry.frames
 
-        # Status bar
-        self.status_var = tk.StringVar(value="F1: Yardım  •  Ctrl+F: Global Arama  •  Çift tık: Düzenle")
-        self.status = ttk.Label(content, textvariable=self.status_var, style="Status.TLabel")
-        self.status.pack(fill=tk.X, side=tk.BOTTOM)
+        self.status_var = self._app_shell.status_var
+        self.status_var.set("F1: Yardım  •  Ctrl+F: Global Arama  •  Çift tık: Düzenle")
 
         # Sol menü üst bilgi
-        hdr = ttk.Frame(nav, style="Sidebar.TFrame")
-        hdr.pack(fill=tk.X, padx=14, pady=(14, 10))
+        hdr = nav.header
 
         ttk.Label(hdr, text="KasaPro", style="SidebarTitle.TLabel").pack(anchor="w")
         ttk.Label(hdr, text=f"Kullanıcı: {self.user['username']} ({self.user['role']})", style="SidebarSub.TLabel").pack(anchor="w", pady=(2, 0))
@@ -728,8 +707,7 @@ class App:
         # Menü butonları
         self.nav_buttons: Dict[str, ttk.Button] = {}
 
-        menu = ttk.Frame(nav, style="Sidebar.TFrame")
-        menu.pack(fill=tk.BOTH, expand=True, padx=8, pady=(0, 8))
+        menu = nav.menu
 
         def nav_btn(text, key):
             log_ui_event("menu_added", key=key, text=text)
@@ -761,7 +739,6 @@ class App:
         if not hasattr(self, "_nav_routes") or not isinstance(getattr(self, "_nav_routes", None), dict):
             self._nav_routes = {}
         # Tanımlar ekranı içinde alt sekme yönlendirmeleri
-        self._nav_routes["cariler"] = {"target": "tanimlar", "after": "hub_tab", "tab": "cariler"}
         self._nav_routes["calisanlar"] = {"target": "tanimlar", "after": "hub_tab", "tab": "calisanlar"}
         self._nav_routes["maas_meslekler"] = {"target": "tanimlar", "after": "hub_tab", "tab": "meslekler"}
 
@@ -778,10 +755,14 @@ class App:
         # ----------------
         # Menü bölümleri
         # ----------------
+        nav_section("🏠 DASHBOARD")
+        nav_btn("🏠 Dashboard", "dashboard")
+
         nav_section("🧾 KAYIT OLUŞTUR")
         nav_btn("🧾 Kayıt Oluştur (Merkez)", "create_center")
 
         nav_section("📚 TANIMLAR & AYARLAR")
+        nav_btn("👥 Cariler", "cariler")
         nav_btn("📚 Tanımlar", "tanimlar")
 
         # Şirket yönetimi sol menüden kaldırıldı; ⚙️ Ayarlar > Şirketler sekmesinde.
@@ -813,8 +794,7 @@ class App:
         # Sol menüde ayrı bir "Kullanıcılar" sayfası göstermiyoruz.
 
         # Alt aksiyonlar
-        actions = ttk.Frame(nav, style="Sidebar.TFrame")
-        actions.pack(fill=tk.X, padx=8, pady=(0, 12), side=tk.BOTTOM)
+        actions = nav.footer
 
         ttk.Separator(actions, orient="horizontal").pack(fill=tk.X, padx=4, pady=(4, 8))
 
@@ -852,7 +832,9 @@ class App:
         ).pack(fill=tk.X, padx=4, pady=(8, 2))
 
         # Ekranlar
-        self.screen_registry.register("kasa", lambda parent, app: KasaFrame(parent, app), title="Kasa")
+        self.screen_registry.register("dashboard", lambda parent, app: DashboardScreen(parent, app), title="Dashboard")
+        self.screen_registry.register("kasa", lambda parent, app: KasaScreen(parent, app), title="Kasa")
+        self.screen_registry.register("cariler", lambda parent, app: CarilerScreen(parent, app), title="Cariler")
         self.screen_registry.register("create_center", lambda parent, app: CreateCenterFrame(parent, app), title="Kayıt Oluştur (Merkez)")
         self.screen_registry.register("mesajlar", lambda parent, app: MessagesFrame(parent, app), title="Mesajlar")
         self.screen_registry.register("tanimlar", lambda parent, app: TanimlarHubFrame(parent, app), title="Tanımlar")
@@ -905,7 +887,7 @@ class App:
             pass
 
         # Başlangıç ekranı
-        self.show("kasa")
+        self.show("dashboard")
 
         self.root.protocol("WM_DELETE_WINDOW", wrap_callback("on_close", self.on_close))
         log_ui_event("callback_bound", target="root", tk_event="WM_DELETE_WINDOW", handler="on_close")
@@ -913,10 +895,11 @@ class App:
     def _ui_on_show(self, key: str, active_nav_key: Optional[str] = None):
         """Ekran değişince sol menü + başlık gibi UI parçalarını günceller."""
         title_map = {
+            "dashboard": "Dashboard",
             "kasa": "Kasa",
             "create_center": "Kayıt Oluştur (Merkez)",
             "tanimlar": "Tanımlar",
-            "cariler": "Tanımlar",
+            "cariler": "Cariler",
             "rapor_araclar": "Rapor & Araçlar",
             "raporlar": "Raporlar",
             "satis_raporlari": "Satış Raporları",
