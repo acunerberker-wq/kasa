@@ -995,6 +995,11 @@ class App:
 
         if target_key not in self.frames:
             log_ui_event("screen_missing", key=target_key, source=key)
+            try:
+                messagebox.showwarning(APP_TITLE, f"Ekran bulunamadı: {target_key}")
+            except Exception:
+                pass
+            return
         self.screen_registry.show(target_key)
 
         # Route sonrası aksiyonlar
