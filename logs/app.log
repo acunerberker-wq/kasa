@@ -7370,3 +7370,20 @@ Traceback (most recent call last):
     self.status_bar = StatusBar(self.root)
                       ^^^^^^^^^
 NameError: name 'StatusBar' is not defined
+2025-12-26 04:41:27,950 [ERROR] kasapro.app: UI kuruluşu başarısız
+Traceback (most recent call last):
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\app.py", line 248, in _init_ui
+    self.status_bar = StatusBar(self.root)
+                      ^^^^^^^^^
+NameError: name 'StatusBar' is not defined
+2025-12-26 04:41:27,952 [ERROR] kasapro.app: Uygulama başlatma hatası
+Traceback (most recent call last):
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\app.py", line 1476, in main
+    app = App()  # ✅ root otomatik oluşturulur
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\app.py", line 87, in __init__
+    self._init_ui()
+    ~~~~~~~~~~~~~^^
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\app.py", line 248, in _init_ui
+    self.status_bar = StatusBar(self.root)
+                      ^^^^^^^^^
+NameError: name 'StatusBar' is not defined
