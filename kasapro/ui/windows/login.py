@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
-"""KasaPro v3 - Login penceresi (Toplevel) - Modern Dark Glass UI."""
+"""KasaPro v3 - Login penceresi (Toplevel) - Modern Light UI."""
 
 from __future__ import annotations
 
+import sys
 import sqlite3
 from typing import Optional
 
@@ -14,32 +15,34 @@ from ...db.users_db import UsersDB
 from ...utils import center_window
 
 
-# ---- RENK PALETİ (Dark Glass Theme - Qt UI'dan uyarlama) ----
-# Qt: rgba(20, 30, 50) -> rgba(10, 14, 24) -> rgba(6, 8, 14)
+# ---- RENK PALET (Light Theme - ana uygulama ile uyumlu) ----
 COLORS = {
-    "bg_dark": "#060810",           # Ana arka plan (en koyu - stop:1)
-    "bg_mid": "#0a0e18",            # Orta arka plan (stop:0.55)
-    "card_bg": "#121a2a",           # Cam kart: rgba(18, 26, 42)
-    "card_border": "#3a4a66",       # Kart kenarlık: rgba(255,255,255,30) ~ solid
-    "input_bg": "#1a2030",          # Input: rgba(255,255,255,10) üzerine koyu
-    "input_border": "#2a3548",      # Input kenarlık: rgba(255,255,255,22)
-    "input_focus": "#4a7acc",       # Focus: rgba(90, 150, 255, 160) -> solid
-    "input_focus_solid": "#4a7acc", # Focus solid
-    "text_primary": "#f0f5ff",      # Ana metin: rgba(240,245,255,220)
-    "text_secondary": "#c8d0e8",    # İkincil: rgba(230,235,255,190) -> solid
-    "text_muted": "#8090a8",        # Soluk metin
-    "text_placeholder": "#6a7a92",  # Placeholder
-    "accent": "#378cff",            # Buton üst: rgba(55, 140, 255)
-    "accent_dark": "#145ad2",       # Buton alt: rgba(20, 90, 210)
-    "accent_hover": "#46a0ff",      # Hover: rgba(70, 160, 255)
-    "accent_glow": "#5090ff",       # Glow: rgba(80,160,255,140)
-    "btn_border": "#5a7aaa",        # Buton border: rgba(140, 190, 255, 90) -> solid
-    "link": "#c8d7ff",              # Link: rgba(200,215,255,140)
-    "link_hover": "#dceaff",        # Link hover: rgba(220,235,255,210)
-    "divider": "#2a3548",           # Divider: rgba(255,255,255,18)
-    "dropdown_bg": "#121a2a",       # Dropdown: rgba(18, 26, 42, 230) -> solid
-    "selection": "#4682b4",         # Selection: rgba(70, 130, 255, 120) -> solid
+    "bg_dark": "#F5F6FA",           # Ana arka plan
+    "bg_mid": "#EEF2F7",            # Orta arka plan
+    "card_bg": "#FFFFFF",           # Kart zemini
+    "card_border": "#DCE3EE",       # Kart kenarlik/golge
+    "input_bg": "#F8FAFC",          # Input arka plan
+    "input_border": "#E2E8F0",      # Input kenarlik
+    "input_focus": "#2563EB",       # Focus rengi
+    "input_focus_solid": "#2563EB", # Focus solid
+    "input_focus_bg": "#FFFFFF",    # Focus arka plan
+    "text_primary": "#0F172A",      # Ana metin
+    "text_secondary": "#475569",    # Ikincil metin
+    "text_muted": "#6B7280",        # Soluk metin
+    "text_placeholder": "#94A3B8",  # Placeholder
+    "accent": "#2563EB",            # Aksan
+    "accent_dark": "#1E40AF",       # Aksan koyu
+    "accent_hover": "#1D4ED8",      # Hover
+    "accent_glow": "#DBEAFE",       # Hafif vurgulu cizgi
+    "btn_border": "#BFDBFE",        # Buton kenarlik
+    "link": "#2563EB",              # Link
+    "link_hover": "#1D4ED8",        # Link hover
+    "divider": "#E5E7EB",           # Divider
+    "dropdown_bg": "#FFFFFF",       # Dropdown
+    "selection": "#DBEAFE",         # Selection
 }
+
+BASE_FONT = "Segoe UI" if sys.platform.startswith("win") else "Calibri"
 
 
 class ModernEntry(tk.Frame):
@@ -63,7 +66,7 @@ class ModernEntry(tk.Frame):
         # Entry widget - Qt: font-size: 14px, color: rgba(240,245,255,220)
         self.entry = tk.Entry(
             self.inner,
-            font=("Inter", 14),
+            font=(BASE_FONT, 12),
             bg=COLORS["input_bg"],
             fg=COLORS["text_placeholder"],
             insertbackground=COLORS["text_primary"],
@@ -82,8 +85,8 @@ class ModernEntry(tk.Frame):
         self._has_focus = True
         # Qt: border: 1px solid rgba(90, 150, 255, 160), background: rgba(255,255,255,12)
         self.outer.configure(bg=COLORS["input_focus_solid"])
-        self.inner.configure(bg="#1c2236")  # Biraz daha açık
-        self.entry.configure(bg="#1c2236")
+        self.inner.configure(bg=COLORS["input_focus_bg"])
+        self.entry.configure(bg=COLORS["input_focus_bg"])
         if self.entry.get() == self.placeholder:
             self.entry.delete(0, tk.END)
             self.entry.configure(fg=COLORS["text_primary"])
@@ -112,7 +115,7 @@ class ModernEntry(tk.Frame):
                 self.entry.configure(show=self._show)
         else:
             self.entry.insert(0, self.placeholder)
-            self.entry.configure(fg=COLORS["text_muted"], show="")
+            self.entry.configure(fg=COLORS["text_placeholder"], show="")
 
 
 class ModernCombobox(tk.Frame):
@@ -132,10 +135,10 @@ class ModernCombobox(tk.Frame):
         # Dropdown listbox styling - Qt: QAbstractItemView
         # Qt: background: rgba(18, 26, 42, 230), selection-background-color: rgba(70, 130, 255, 120)
         root = self.winfo_toplevel()
-        root.option_add("*TCombobox*Listbox.background", "#121a2a")
-        root.option_add("*TCombobox*Listbox.foreground", "#f0f5ff")
-        root.option_add("*TCombobox*Listbox.selectBackground", "#4682b4")
-        root.option_add("*TCombobox*Listbox.selectForeground", "#ffffff")
+        root.option_add("*TCombobox*Listbox.background", COLORS["dropdown_bg"])
+        root.option_add("*TCombobox*Listbox.foreground", COLORS["text_primary"])
+        root.option_add("*TCombobox*Listbox.selectBackground", COLORS["selection"])
+        root.option_add("*TCombobox*Listbox.selectForeground", COLORS["text_primary"])
         
         # Style for combobox - Qt: font-size: 14px, color: rgba(240,245,255,220)
         style = ttk.Style()
@@ -144,21 +147,21 @@ class ModernCombobox(tk.Frame):
             fieldbackground=COLORS["input_bg"],
             background=COLORS["input_bg"],
             foreground=COLORS["text_primary"],
-            arrowcolor="#a0b8d8",    # Qt: rgba(210,225,255,160) -> solid
+            arrowcolor=COLORS["text_muted"],
             borderwidth=0,
             padding=5,
         )
         style.map("Modern.TCombobox",
             fieldbackground=[("readonly", COLORS["input_bg"])],
-            selectbackground=[("readonly", "#4682b4")],
-            selectforeground=[("readonly", "#ffffff")],
+            selectbackground=[("readonly", COLORS["selection"])],
+            selectforeground=[("readonly", COLORS["text_primary"])],
         )
         
         self.combo = ttk.Combobox(
             self.inner,
             values=values,
             state="readonly",
-            font=("Inter", 14),
+            font=(BASE_FONT, 12),
             style="Modern.TCombobox",
         )
         self.combo.pack(fill=tk.X)
@@ -199,7 +202,7 @@ class ModernCheckbox(tk.Frame):
             width=18, height=18,
             bg=COLORS["input_bg"],
             highlightthickness=1,
-            highlightbackground="#4a5a72",  # rgba(255,255,255,30)
+            highlightbackground=COLORS["input_border"],
         )
         self.indicator.pack(side=tk.LEFT, padx=(0, 10))
         
@@ -207,9 +210,9 @@ class ModernCheckbox(tk.Frame):
         self.label = tk.Label(
             self,
             text=text,
-            font=("Inter", 13),
+            font=(BASE_FONT, 11),
             bg=COLORS["card_bg"],
-            fg="#c8d0e8",    # rgba(230,235,255,190) -> solid
+            fg=COLORS["text_secondary"],
             cursor="hand2",
         )
         self.label.pack(side=tk.LEFT)
@@ -229,12 +232,12 @@ class ModernCheckbox(tk.Frame):
         self.indicator.delete("check")
         if self.var.get():
             # Qt checked: background: rgba(70, 130, 255, 160), border: 1px solid rgba(120, 170, 255, 200)
-            self.indicator.configure(bg="#4682b4", highlightbackground="#78aacc")
+            self.indicator.configure(bg=COLORS["accent"], highlightbackground=COLORS["accent_hover"])
             # Draw checkmark
             self.indicator.create_line(4, 9, 7, 13, fill="white", width=2, tags="check")
             self.indicator.create_line(7, 13, 14, 5, fill="white", width=2, tags="check")
         else:
-            self.indicator.configure(bg=COLORS["input_bg"], highlightbackground="#4a5a72")
+            self.indicator.configure(bg=COLORS["input_bg"], highlightbackground=COLORS["input_border"])
     
     def get(self) -> bool:
         return self.var.get()
@@ -249,7 +252,7 @@ class ModernButton(tk.Frame):
         self.command = command
         
         # Border frame - Qt: border: 1px solid rgba(140, 190, 255, 90), border-radius: 10px
-        self.border = tk.Frame(self, bg="#5a7aaa", padx=1, pady=1)
+        self.border = tk.Frame(self, bg=COLORS["btn_border"], padx=1, pady=1)
         self.border.pack(fill=tk.X)
         
         # Button - Qt: background gradient rgba(55, 140, 255) -> rgba(20, 90, 210)
@@ -257,11 +260,11 @@ class ModernButton(tk.Frame):
         self.btn = tk.Label(
             self.border,
             text=text,
-            font=("Inter", 18, "bold"),
-            bg="#378cff",
+            font=(BASE_FONT, 13, "bold"),
+            bg=COLORS["accent"],
             fg="#ffffff",
             padx=14,
-            pady=12,
+            pady=10,
             cursor="hand2",
         )
         self.btn.pack(fill=tk.X)
@@ -274,17 +277,17 @@ class ModernButton(tk.Frame):
     
     def _on_enter(self, _event):
         # Qt hover: rgba(70, 160, 255) -> rgba(25, 105, 230)
-        self.btn.configure(bg="#46a0ff")
+        self.btn.configure(bg=COLORS["accent_hover"])
     
     def _on_leave(self, _event):
-        self.btn.configure(bg="#378cff")
+        self.btn.configure(bg=COLORS["accent"])
     
     def _on_click(self, _event):
         # Qt pressed: rgba(20, 90, 210)
-        self.btn.configure(bg="#145ad2")
+        self.btn.configure(bg=COLORS["accent_dark"])
     
     def _on_release(self, _event):
-        self.btn.configure(bg="#378cff")
+        self.btn.configure(bg=COLORS["accent"])
         if self.command:
             self.command()
 
@@ -323,14 +326,14 @@ class LoginWindow(tk.Toplevel):
         
         # Glass Card - Qt: minimumSize 720x460, padding 48/42/48/34, spacing 16
         # Qt: background: rgba(18, 26, 42, 165), border: 1px solid rgba(255,255,255,30), border-radius: 16px
-        card_border = tk.Frame(main_container, bg="#4a5a72", padx=1, pady=1)  # border
+        card_border = tk.Frame(main_container, bg=COLORS["card_border"], padx=2, pady=2)  # border
         card_border.pack()
         
         card = tk.Frame(
             card_border,
             bg=COLORS["card_bg"],
-            padx=48,
-            pady=42,
+            padx=40,
+            pady=36,
         )
         card.pack()
         
@@ -342,17 +345,17 @@ class LoginWindow(tk.Toplevel):
         logo = tk.Canvas(brand_frame, width=36, height=36, bg=COLORS["card_bg"], highlightthickness=0)
         logo.pack(side=tk.LEFT, padx=(0, 12))
         # Gradient simulation - Qt: rgba(70,160,255) -> rgba(30,110,230)
-        logo.create_rectangle(0, 0, 36, 36, fill="#1e6ee6", outline="")
-        logo.create_rectangle(3, 3, 33, 18, fill="#46a0ff", outline="")
-        logo.create_rectangle(3, 3, 18, 33, fill="#3890ff", outline="")
+        logo.create_rectangle(0, 0, 36, 36, fill=COLORS["accent"], outline="")
+        logo.create_rectangle(3, 3, 33, 18, fill="#3b82f6", outline="")
+        logo.create_rectangle(3, 3, 18, 33, fill="#60a5fa", outline="")
         
         # App name - Qt: font-size: 22px, font-weight: 700, color: rgba(240,245,255,220)
         app_name = tk.Label(
             brand_frame,
             text=APP_TITLE,
-            font=("Inter", 22, "bold"),
+            font=(BASE_FONT, 20, "bold"),
             bg=COLORS["card_bg"],
-            fg="#d8e0f0",
+            fg=COLORS["text_primary"],
         )
         app_name.pack(side=tk.LEFT)
         
@@ -392,13 +395,9 @@ class LoginWindow(tk.Toplevel):
         self.btn_login = ModernButton(form_frame, text="Giriş Yap..", command=self.do_login)
         self.btn_login.pack(fill=tk.X, pady=(0, 4))
         
-        # Glow line - Qt: GlowLine, height 4, gradient glow
-        glow_canvas = tk.Canvas(form_frame, height=4, bg=COLORS["card_bg"], highlightthickness=0)
-        glow_canvas.pack(fill=tk.X, pady=(0, 10))
-        # Gradient glow simulation - Qt: rgba(80,160,255,140) ortada
-        glow_canvas.update_idletasks()
-        glow_canvas.create_rectangle(80, 0, 340, 4, fill="#5090ff", outline="")
-        glow_canvas.create_rectangle(120, 0, 300, 4, fill="#60a0ff", outline="")
+        # Glow line - Qt: GlowLine, height 2, subtle highlight
+        glow_line = tk.Frame(form_frame, bg=COLORS["accent_glow"], height=2)
+        glow_line.pack(fill=tk.X, pady=(0, 12))
         
         # Loading satırı - Qt: LoadingRow, spacing 10 (başlangıçta gizli)
         self.loading_frame = tk.Frame(form_frame, bg=COLORS["card_bg"])
@@ -408,9 +407,9 @@ class LoginWindow(tk.Toplevel):
         self.lbl_spinner = tk.Label(
             self.loading_frame,
             text="◐",
-            font=("Inter", 14),
+            font=(BASE_FONT, 11),
             bg=COLORS["card_bg"],
-            fg="#82aaff",
+            fg=COLORS["accent"],
         )
         self.lbl_spinner.pack(side=tk.LEFT, padx=(0, 10))
         
@@ -418,9 +417,9 @@ class LoginWindow(tk.Toplevel):
         self.lbl_loading = tk.Label(
             self.loading_frame,
             text="Giriş Yap...",
-            font=("Inter", 13),
+            font=(BASE_FONT, 11),
             bg=COLORS["card_bg"],
-            fg="#8090a8",
+            fg=COLORS["text_muted"],
         )
         self.lbl_loading.pack(side=tk.LEFT)
         self.loading_frame.pack_forget()  # Başlangıçta gizle
@@ -429,29 +428,28 @@ class LoginWindow(tk.Toplevel):
         tk.Frame(form_frame, bg=COLORS["card_bg"], height=28).pack()
         
         # Divider - Qt: Divider, height 1, background: rgba(255,255,255,18)
-        divider = tk.Frame(form_frame, bg="#3a4a5a", height=1)
+        divider = tk.Frame(form_frame, bg=COLORS["divider"], height=1)
         divider.pack(fill=tk.X)
         
         # Şifremi unuttum linki - Qt: LblForgot, color: rgba(200,215,255,140), font-size: 14px
         self.lbl_forgot = tk.Label(
             form_frame,
             text="Şifremi unuttum",
-            font=("Inter", 14),
             bg=COLORS["card_bg"],
-            fg="#8a9ab8",
             cursor="hand2",
         )
         self.lbl_forgot.pack(pady=(16, 0))
+        self.lbl_forgot.configure(font=(BASE_FONT, 11), fg=COLORS["link"])
         # Hover - Qt: color: rgba(220,235,255,210), text-decoration: underline
-        self.lbl_forgot.bind("<Enter>", lambda _: self.lbl_forgot.configure(fg="#c8d8f0", font=("Inter", 14, "underline")))
-        self.lbl_forgot.bind("<Leave>", lambda _: self.lbl_forgot.configure(fg="#8a9ab8", font=("Inter", 14)))
+        self.lbl_forgot.bind("<Enter>", lambda _: self.lbl_forgot.configure(fg=COLORS["link_hover"], font=(BASE_FONT, 11, "underline")))
+        self.lbl_forgot.bind("<Leave>", lambda _: self.lbl_forgot.configure(fg=COLORS["link"], font=(BASE_FONT, 11)))
         self.lbl_forgot.bind("<Button-1>", self._on_forgot_password)
         
         # İlk kurulum notu
         note_label = tk.Label(
             form_frame,
             text="İlk kurulum: admin / admin",
-            font=("Inter", 11),
+            font=(BASE_FONT, 10),
             bg=COLORS["card_bg"],
             fg=COLORS["text_muted"],
         )
