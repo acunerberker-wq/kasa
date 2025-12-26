@@ -327,7 +327,13 @@ class DmsHubFrame(ttk.Frame):
     def _refresh_approvals(self) -> None:
         company_id = self._company_id()
         user_id = int(self._actor_id() or 0)
-        role = str(getattr(self.app, "user", {}).get("role") or "user")
+        user = getattr(self.app, "user", None)
+        if user is None:
+            role = "user"
+        elif hasattr(user, "get"):
+            role = str(user.get("role") or "user")
+        else:
+            role = str(user["role"] if "role" in user.keys() else "user")
 
         def worker():
             try:
