@@ -42,66 +42,88 @@ COLORS_LIGHT: Dict[str, str] = {
 
 # Premium Dark Glass Theme (Qt UI'dan alındı)
 # NOT: Tkinter alpha desteklemez, tüm renkler koyu arka plana göre blend edildi
+# Görsel referanslar: 15 ekran görüntüsünden analiz edildi
 COLORS_DARK: Dict[str, str] = {
-    # Ana arka planlar (Qt: qradialgradient)
-    "bg": "#0a0e18",                # Ana arka plan (Qt: rgba(10, 14, 24))
-    "bg_glow": "#141e32",           # Glow efekt alanı (Qt: rgba(20, 30, 50))
-    "bg_dark": "#06080e",           # En koyu arka plan (Qt: rgba(6, 8, 14))
+    # Ana arka planlar - daha derin lacivert tonları
+    "bg": "#080c14",                # Ana arka plan (daha koyu)
+    "bg_glow": "#101828",           # Glow efekt alanı
+    "bg_dark": "#050810",           # En koyu arka plan
     
-    # Panel/Kart renkleri (Qt: QFrame#Card, QFrame.Card)
-    "panel": "#121a2a",             # Kart zemini (Qt: rgba(18, 26, 42))
-    "panel_border": "#3a3e48",      # Kart kenarı (blend: #ffffff @ 19% on dark)
-    "sidebar": "#0e1422",           # Sidebar (Qt: rgba(14, 20, 34))
+    # Panel/Kart renkleri - görsellerle uyumlu
+    "panel": "#0f1520",             # Kart zemini (daha koyu)
+    "panel_hover": "#141c2a",       # Kart hover
+    "panel_border": "#243040",      # Kart kenarı (mavi tonlu)
+    "sidebar": "#0a1018",           # Sidebar (en koyu)
+    "sidebar_active": "#0f1828",    # Aktif sidebar item arka planı
     
-    # Kenar renkleri
-    "border": "#2a2e38",            # Genel kenar (blend: #ffffff @ 10% on dark)
-    "border_light": "#1e222c",      # Hafif kenar (blend: #ffffff @ 7% on dark)
+    # Kenar renkleri - mavi tonlu
+    "border": "#1a2535",            # Genel kenar (mavi tonlu)
+    "border_light": "#141c28",      # Hafif kenar
+    "border_accent": "#2a4a6a",     # Vurgulu kenar (aktif tab gibi)
     
-    # Metin renkleri (Qt: color: rgba(...))
-    "text": "#f0f5ff",              # Ana metin (Qt: rgba(240,245,255,220))
-    "text_secondary": "#dce5ff",    # İkincil (Qt: rgba(220,225,255,175))
-    "muted": "#8090aa",             # Soluk (Qt: rgba(180,200,255,120))
-    "placeholder": "#7080a0",       # Placeholder
+    # Metin renkleri
+    "text": "#e8f0ff",              # Ana metin (biraz daha açık)
+    "text_secondary": "#b8c8e0",    # İkincil
+    "muted": "#6080a0",             # Soluk (daha mavi)
+    "placeholder": "#506080",       # Placeholder
     
-    # Aksan renkleri (Qt: QPushButton.Primary gradient)
-    "accent": "#378cff",            # Ana aksan (Qt: rgba(55, 140, 255))
-    "accent_dark": "#145ad2",       # Koyu aksan (Qt: rgba(20, 90, 210))
-    "accent_light": "#1e3a5f",      # Açık aksan (blend: #5a8cff @ 47% on dark)
-    "accent_hover": "#46a0ff",      # Hover (Qt: rgba(70, 160, 255))
-    "accent_glow": "#50a0ff",       # Glow efekt
+    # Aksan renkleri - parlak mavi
+    "accent": "#3a8fff",            # Ana aksan (daha parlak)
+    "accent_dark": "#1a5cc0",       # Koyu aksan
+    "accent_light": "#1a3050",      # Açık aksan (hover/selection)
+    "accent_bright": "#50a0ff",     # En parlak (aktif tab)
+    "accent_hover": "#4a9fff",      # Hover
+    "accent_glow": "#5ab0ff",       # Glow efekt
     
-    # Input stilleri (Qt: QLineEdit, QCombobox)
-    "input_bg": "#151923",          # Input arka plan (blend: #ffffff @ 4% on dark)
-    "input_border": "#1e222c",      # Input kenar (blend: #ffffff @ 9% on dark)
-    "input_focus": "#3a5a8a",       # Focus kenar (blend: #5a96ff @ 63% on dark)
+    # Input stilleri - daha belirgin
+    "input_bg": "#0c1018",          # Input arka plan (koyu)
+    "input_border": "#1a2838",      # Input kenar
+    "input_focus": "#2a5080",       # Focus kenar (mavi)
     
     # Durum renkleri
-    "danger": "#ff5a5a",            # Tehlike (Qt: rgba(255,90,90))
-    "danger_bg": "#2a1a1a",         # Tehlike arka plan (blend on dark)
-    "success": "#23aa5f",           # Başarı (Qt: rgba(35,170,95))
-    "success_bg": "#142a1f",        # Başarı arka plan (blend on dark)
-    "warning": "#f5a623",           # Uyarı
-    "warning_bg": "#2a2214",        # Uyarı arka plan (blend on dark)
+    "danger": "#ff5a5a",            # Tehlike
+    "danger_bg": "#201418",         # Tehlike arka plan
+    "success": "#20c060",           # Başarı (daha parlak)
+    "success_bg": "#102018",        # Başarı arka plan
+    "warning": "#f5a020",           # Uyarı
+    "warning_bg": "#201810",        # Uyarı arka plan
     
-    # Tablo/Treeview
-    "table_header": "#14181f",      # Header arka plan (blend: #ffffff @ 3% on dark)
-    "table_row_alt": "#0e1218",     # Alternatif satır (blend: #ffffff @ 2% on dark)
-    "selection": "#1e3a5f",         # Seçim (blend: #5a8cff @ 47% on dark)
-    "gridline": "#1e222c",          # Tablo çizgileri (blend: #ffffff @ 7% on dark)
+    # Tablo/Treeview - görsellerle uyumlu
+    "table_header": "#0c1420",      # Header arka plan
+    "table_header_border": "#1a2838", # Header alt border
+    "table_row": "#0f1520",         # Normal satır
+    "table_row_alt": "#0a1018",     # Alternatif satır
+    "selection": "#1a3858",         # Seçim
+    "gridline": "#141c28",          # Tablo çizgileri
+    
+    # Tab stilleri - görsellerle uyumlu
+    "tab_bg": "#0c1420",            # Pasif tab
+    "tab_active_bg": "#1a3858",     # Aktif tab arka plan
+    "tab_active_text": "#50a0ff",   # Aktif tab metin
+    "tab_border": "#1a2838",        # Tab border
     
     # Badge/Etiket renkleri
-    "badge_in_bg": "#142a1f",       # Giriş badge (blend: #23aa5f @ 18% on dark)
-    "badge_in_border": "#1a4030",   # Giriş kenar (blend: #23aa5f @ 35% on dark)
-    "badge_in_text": "#aaf0c8",     # Giriş metin (Qt: rgba(170,240,200,235))
-    "badge_out_bg": "#2a1a1a",      # Çıkış badge (blend: #ff5a5a @ 18% on dark)
-    "badge_out_border": "#4a2828",  # Çıkış kenar (blend: #ff7878 @ 35% on dark)
-    "badge_out_text": "#ffd2d2",    # Çıkış metin (Qt: rgba(255,210,210,235))
+    "badge_in_bg": "#102820",       # Giriş badge
+    "badge_in_border": "#184030",   # Giriş kenar
+    "badge_in_text": "#80e0a0",     # Giriş metin
+    "badge_out_bg": "#281418",      # Çıkış badge
+    "badge_out_border": "#402028",  # Çıkış kenar
+    "badge_out_text": "#ffa0a0",    # Çıkış metin
     
-    # Buton stilleri
-    "btn_primary_bg": "#378cff",    # Primary arka plan
-    "btn_primary_border": "#5a8ccc",# Primary kenar (blend: #8cbeff @ 56% on dark)
-    "btn_ghost_bg": "#151923",      # Ghost arka plan (blend: #ffffff @ 4% on dark)
-    "btn_ghost_border": "#1e222c",  # Ghost kenar (blend: #ffffff @ 9% on dark)
+    # Buton stilleri - görsellerle uyumlu
+    "btn_primary_bg": "#3a8fff",    # Primary arka plan
+    "btn_primary_hover": "#4a9fff", # Primary hover
+    "btn_primary_border": "#5aafff",# Primary kenar
+    "btn_secondary_bg": "#141c28",  # Secondary arka plan
+    "btn_secondary_border": "#1a2838", # Secondary kenar
+    "btn_ghost_bg": "#0c1420",      # Ghost arka plan
+    "btn_ghost_border": "#1a2838",  # Ghost kenar
+    "btn_ghost_hover": "#141c30",   # Ghost hover
+    
+    # Pagination stilleri
+    "pager_bg": "#0c1420",          # Sayfalama buton bg
+    "pager_border": "#1a2838",      # Sayfalama border
+    "pager_text": "#6080a0",        # Sayfalama metin
 }
 
 # Aktif tema (varsayılan: dark)
@@ -222,11 +244,14 @@ def apply_dark_glass_theme(root: tk.Tk) -> Dict[str, str]:
     style.configure("Card.TFrame", background=colors["panel"])
     style.configure("Sidebar.TFrame", background=colors["sidebar"])
     style.configure("Topbar.TFrame", background=colors["panel"])
+    style.configure("FilterBar.TFrame", background=colors["panel"])  # Filtre alanı
+    style.configure("FormSection.TFrame", background=colors["panel"]) # Form bölümü
     
     # ========================================
     # SEPARATOR
     # ========================================
     style.configure("TSeparator", background=colors["border"])
+    style.configure("Accent.TSeparator", background=colors["accent"])  # Aktif sidebar indicator
     
     # ========================================
     # LABEL STİLLERİ
@@ -240,12 +265,27 @@ def apply_dark_glass_theme(root: tk.Tk) -> Dict[str, str]:
         foreground=colors["text"],
     )
     style.configure("TopTitle.TLabel", 
-        background=colors["panel"], 
+        background=colors["bg"], 
         foreground=colors["text"], 
-        font=(base_font, 18, "bold"),
+        font=(base_font, 20, "bold"),  # Daha büyük başlık
     )
     style.configure("TopSub.TLabel", 
-        background=colors["panel"], 
+        background=colors["bg"], 
+        foreground=colors["muted"],
+        font=(base_font, 10),
+    )
+    style.configure("PageTitle.TLabel",  # Sayfa başlığı (ör: "Banka Hareketleri")
+        background=colors["bg"],
+        foreground=colors["text"],
+        font=(base_font, 18, "bold"),
+    )
+    style.configure("SectionTitle.TLabel",  # Bölüm başlığı (ör: "Filtre")
+        background=colors["panel"],
+        foreground=colors["text"],
+        font=(base_font, 11, "bold"),
+    )
+    style.configure("FormLabel.TLabel",  # Form etiketleri
+        background=colors["panel"],
         foreground=colors["muted"],
         font=(base_font, 10),
     )
@@ -265,7 +305,7 @@ def apply_dark_glass_theme(root: tk.Tk) -> Dict[str, str]:
         background=colors["sidebar"],
         foreground=colors["muted"],
         font=(base_font, 9, "bold"),
-        padding=(12, 6),
+        padding=(12, 8),
     )
     
     # Status bar
@@ -275,95 +315,116 @@ def apply_dark_glass_theme(root: tk.Tk) -> Dict[str, str]:
         padding=(12, 6),
     )
     
+    # Pagination label
+    style.configure("Pager.TLabel",
+        background=colors["panel"],
+        foreground=colors["muted"],
+        font=(base_font, 10),
+    )
+    
+    # Summary/Info labels (ör: "Toplam: Giriş 0,00 - Çıkış 0,00")
+    style.configure("Summary.TLabel",
+        background=colors["panel"],
+        foreground=colors["text_secondary"],
+        font=(base_font, 10),
+    )
+    
     # Badge stilleri
     style.configure("Badge.TLabel",
         background=colors["accent_light"],
         foreground=colors["accent"],
         font=(base_font, 9, "bold"),
-        padding=(6, 3),
+        padding=(8, 4),
     )
     style.configure("BadgeSuccess.TLabel",
         background=colors["success_bg"],
         foreground=colors["success"],
         font=(base_font, 9, "bold"),
-        padding=(6, 3),
+        padding=(8, 4),
     )
     style.configure("BadgeDanger.TLabel",
         background=colors["danger_bg"],
         foreground=colors["danger"],
         font=(base_font, 9, "bold"),
-        padding=(6, 3),
+        padding=(8, 4),
+    )
+    style.configure("BadgeWarning.TLabel",
+        background=colors["warning_bg"],
+        foreground=colors["warning"],
+        font=(base_font, 9, "bold"),
+        padding=(8, 4),
     )
     style.configure("BadgeIn.TLabel",
         background=colors["badge_in_bg"],
         foreground=colors["badge_in_text"],
         font=(base_font, 9, "bold"),
-        padding=(6, 3),
+        padding=(8, 4),
     )
     style.configure("BadgeOut.TLabel",
         background=colors["badge_out_bg"],
         foreground=colors["badge_out_text"],
         font=(base_font, 9, "bold"),
-        padding=(6, 3),
+        padding=(8, 4),
     )
     
     # ========================================
-    # BUTTON STİLLERİ
+    # BUTTON STİLLERİ - Görsellerden
     # ========================================
     
-    # Genel buton
+    # Genel buton (Ghost tarzı)
     style.configure("TButton", 
-        padding=(14, 10),
+        padding=(16, 8),
         font=(base_font, 10),
         background=colors["btn_ghost_bg"],
-        foreground=colors["text"],
+        foreground=colors["text_secondary"],
         borderwidth=1,
         relief="flat",
     )
     style.map("TButton",
         background=[
-            ("active", colors["accent_light"]),
-            ("pressed", colors["accent_dark"]),
+            ("active", colors["btn_ghost_hover"]),
+            ("pressed", colors["accent_light"]),
             ("!active", colors["btn_ghost_bg"]),
         ],
         foreground=[
             ("disabled", colors["muted"]),
-            ("!disabled", colors["text"]),
+            ("!disabled", colors["text_secondary"]),
         ],
     )
     
-    # Primary Button (Ana aksiyon)
+    # Primary Button (Parlak mavi - "Yeni", "Kaydet + Yeni", "Yenile")
     style.configure("Primary.TButton", 
-        padding=(14, 10),
+        padding=(16, 8),
         font=(base_font, 10, "bold"),
-        background=colors["accent"],
+        background=colors["btn_primary_bg"],
         foreground="#ffffff",
-        borderwidth=1,
+        borderwidth=0,
     )
     style.map("Primary.TButton",
         background=[
-            ("active", colors["accent_hover"]),
+            ("active", colors["btn_primary_hover"]),
             ("pressed", colors["accent_dark"]),
-            ("!active", colors["accent"]),
+            ("disabled", colors["muted"]),
+            ("!active", colors["btn_primary_bg"]),
         ],
         foreground=[
-            ("disabled", "#888888"),
+            ("disabled", "#666666"),
             ("!disabled", "#ffffff"),
         ],
     )
     
-    # Secondary Button (İkincil aksiyon)
+    # Secondary Button (Koyu arka plan, açık kenar - "Detay", "İptal")
     style.configure("Secondary.TButton", 
-        padding=(14, 10),
+        padding=(16, 8),
         font=(base_font, 10),
-        background=colors["panel"],
+        background=colors["btn_secondary_bg"],
         foreground=colors["text"],
         borderwidth=1,
     )
     style.map("Secondary.TButton",
         background=[
             ("active", colors["accent_light"]),
-            ("!active", colors["panel"]),
+            ("!active", colors["btn_secondary_bg"]),
         ],
         foreground=[
             ("disabled", colors["muted"]),
@@ -371,9 +432,9 @@ def apply_dark_glass_theme(root: tk.Tk) -> Dict[str, str]:
         ],
     )
     
-    # Ghost Button (Saydam)
+    # Ghost Button (Tamamen saydam görünüm)
     style.configure("Ghost.TButton", 
-        padding=(14, 10),
+        padding=(16, 8),
         font=(base_font, 10),
         background=colors["btn_ghost_bg"],
         foreground=colors["text_secondary"],
@@ -381,14 +442,33 @@ def apply_dark_glass_theme(root: tk.Tk) -> Dict[str, str]:
     )
     style.map("Ghost.TButton",
         background=[
-            ("active", colors["accent_light"]),
+            ("active", colors["btn_ghost_hover"]),
             ("!active", colors["btn_ghost_bg"]),
+        ],
+        foreground=[
+            ("disabled", colors["muted"]),
+            ("!disabled", colors["text_secondary"]),
         ],
     )
     
-    # Danger Button (Tehlikeli aksiyon)
+    # Toolbar Button (Araç çubuğu - "Excel ile Aktar", "PDF", "Sil")
+    style.configure("Toolbar.TButton", 
+        padding=(12, 6),
+        font=(base_font, 10),
+        background=colors["btn_secondary_bg"],
+        foreground=colors["text_secondary"],
+        borderwidth=1,
+    )
+    style.map("Toolbar.TButton",
+        background=[
+            ("active", colors["accent_light"]),
+            ("!active", colors["btn_secondary_bg"]),
+        ],
+    )
+    
+    # Danger Button (Sil, İptal gibi)
     style.configure("Danger.TButton", 
-        padding=(14, 10),
+        padding=(16, 8),
         font=(base_font, 10, "bold"),
         background=colors["danger"],
         foreground="#ffffff",
@@ -396,27 +476,42 @@ def apply_dark_glass_theme(root: tk.Tk) -> Dict[str, str]:
     style.map("Danger.TButton",
         background=[
             ("active", "#ff4040"),
-            ("pressed", "#cc4040"),
+            ("pressed", "#cc3030"),
             ("!active", colors["danger"]),
         ],
         foreground=[
-            ("disabled", "#aaaaaa"),
+            ("disabled", "#888888"),
             ("!disabled", "#ffffff"),
         ],
     )
     
     # Success Button
     style.configure("Success.TButton", 
-        padding=(14, 10),
+        padding=(16, 8),
         font=(base_font, 10, "bold"),
         background=colors["success"],
         foreground="#ffffff",
     )
     style.map("Success.TButton",
         background=[
-            ("active", "#2bc96e"),
-            ("pressed", "#1a8a4a"),
+            ("active", "#30d070"),
+            ("pressed", "#18a050"),
             ("!active", colors["success"]),
+        ],
+    )
+    
+    # Pagination Buttons (◄ ►)
+    style.configure("Pager.TButton", 
+        padding=(12, 6),
+        font=(base_font, 10),
+        background=colors["pager_bg"],
+        foreground=colors["pager_text"],
+        borderwidth=1,
+    )
+    style.map("Pager.TButton",
+        background=[
+            ("active", colors["accent_light"]),
+            ("!active", colors["pager_bg"]),
         ],
     )
     
@@ -427,10 +522,11 @@ def apply_dark_glass_theme(root: tk.Tk) -> Dict[str, str]:
         font=(base_font, 10),
         background=colors["sidebar"],
         foreground=colors["text_secondary"],
+        borderwidth=0,
     )
     style.map("Sidebar.TButton",
         background=[
-            ("active", colors["accent_light"]),
+            ("active", colors["sidebar_active"]),
             ("!active", colors["sidebar"]),
         ],
         foreground=[
@@ -439,53 +535,71 @@ def apply_dark_glass_theme(root: tk.Tk) -> Dict[str, str]:
         ],
     )
     
+    # Active Sidebar Button (Sol mavi çizgi efekti simülasyonu)
     style.configure("SidebarActive.TButton", 
         padding=(14, 10), 
         anchor="w",
         font=(base_font, 10, "bold"),
-        background=colors["accent_light"],
-        foreground=colors["accent"],
+        background=colors["sidebar_active"],
+        foreground=colors["accent_bright"],
+        borderwidth=0,
     )
     style.map("SidebarActive.TButton",
         background=[
-            ("active", colors["accent_light"]),
-            ("!active", colors["accent_light"]),
+            ("active", colors["sidebar_active"]),
+            ("!active", colors["sidebar_active"]),
         ],
         foreground=[
-            ("!disabled", colors["accent"]),
+            ("!disabled", colors["accent_bright"]),
         ],
     )
     
     # ========================================
-    # INPUT STİLLERİ (Entry, Combobox)
+    # INPUT STİLLERİ (Entry, Combobox) - Görsellerden
     # ========================================
     style.configure("TEntry",
-        padding=8,
-        fieldbackground=colors["panel"],
+        padding=10,
+        fieldbackground=colors["input_bg"],
         foreground=colors["text"],
         insertcolor=colors["accent"],
         borderwidth=1,
     )
     style.map("TEntry",
         fieldbackground=[
-            ("focus", colors["panel"]),
-            ("!focus", colors["panel"]),
+            ("focus", colors["input_bg"]),
+            ("!focus", colors["input_bg"]),
+        ],
+        bordercolor=[
+            ("focus", colors["input_focus"]),
         ],
     )
     
     style.configure("TCombobox",
-        padding=6,
-        fieldbackground=colors["panel"],
+        padding=8,
+        fieldbackground=colors["input_bg"],
         foreground=colors["text"],
         arrowcolor=colors["text_secondary"],
+        borderwidth=1,
     )
     style.map("TCombobox",
         fieldbackground=[
-            ("readonly", colors["panel"]),
+            ("readonly", colors["input_bg"]),
+            ("!readonly", colors["input_bg"]),
         ],
         selectbackground=[
             ("readonly", colors["accent_light"]),
         ],
+        arrowcolor=[
+            ("disabled", colors["muted"]),
+        ],
+    )
+    
+    # Search Entry (Arama kutusu - üst barda)
+    style.configure("Search.TEntry",
+        padding=10,
+        fieldbackground=colors["panel"],
+        foreground=colors["text"],
+        insertcolor=colors["accent"],
     )
     
     # Error variants
@@ -502,42 +616,44 @@ def apply_dark_glass_theme(root: tk.Tk) -> Dict[str, str]:
     # SPINBOX
     # ========================================
     style.configure("TSpinbox",
-        padding=6,
-        fieldbackground=colors["panel"],
+        padding=8,
+        fieldbackground=colors["input_bg"],
         foreground=colors["text"],
         arrowcolor=colors["text_secondary"],
+        borderwidth=1,
     )
     
     # ========================================
-    # LABELFRAME
+    # LABELFRAME - Kart stili
     # ========================================
     style.configure("TLabelframe", 
-        background=colors["bg"],
+        background=colors["panel"],
         borderwidth=1,
         relief="solid",
     )
     style.configure("TLabelframe.Label", 
-        background=colors["bg"], 
+        background=colors["panel"], 
         foreground=colors["text"], 
-        font=(base_font, 10, "bold"),
+        font=(base_font, 11, "bold"),
     )
     style.configure("Card.TLabelframe",
         background=colors["panel"],
+        bordercolor=colors["border"],
     )
     style.configure("Card.TLabelframe.Label",
         background=colors["panel"],
         foreground=colors["text"],
-        font=(base_font, 10, "bold"),
+        font=(base_font, 11, "bold"),
     )
     
     # ========================================
-    # TREEVIEW (Tablo)
+    # TREEVIEW (Tablo) - Görsellerden
     # ========================================
     style.configure("Treeview",
-        background=colors["panel"],
-        fieldbackground=colors["panel"],
+        background=colors["table_row"],
+        fieldbackground=colors["table_row"],
         foreground=colors["text"],
-        rowheight=28,
+        rowheight=32,  # Daha yüksek satırlar
         borderwidth=0,
         relief="flat",
     )
@@ -546,7 +662,8 @@ def apply_dark_glass_theme(root: tk.Tk) -> Dict[str, str]:
         foreground=colors["text_secondary"],
         font=(base_font, 10, "bold"),
         relief="flat",
-        padding=(10, 8),
+        padding=(12, 10),
+        borderwidth=1,
     )
     style.map("Treeview",
         background=[
@@ -559,11 +676,12 @@ def apply_dark_glass_theme(root: tk.Tk) -> Dict[str, str]:
     style.map("Treeview.Heading",
         background=[
             ("active", colors["accent_light"]),
+            ("!active", colors["table_header"]),
         ],
     )
     
     # ========================================
-    # NOTEBOOK (Tabs)
+    # NOTEBOOK (Tabs) - Görsellerden
     # ========================================
     style.configure("TNotebook", 
         background=colors["bg"], 
@@ -571,18 +689,41 @@ def apply_dark_glass_theme(root: tk.Tk) -> Dict[str, str]:
         tabmargins=[0, 0, 0, 0],
     )
     style.configure("TNotebook.Tab", 
-        padding=(16, 10),
+        padding=(18, 10),
+        font=(base_font, 10),
+        background=colors["tab_bg"],
+        foreground=colors["muted"],
+        borderwidth=0,
+    )
+    style.map("TNotebook.Tab",
+        background=[
+            ("selected", colors["tab_active_bg"]),
+            ("!selected", colors["tab_bg"]),
+        ],
+        foreground=[
+            ("selected", colors["tab_active_text"]),
+            ("!selected", colors["muted"]),
+        ],
+    )
+    
+    # Alt Tab stili (nested tabs için - ör: Fatura içindeki tabs)
+    style.configure("Inner.TNotebook", 
+        background=colors["panel"], 
+        borderwidth=0,
+    )
+    style.configure("Inner.TNotebook.Tab", 
+        padding=(14, 8),
         font=(base_font, 10),
         background=colors["panel"],
         foreground=colors["muted"],
     )
-    style.map("TNotebook.Tab",
+    style.map("Inner.TNotebook.Tab",
         background=[
             ("selected", colors["accent_light"]),
             ("!selected", colors["panel"]),
         ],
         foreground=[
-            ("selected", colors["accent"]),
+            ("selected", colors["accent_bright"]),
             ("!selected", colors["muted"]),
         ],
     )
@@ -592,9 +733,9 @@ def apply_dark_glass_theme(root: tk.Tk) -> Dict[str, str]:
     # ========================================
     style.configure("TProgressbar",
         background=colors["accent"],
-        troughcolor=colors["panel"],
+        troughcolor=colors["input_bg"],
         borderwidth=0,
-        thickness=6,
+        thickness=8,
     )
     
     # ========================================
@@ -602,7 +743,7 @@ def apply_dark_glass_theme(root: tk.Tk) -> Dict[str, str]:
     # ========================================
     style.configure("TScale",
         background=colors["bg"],
-        troughcolor=colors["panel"],
+        troughcolor=colors["input_bg"],
         sliderrelief="flat",
     )
     
@@ -613,10 +754,15 @@ def apply_dark_glass_theme(root: tk.Tk) -> Dict[str, str]:
         background=colors["bg"],
         foreground=colors["text"],
         focuscolor=colors["accent"],
+        indicatorcolor=colors["input_bg"],
     )
     style.map("TCheckbutton",
         background=[
             ("active", colors["bg"]),
+        ],
+        indicatorcolor=[
+            ("selected", colors["accent"]),
+            ("!selected", colors["input_bg"]),
         ],
     )
     
@@ -624,10 +770,15 @@ def apply_dark_glass_theme(root: tk.Tk) -> Dict[str, str]:
         background=colors["bg"],
         foreground=colors["text"],
         focuscolor=colors["accent"],
+        indicatorcolor=colors["input_bg"],
     )
     style.map("TRadiobutton",
         background=[
             ("active", colors["bg"]),
+        ],
+        indicatorcolor=[
+            ("selected", colors["accent"]),
+            ("!selected", colors["input_bg"]),
         ],
     )
     
@@ -636,24 +787,35 @@ def apply_dark_glass_theme(root: tk.Tk) -> Dict[str, str]:
         background=colors["panel"],
         foreground=colors["text"],
     )
+    style.map("Panel.TCheckbutton",
+        background=[
+            ("active", colors["panel"]),
+        ],
+    )
     style.configure("Panel.TRadiobutton",
         background=colors["panel"],
         foreground=colors["text"],
     )
+    style.map("Panel.TRadiobutton",
+        background=[
+            ("active", colors["panel"]),
+        ],
+    )
     
     # ========================================
-    # SCROLLBAR
+    # SCROLLBAR - İnce modern scrollbar
     # ========================================
     style.configure("TScrollbar",
-        background=colors["panel"],
+        background=colors["border"],
         troughcolor=colors["bg"],
-        arrowcolor=colors["text_secondary"],
+        arrowcolor=colors["muted"],
         borderwidth=0,
+        width=10,
     )
     style.map("TScrollbar",
         background=[
             ("active", colors["accent_light"]),
-            ("!active", colors["panel"]),
+            ("!active", colors["border"]),
         ],
     )
     
@@ -661,9 +823,23 @@ def apply_dark_glass_theme(root: tk.Tk) -> Dict[str, str]:
     # MENUBUTTON
     # ========================================
     style.configure("TMenubutton",
-        background=colors["panel"],
+        background=colors["btn_secondary_bg"],
         foreground=colors["text"],
-        padding=(10, 6),
+        padding=(12, 8),
+        borderwidth=1,
+    )
+    style.map("TMenubutton",
+        background=[
+            ("active", colors["accent_light"]),
+            ("!active", colors["btn_secondary_bg"]),
+        ],
+    )
+    
+    # ========================================
+    # SIZEGRIP
+    # ========================================
+    style.configure("TSizegrip",
+        background=colors["bg"],
     )
     
     return colors
