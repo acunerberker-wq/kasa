@@ -369,8 +369,9 @@ class SatisRaporlariFrame(BaseView):
         self._current_rows = rows
         self._current_title = self.cmb_report.get()
 
-        for iid in self.tree.get_children():
-            self.tree.delete(iid)
+        children = self.tree.get_children()
+        if children:
+            self.tree.delete(*children)
 
         if self._report_key == "daily":
             headers = ["Tarih", "Satış", "İade", "Ciro", "İskonto", "İade Tutar", "Net Ciro", "Tahsilat"]
