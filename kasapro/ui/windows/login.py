@@ -15,34 +15,87 @@ from ...db.users_db import UsersDB
 from ...utils import center_window
 
 
-# ---- RENK PALET (Mockups dark theme) ----
+# ---- RENK PALET (Qt Dark Glass theme - login_with_user_select.ui) ----
 COLORS = {
-    "bg_dark": "#0b111b",           # Ana arka plan
-    "bg_mid": "#121826",            # Orta arka plan
-    "card_bg": "#121826",           # Kart zemini
-    "card_border": "#1b2536",       # Kart kenarlik
-    "input_bg": "#0f1522",          # Input arka plan
-    "input_border": "#1f2736",      # Input kenarlik
-    "input_focus": "#7c5cff",       # Focus rengi
-    "input_focus_solid": "#7c5cff", # Focus solid
-    "input_focus_bg": "#111827",    # Focus arka plan
-    "text_primary": "#e6e9f2",      # Ana metin
-    "text_secondary": "#c2c9d6",    # Ikincil metin
-    "text_muted": "#9aa3b2",        # Soluk metin
-    "text_placeholder": "#7f8898",  # Placeholder
-    "accent": "#7c5cff",            # Aksan
-    "accent_dark": "#6a4cf2",       # Aksan koyu
-    "accent_hover": "#8d75ff",      # Hover
-    "accent_glow": "#2b2147",       # Hafif vurgulu cizgi
-    "btn_border": "#3b2f63",        # Buton kenarlik
-    "link": "#b8b1ff",              # Link
-    "link_hover": "#d4cfff",        # Link hover
-    "divider": "#1f2a3a",           # Divider
-    "dropdown_bg": "#151e2e",       # Dropdown
-    "selection": "#242a3b",         # Selection
+    # Qt: qradialgradient - stop:0 rgba(20, 30, 50), stop:0.55 rgba(10, 14, 24), stop:1 rgba(6, 8, 14)
+    "bg_dark": "#06080e",           # Ana arka plan (Qt: rgba(6, 8, 14))
+    "bg_mid": "#0a0e18",            # Orta arka plan (Qt: rgba(10, 14, 24))
+    "bg_glow": "#141e32",           # Glow efekt (Qt: rgba(20, 30, 50))
+    # Qt: QFrame#Card - background: rgba(18, 26, 42, 165), border: rgba(255,255,255,30)
+    "card_bg": "#121a2a",           # Kart zemini (Qt: rgba(18, 26, 42))
+    "card_border": "#3a3a44",       # Kart kenarlik (simulated rgba(255,255,255,30))
+    # Qt: QLineEdit/QComboBox - background: rgba(255,255,255,10), border: rgba(255,255,255,22)
+    "input_bg": "#161a22",          # Input arka plan
+    "input_border": "#2a2e38",      # Input kenarlik (simulated)
+    # Qt: focus - border: rgba(90, 150, 255, 160), background: rgba(255,255,255,12)
+    "input_focus": "#5a96ff",       # Focus rengi (Qt: rgba(90, 150, 255))
+    "input_focus_solid": "#5a96ff", # Focus solid
+    "input_focus_bg": "#14192a",    # Focus arka plan
+    # Qt: color: rgba(240,245,255,220) / rgba(235,240,255,210)
+    "text_primary": "#e8ecf5",      # Ana metin (Qt: rgba(240,245,255,220))
+    "text_secondary": "#d0d6e2",    # Ikincil metin (Qt: rgba(235,240,255,210))
+    "text_muted": "#8090aa",        # Soluk metin (Qt: rgba(180,200,255,120))
+    "text_placeholder": "#7080a0",  # Placeholder
+    # Qt: QPushButton#BtnLogin - gradient rgba(55, 140, 255) -> rgba(20, 90, 210)
+    "accent": "#378cff",            # Aksan (Qt: rgba(55, 140, 255))
+    "accent_dark": "#145ad2",       # Aksan koyu (Qt: rgba(20, 90, 210))
+    "accent_hover": "#46a0ff",      # Hover (Qt: rgba(70, 160, 255))
+    "accent_hover_dark": "#1969e6", # Hover koyu (Qt: rgba(25, 105, 230))
+    # Qt: QFrame#GlowLine - gradient rgba(80,160,255,140)
+    "accent_glow": "#3878b8",       # Glow line (simulated with dark bg blend)
+    # Qt: border: 1px solid rgba(140, 190, 255, 90)
+    "btn_border": "#5a7eb0",        # Buton kenarlik (simulated)
+    # Qt: LblForgot - color: rgba(200,215,255,140), hover: rgba(220,235,255,210)
+    "link": "#8898c0",              # Link (simulated)
+    "link_hover": "#b8c8e8",        # Link hover (simulated)
+    # Qt: Divider - background: rgba(255,255,255,18)
+    "divider": "#282c36",           # Divider (simulated)
+    # Qt: QAbstractItemView - background: rgba(18, 26, 42, 230), selection: rgba(70, 130, 255, 120)
+    "dropdown_bg": "#101620",       # Dropdown
+    "selection": "#2a4878",         # Selection (simulated)
+    # Qt: QCheckBox indicator checked - background: rgba(70, 130, 255, 160), border: rgba(120, 170, 255, 200)
+    "checkbox_checked": "#4682ff",  # Checkbox checked (Qt: rgba(70, 130, 255))
+    "checkbox_border": "#78aaff",   # Checkbox border (Qt: rgba(120, 170, 255))
+    # Qt: LblSpinner - border: 2px solid rgba(130, 170, 255, 90)
+    "spinner_border": "#5878a8",    # Spinner border (simulated)
 }
 
-BASE_FONT = "Segoe UI" if sys.platform.startswith("win") else "Calibri"
+# Qt: font-family: "Inter","Segoe UI","SF Pro Display" - sans-serif fontlar
+# Tkinter için platform bazlı sans-serif font seçimi
+import tkinter.font as tkfont
+
+def _get_sans_serif_font() -> str:
+    """Sistemde mevcut olan ilk sans-serif fontu döndür."""
+    # Tercih sırası: Inter > Segoe UI > SF Pro Display > Helvetica Neue > Arial
+    preferred = ["Inter", "Segoe UI", "SF Pro Display", "Helvetica Neue", "Arial", "Helvetica"]
+    try:
+        available = tkfont.families()
+        for font in preferred:
+            if font in available:
+                return font
+    except Exception:
+        pass
+    # Windows için varsayılan
+    if sys.platform.startswith("win"):
+        return "Segoe UI"
+    # macOS için varsayılan
+    elif sys.platform == "darwin":
+        return "SF Pro Display"
+    # Linux için varsayılan
+    return "DejaVu Sans"
+
+# Lazy initialization - font ailesi ilk kullanımda belirlenir
+_BASE_FONT_CACHE: Optional[str] = None
+
+def get_base_font() -> str:
+    """Sans-serif base font döndür (lazy loaded)."""
+    global _BASE_FONT_CACHE
+    if _BASE_FONT_CACHE is None:
+        _BASE_FONT_CACHE = _get_sans_serif_font()
+    return _BASE_FONT_CACHE
+
+# Eski kod ile uyumluluk için
+BASE_FONT = "Segoe UI"  # Varsayılan, runtime'da güncellenir
 
 
 def _round_rect_points(x1: float, y1: float, x2: float, y2: float, r: float) -> list[float]:
@@ -323,13 +376,15 @@ class ModernCheckbox(tk.Frame):
     def _update_indicator(self):
         self.indicator.delete("all")
         if self.var.get():
-            border = COLORS["accent_hover"]
-            fill = COLORS["accent"]
+            # Qt: checked - background: rgba(70, 130, 255, 160), border: rgba(120, 170, 255, 200)
+            border = COLORS["checkbox_border"]
+            fill = COLORS["checkbox_checked"]
             # Draw checkmark
             self.indicator.create_oval(1, 1, 17, 17, outline=border, width=1, fill=fill, tags="box")
             self.indicator.create_line(4, 9, 7, 13, fill="white", width=2, tags="check")
             self.indicator.create_line(7, 13, 14, 5, fill="white", width=2, tags="check")
         else:
+            # Qt: unchecked - border: rgba(255,255,255,30), background: rgba(255,255,255,10)
             border = COLORS["input_border"]
             fill = COLORS["input_bg"]
             self.indicator.create_oval(1, 1, 17, 17, outline=border, width=1, fill=fill, tags="box")
@@ -406,6 +461,10 @@ class LoginWindow(tk.Toplevel):
         self.usersdb = usersdb
         self.user: Optional[sqlite3.Row] = None
         
+        # Sans-serif font'u runtime'da belirle
+        global BASE_FONT
+        BASE_FONT = get_base_font()
+        
         # Pencere ayarları
         self.title("Giriş")
         self.geometry("980x620")
@@ -441,11 +500,11 @@ class LoginWindow(tk.Toplevel):
         # Qt: background: rgba(18, 26, 42, 165), border: 1px solid rgba(255,255,255,30), border-radius: 16px
         card_box = RoundedBox(
             main_container,
-            radius=18,
+            radius=16,
             bg_color=COLORS["card_bg"],
-            border_color=COLORS["card_border"],
+            border_color=COLORS["card_border"],  # Simulated rgba(255,255,255,30)
             border_width=1,
-            padding=24,
+            padding=32,
         )
         card_box.pack()
         card = card_box.inner
@@ -455,12 +514,13 @@ class LoginWindow(tk.Toplevel):
         brand_frame.pack(fill=tk.X, pady=(0, 16))
         
         # Logo - Qt: 36x36, gradient mavi, border-radius: 10px
+        # Qt: qlineargradient rgba(70,160,255) -> rgba(30,110,230)
         logo = tk.Canvas(brand_frame, width=36, height=36, bg=COLORS["card_bg"], highlightthickness=0)
         logo.pack(side=tk.LEFT, padx=(0, 12))
-        # Gradient simulation - Qt: rgba(124,92,255) -> rgba(90,70,220)
+        # Gradient simulation - Qt: rgba(70,160,255) -> rgba(30,110,230)
         logo.create_rectangle(0, 0, 36, 36, fill=COLORS["accent"], outline="")
-        logo.create_rectangle(3, 3, 33, 18, fill="#9b86ff", outline="")
-        logo.create_rectangle(3, 3, 18, 33, fill="#5f44db", outline="")
+        logo.create_rectangle(3, 3, 33, 18, fill="#46a0ff", outline="")  # rgba(70,160,255)
+        logo.create_rectangle(3, 3, 18, 33, fill="#1e6ee6", outline="")  # rgba(30,110,230)
         
         # App name - Qt: font-size: 22px, font-weight: 700, color: rgba(240,245,255,220)
         app_name = tk.Label(
@@ -508,8 +568,9 @@ class LoginWindow(tk.Toplevel):
         self.btn_login = ModernButton(form_frame, text="Giriş Yap..", command=self.do_login)
         self.btn_login.pack(fill=tk.X, pady=(0, 4))
         
-        # Glow line - Qt: GlowLine, height 2, subtle highlight
-        glow_line = tk.Frame(form_frame, bg=COLORS["accent_glow"], height=2)
+        # Glow line - Qt: GlowLine, height 4
+        # Qt: qlineargradient stop:0.3/0.7 rgba(80,160,255,140)
+        glow_line = tk.Frame(form_frame, bg="#50a0ff", height=4)
         glow_line.pack(fill=tk.X, pady=(0, 12))
         
         # Loading satırı - Qt: LoadingRow, spacing 10 (başlangıçta gizli)
@@ -520,9 +581,9 @@ class LoginWindow(tk.Toplevel):
         self.lbl_spinner = tk.Label(
             self.loading_frame,
             text="◐",
-            font=(BASE_FONT, 11),
+            font=(BASE_FONT, 12),
             bg=COLORS["card_bg"],
-            fg=COLORS["accent"],
+            fg=COLORS["accent"],  # Qt: rgba(55, 140, 255)
         )
         self.lbl_spinner.pack(side=tk.LEFT, padx=(0, 10))
         
@@ -570,21 +631,36 @@ class LoginWindow(tk.Toplevel):
         card_box.fit_to_inner()
 
     def _draw_background(self, _event=None):
+        """Qt radial gradient simulation - cx:0.5, cy:0.35, radius:0.95"""
         canvas = getattr(self, "_bg_canvas", None)
         if not canvas:
             return
         w = max(1, self.winfo_width())
         h = max(1, self.winfo_height())
         canvas.delete("bg")
+        # Qt: stop:1 rgba(6, 8, 14) - ana arka plan
         canvas.create_rectangle(0, 0, w, h, fill=COLORS["bg_dark"], outline="", tags="bg")
-        glow_w = int(w * 0.9)
-        glow_h = int(h * 0.7)
+        # Qt: stop:0.55 rgba(10, 14, 24) - orta katman
+        glow_w = int(w * 0.85)
+        glow_h = int(h * 0.75)
         canvas.create_oval(
-            -int(glow_w * 0.25),
-            -int(glow_h * 0.55),
-            glow_w,
-            glow_h,
-            fill=COLORS["accent_glow"],
+            int(w * 0.5 - glow_w * 0.5),
+            int(h * 0.35 - glow_h * 0.5),
+            int(w * 0.5 + glow_w * 0.5),
+            int(h * 0.35 + glow_h * 0.5),
+            fill=COLORS["bg_mid"],
+            outline="",
+            tags="bg",
+        )
+        # Qt: stop:0 rgba(20, 30, 50) - merkez glow
+        inner_w = int(w * 0.5)
+        inner_h = int(h * 0.45)
+        canvas.create_oval(
+            int(w * 0.5 - inner_w * 0.5),
+            int(h * 0.35 - inner_h * 0.5),
+            int(w * 0.5 + inner_w * 0.5),
+            int(h * 0.35 + inner_h * 0.5),
+            fill=COLORS["bg_glow"],
             outline="",
             tags="bg",
         )
