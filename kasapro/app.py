@@ -23,25 +23,10 @@ from .utils import _safe_slug, fmt_amount
 from .db.main_db import DB
 from .db.users_db import UsersDB
 from .services import Services
-from .ui.navigation import ScreenRegistry
 from .ui.style import apply_modern_style
 from .ui.ui_logging import log_ui_event, wrap_callback
-from .ui.windows import LoginWindow, SettingsWindow, HelpWindow, ImportWizard
-from .ui.frames import (
-    KasaFrame,
-    TanimlarHubFrame,
-    RaporAraclarHubFrame,
-    KullanicilarFrame,
-    MessagesFrame,
-    IntegrationsHubFrame,
-    CreateCenterFrame,
-    SatisRaporlariFrame,
-    StockWmsFrame,
-)
-from .ui.plugins.loader import discover_ui_plugins
 from modules.hr.service import HRContext
 from .modules.notes_reminders.scheduler import ReminderScheduler
-from .modules.integrations.worker import IntegrationWorker
 
 # Import HRContext for typing
 try:
@@ -131,7 +116,7 @@ class App:
         self.db = DB(db_path)
         # Servis katmanı (UI -> services -> DB)
         self.services = Services.build(self.db, self.usersdb, context_provider=self._hr_context)
-        self.services = Services.build(self.db, self.usersdb, context_provider=self._hr_context)
+        from .modules.integrations.worker import IntegrationWorker
         self.integrations_worker = IntegrationWorker(self.services.integrations)
         try:
             cname = getattr(self, "active_company_name", "")
@@ -144,8 +129,7 @@ class App:
 
         self.frames: Dict[str, ttk.Frame] = {}
         self._build_ui()
-        self._schedule_sales_order_summary()
-        self._start_reminder_scheduler()
+        self._defer_post_login_tasks()
 
         # Login başarılı -> ana pencereyi göster
         if not self._test_mode:
@@ -155,6 +139,18 @@ class App:
                 self.root.after(80, self.root.lift)
             except Exception:
                 pass
+
+    def _defer_post_login_tasks(self) -> None:
+        if getattr(self, "_test_mode", False):
+            return
+        try:
+            self.root.after(200, self._schedule_sales_order_summary)
+        except Exception:
+            pass
+        try:
+            self.root.after(300, self._start_reminder_scheduler)
+        except Exception:
+            pass
 
     def _schedule_sales_order_summary(self) -> None:
         try:
@@ -247,6 +243,7 @@ class App:
 
     def _login(self) -> Optional[sqlite3.Row]:
         # LoginWindow kullanıcı seçimi + şifre doğrulama yapar
+        from .ui.windows import LoginWindow
         w = LoginWindow(self.root, self.usersdb)
 
         # ⚠️ Önemli:
@@ -661,6 +658,19 @@ class App:
             pass
 
     def _build_ui(self):
+        from .ui.frames import (
+            CreateCenterFrame,
+            IntegrationsHubFrame,
+            KasaFrame,
+            KullanicilarFrame,
+            MessagesFrame,
+            RaporAraclarHubFrame,
+            SatisRaporlariFrame,
+            StockWmsFrame,
+            TanimlarHubFrame,
+        )
+        from .ui.navigation import ScreenRegistry
+        from .ui.plugins.loader import discover_ui_plugins
         # Modern tema + okunabilir fontlar
         try:
             self._ui_colors = apply_modern_style(self.root)
@@ -877,17 +887,18 @@ class App:
         ).pack(fill=tk.X, padx=4, pady=(8, 2))
 
         # Ekranlar
-        self.screen_registry.register("kasa", lambda parent, app: KasaFrame(parent, app), title="Kasa")
-        self.screen_registry.register("create_center", lambda parent, app: CreateCenterFrame(parent, app), title="Kayıt Oluştur (Merkez)")
-        self.screen_registry.register("mesajlar", lambda parent, app: MessagesFrame(parent, app), title="Mesajlar")
-        self.screen_registry.register("tanimlar", lambda parent, app: TanimlarHubFrame(parent, app), title="Tanımlar")
-        self.screen_registry.register("stok_wms", lambda parent, app: StockWmsFrame(parent, app), title="Stok/WMS")
-        self.screen_registry.register("entegrasyonlar", lambda parent, app: IntegrationsHubFrame(parent, app), title="Entegrasyonlar")
-        self.screen_registry.register("satis_raporlari", lambda parent, app: SatisRaporlariFrame(parent, app), title="Satış Raporları")
+        self.screen_registry.register("kasa", lambda parent, app: KasaFrame(parent, app), title="Kasa", create=True)
+        self.screen_registry.register("create_center", lambda parent, app: CreateCenterFrame(parent, app), title="Kayıt Oluştur (Merkez)", create=False)
+        self.screen_registry.register("mesajlar", lambda parent, app: MessagesFrame(parent, app), title="Mesajlar", create=False)
+        self.screen_registry.register("tanimlar", lambda parent, app: TanimlarHubFrame(parent, app), title="Tanımlar", create=False)
+        self.screen_registry.register("stok_wms", lambda parent, app: StockWmsFrame(parent, app), title="Stok/WMS", create=False)
+        self.screen_registry.register("entegrasyonlar", lambda parent, app: IntegrationsHubFrame(parent, app), title="Entegrasyonlar", create=False)
+        self.screen_registry.register("satis_raporlari", lambda parent, app: SatisRaporlariFrame(parent, app), title="Satış Raporları", create=False)
         self.screen_registry.register(
             "rapor_araclar",
             lambda parent, app: RaporAraclarHubFrame(parent, app),
             title="Rapor & Araçlar",
+            create=False,
         )
 
         # Plugin ekranları
@@ -896,7 +907,7 @@ class App:
             log_ui_event("plugin_ui_registered", key=p.key, title=p.page_title)
 
         if self.is_admin:
-            self.screen_registry.register("kullanicilar", lambda parent, app: KullanicilarFrame(parent, app), title="Kullanıcılar")
+            self.screen_registry.register("kullanicilar", lambda parent, app: KullanicilarFrame(parent, app), title="Kullanıcılar", create=False)
 
         # İlk yüklemeler
         try:
@@ -1102,10 +1113,12 @@ class App:
             except Exception:
                 pass
     def open_settings(self):
+        from .ui.windows import SettingsWindow
         SettingsWindow(self)
 
 
     def open_help(self):
+        from .ui.windows import HelpWindow
         HelpWindow(self)
 
     def backup_db(self):
@@ -1156,6 +1169,7 @@ class App:
         messagebox.showinfo(APP_TITLE, 'Geri yüklendi. Uygulamayı yeniden başlatman önerilir.')
 
     def import_excel(self):
+        from .ui.windows import ImportWizard
         p = filedialog.askopenfilename(title="Excel Seç", filetypes=[("Excel", "*.xlsx *.xlsm"), ("All", "*.*")])
         if not p:
             return
