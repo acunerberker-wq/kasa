@@ -11589,3 +11589,983 @@ _tkinter.TclError: invalid color name "#ffffff1e"
 2025-12-27 20:27:21,370 [INFO] kasapro.ui: UI callback invoked: nav:tanimlar
 2025-12-27 20:27:21,371 [INFO] kasapro.ui: UI screen_shown | key='tanimlar'
 2025-12-27 20:27:22,225 [INFO] kasapro.ui: UI callback invoked: on_close
+2025-12-27 20:39:27,616 [INFO] kasapro.ui: UI container_created | view='root_container'
+2025-12-27 20:39:27,620 [INFO] kasapro.ui: UI callback_bound | handler='open_help'
+2025-12-27 20:39:27,727 [INFO] kasapro.ui: UI callback_bound | handler='open_settings'
+2025-12-27 20:39:27,748 [INFO] kasapro.ui.plugins: UI plugin loaded: advanced_invoice (advanced_invoice v0.1.0)
+2025-12-27 20:39:27,748 [INFO] kasapro.ui.plugins: UI plugin loaded: banka_hareketleri (banka_hareketleri v0.1.0)
+2025-12-27 20:39:27,749 [INFO] kasapro.ui.plugins: UI plugin loaded: cari_hareket_ekle (cari_hareket_ekle v0.1.0)
+2025-12-27 20:39:27,750 [INFO] kasapro.ui.plugins: UI plugin loaded: cari_hareketler (cari_hareketler v0.1.0)
+2025-12-27 20:39:27,752 [INFO] kasapro.ui.plugins: UI plugin loaded: diagnostics (Sistem Testleri v1.1.0)
+2025-12-27 20:39:27,752 [INFO] kasapro.ui.plugins: UI plugin loaded: diger_giderler (diger_giderler v0.1.0)
+2025-12-27 20:39:27,754 [INFO] kasapro.ui.plugins: UI plugin loaded: dms (dms v0.1.0)
+2025-12-27 20:39:27,756 [INFO] kasapro.ui.plugins: UI plugin loaded: fatura (fatura v0.1.0)
+2025-12-27 20:39:27,757 [INFO] kasapro.ui.plugins: UI plugin loaded: hakedis (hakedis v0.1.0)
+2025-12-27 20:39:27,759 [INFO] kasapro.ui.plugins: UI plugin loaded: hr (hr v0.1.0)
+2025-12-27 20:39:27,760 [INFO] kasapro.ui.plugins: UI plugin loaded: maas_eklentileri (maas_eklentileri v0.1.0)
+2025-12-27 20:39:27,760 [INFO] kasapro.ui.plugins: UI plugin loaded: maas_meslekler (maas_meslekler v0.1.0)
+2025-12-27 20:39:27,761 [INFO] kasapro.ui.plugins: UI plugin loaded: maas_takibi (maas_takibi v0.1.0)
+2025-12-27 20:39:27,762 [INFO] kasapro.ui.plugins: UI plugin loaded: nakliye (nakliye v0.1.0)
+2025-12-27 20:39:27,766 [INFO] kasapro.ui.plugins: UI plugin loaded: quote_orders_orders (quote_orders_orders v0.1.0)
+2025-12-27 20:39:27,766 [INFO] kasapro.ui.plugins: UI plugin loaded: quote_orders_quotes (quote_orders_quotes v0.1.0)
+2025-12-27 20:39:27,767 [INFO] kasapro.ui.plugins: UI plugin loaded: satis_siparis_rapor (satis_siparis_rapor v0.1.0)
+2025-12-27 20:39:27,769 [INFO] kasapro.ui.plugins: UI plugin loaded: stok (stok v0.1.0)
+2025-12-27 20:39:27,774 [INFO] kasapro.ui.plugins: UI plugin loaded: trade_module (trade_module v0.1.0)
+2025-12-27 20:39:27,994 [INFO] kasapro.ui: UI menu_section_added | title='🧾 KAYIT OLUŞTUR'
+2025-12-27 20:39:27,994 [INFO] kasapro.ui: UI menu_added | key='create_center', text='🧾 Kayıt Oluştur (Merkez)'
+2025-12-27 20:39:27,994 [INFO] kasapro.ui: UI callback_bound | handler='nav:create_center'
+2025-12-27 20:39:28,023 [INFO] kasapro.ui: UI menu_section_added | title='📚 TANIMLAR & AYARLAR'
+2025-12-27 20:39:28,023 [INFO] kasapro.ui: UI menu_added | key='tanimlar', text='📚 Tanımlar'
+2025-12-27 20:39:28,023 [INFO] kasapro.ui: UI callback_bound | handler='nav:tanimlar'
+2025-12-27 20:39:28,039 [INFO] kasapro.ui: UI menu_section_added | title='💳 İŞLEMLER'
+2025-12-27 20:39:28,039 [INFO] kasapro.ui: UI menu_added | key='kasa', text='🏦 Kasa'
+2025-12-27 20:39:28,039 [INFO] kasapro.ui: UI callback_bound | handler='nav:kasa'
+2025-12-27 20:39:28,054 [INFO] kasapro.ui: UI menu_added | key='mesajlar', text='📨 Mesajlar'
+2025-12-27 20:39:28,054 [INFO] kasapro.ui: UI callback_bound | handler='nav:mesajlar'
+2025-12-27 20:39:28,064 [INFO] kasapro.ui: UI menu_added | key='stok', text='📦 Stok'
+2025-12-27 20:39:28,065 [INFO] kasapro.ui: UI callback_bound | handler='nav:stok'
+2025-12-27 20:39:28,075 [INFO] kasapro.ui: UI menu_added | key='advanced_invoice', text='🧾 Faturalar'
+2025-12-27 20:39:28,075 [INFO] kasapro.ui: UI callback_bound | handler='nav:advanced_invoice'
+2025-12-27 20:39:28,076 [INFO] kasapro.ui: UI menu_added | key='banka_hareketleri', text='🏦 Banka'
+2025-12-27 20:39:28,076 [INFO] kasapro.ui: UI callback_bound | handler='nav:banka_hareketleri'
+2025-12-27 20:39:28,077 [INFO] kasapro.ui: UI menu_added | key='fatura', text='🧾 Fatura'
+2025-12-27 20:39:28,077 [INFO] kasapro.ui: UI callback_bound | handler='nav:fatura'
+2025-12-27 20:39:28,078 [INFO] kasapro.ui: UI menu_added | key='satis_siparis_rapor', text='🧾 Satış Siparişleri'
+2025-12-27 20:39:28,078 [INFO] kasapro.ui: UI callback_bound | handler='nav:satis_siparis_rapor'
+2025-12-27 20:39:28,079 [INFO] kasapro.ui: UI menu_added | key='trade_module', text='🏭 Ticari'
+2025-12-27 20:39:28,079 [INFO] kasapro.ui: UI callback_bound | handler='nav:trade_module'
+2025-12-27 20:39:28,090 [INFO] kasapro.ui: UI menu_added | key='hr', text='🧑\u200d💼 İK'
+2025-12-27 20:39:28,090 [INFO] kasapro.ui: UI callback_bound | handler='nav:hr'
+2025-12-27 20:39:28,117 [INFO] kasapro.ui: UI menu_added | key='diger_giderler', text='🧾 Diğer Giderler'
+2025-12-27 20:39:28,117 [INFO] kasapro.ui: UI callback_bound | handler='nav:diger_giderler'
+2025-12-27 20:39:28,118 [INFO] kasapro.ui: UI menu_added | key='cari_hareketler', text='📒 Cari Hareketler'
+2025-12-27 20:39:28,118 [INFO] kasapro.ui: UI callback_bound | handler='nav:cari_hareketler'
+2025-12-27 20:39:28,131 [INFO] kasapro.ui: UI menu_added | key='maas_takibi', text='💼 Maaş Takibi'
+2025-12-27 20:39:28,131 [INFO] kasapro.ui: UI callback_bound | handler='nav:maas_takibi'
+2025-12-27 20:39:28,132 [INFO] kasapro.ui: UI menu_added | key='nakliye', text='🚚 Nakliye'
+2025-12-27 20:39:28,132 [INFO] kasapro.ui: UI callback_bound | handler='nav:nakliye'
+2025-12-27 20:39:28,149 [INFO] kasapro.ui: UI menu_added | key='cari_hareket_ekle', text='➕ Cari Hareket Ekle'
+2025-12-27 20:39:28,149 [INFO] kasapro.ui: UI callback_bound | handler='nav:cari_hareket_ekle'
+2025-12-27 20:39:28,150 [INFO] kasapro.ui: UI menu_added | key='dms', text='📄 Dokümanlar'
+2025-12-27 20:39:28,150 [INFO] kasapro.ui: UI callback_bound | handler='nav:dms'
+2025-12-27 20:39:28,163 [INFO] kasapro.ui: UI menu_added | key='hakedis', text='🏗️ Hakediş Merkezi'
+2025-12-27 20:39:28,163 [INFO] kasapro.ui: UI callback_bound | handler='nav:hakedis'
+2025-12-27 20:39:28,175 [INFO] kasapro.ui: UI menu_added | key='quote_orders_quotes', text='Satış > Teklifler'
+2025-12-27 20:39:28,175 [INFO] kasapro.ui: UI callback_bound | handler='nav:quote_orders_quotes'
+2025-12-27 20:39:28,176 [INFO] kasapro.ui: UI menu_added | key='quote_orders_orders', text='Satış > Siparişler'
+2025-12-27 20:39:28,176 [INFO] kasapro.ui: UI callback_bound | handler='nav:quote_orders_orders'
+2025-12-27 20:39:28,177 [INFO] kasapro.ui: UI menu_added | key='diagnostics', text='🧪 Sistem Testleri'
+2025-12-27 20:39:28,177 [INFO] kasapro.ui: UI callback_bound | handler='nav:diagnostics'
+2025-12-27 20:39:28,188 [INFO] kasapro.ui: UI menu_section_added | title='📦 STOK & WMS'
+2025-12-27 20:39:28,189 [INFO] kasapro.ui: UI menu_added | key='stok_wms', text='📦 Stok/WMS'
+2025-12-27 20:39:28,189 [INFO] kasapro.ui: UI callback_bound | handler='nav:stok_wms'
+2025-12-27 20:39:28,201 [INFO] kasapro.ui: UI menu_section_added | title='🔌 ENTEGRASYONLAR'
+2025-12-27 20:39:28,201 [INFO] kasapro.ui: UI menu_added | key='entegrasyonlar', text='🔌 Entegrasyonlar'
+2025-12-27 20:39:28,201 [INFO] kasapro.ui: UI callback_bound | handler='nav:entegrasyonlar'
+2025-12-27 20:39:28,212 [INFO] kasapro.ui: UI menu_section_added | title='📈 RAPORLAR & DASHBOARD'
+2025-12-27 20:39:28,212 [INFO] kasapro.ui: UI menu_added | key='rapor_araclar', text='📈 Rapor & Araçlar'
+2025-12-27 20:39:28,213 [INFO] kasapro.ui: UI callback_bound | handler='nav:rapor_araclar'
+2025-12-27 20:39:28,213 [INFO] kasapro.ui: UI menu_added | key='satis_raporlari', text='💹 Satış Raporları'
+2025-12-27 20:39:28,214 [INFO] kasapro.ui: UI callback_bound | handler='nav:satis_raporlari'
+2025-12-27 20:39:28,224 [INFO] kasapro.ui: UI callback_bound | handler='import_excel'
+2025-12-27 20:39:28,234 [INFO] kasapro.ui: UI callback_bound | handler='export_excel'
+2025-12-27 20:39:28,244 [INFO] kasapro.ui: UI callback_bound | handler='on_close'
+2025-12-27 20:39:28,265 [INFO] kasapro.ui: UI screen_registered | key='kasa', title='Kasa'
+2025-12-27 20:39:28,266 [INFO] kasapro.ui: UI frame_created | view='KasaFrame'
+2025-12-27 20:39:28,311 [INFO] kasapro.ui: UI screen_created | key='kasa', view='KasaFrame', elapsed_s=0.0453
+2025-12-27 20:39:28,311 [INFO] kasapro.ui: UI screen_registered | key='create_center', title='Kayıt Oluştur (Merkez)'
+2025-12-27 20:39:28,312 [INFO] kasapro.ui: UI frame_created | view='CreateCenterFrame'
+2025-12-27 20:39:28,333 [INFO] kasapro.ui: UI create_form_selected | form='cari'
+2025-12-27 20:39:28,333 [INFO] kasapro.ui: UI screen_created | key='create_center', view='CreateCenterFrame', elapsed_s=0.0217
+2025-12-27 20:39:28,333 [INFO] kasapro.ui: UI screen_registered | key='mesajlar', title='Mesajlar'
+2025-12-27 20:39:28,334 [INFO] kasapro.ui: UI frame_created | view='MessagesFrame'
+2025-12-27 20:39:28,335 [INFO] kasapro.ui: UI callback_bound | handler='messages_folder_change'
+2025-12-27 20:39:28,336 [INFO] kasapro.ui: UI callback_bound | handler='messages_search'
+2025-12-27 20:39:28,337 [INFO] kasapro.ui: UI callback_bound | handler='messages_refresh'
+2025-12-27 20:39:28,345 [INFO] kasapro.ui: UI callback_bound | handler='messages_compose'
+2025-12-27 20:39:28,347 [INFO] kasapro.ui: UI callback_bound | handler='messages_prev'
+2025-12-27 20:39:28,347 [INFO] kasapro.ui: UI callback_bound | handler='messages_next'
+2025-12-27 20:39:28,360 [INFO] kasapro.ui: UI screen_created | key='mesajlar', view='MessagesFrame', elapsed_s=0.0272
+2025-12-27 20:39:28,361 [INFO] kasapro.ui: UI screen_registered | key='tanimlar', title='Tanımlar'
+2025-12-27 20:39:28,361 [INFO] kasapro.ui: UI frame_created | view='TanimlarHubFrame'
+2025-12-27 20:39:28,362 [INFO] kasapro.ui: UI tab_added | tab='cariler', container='tanimlar'
+2025-12-27 20:39:28,362 [INFO] kasapro.ui: UI tab_added | tab='calisanlar', container='tanimlar'
+2025-12-27 20:39:28,363 [INFO] kasapro.ui: UI tab_added | tab='meslekler', container='tanimlar'
+2025-12-27 20:39:28,363 [INFO] kasapro.ui: UI frame_created | view='CarilerFrame'
+2025-12-27 20:39:28,374 [INFO] kasapro.ui: UI frame_created | view='MaasTakibiFrame'
+2025-12-27 20:39:28,439 [INFO] kasapro.ui: UI frame_created | view='MaasMesleklerFrame'
+2025-12-27 20:39:28,450 [INFO] kasapro.ui: UI callback_bound | handler='tanimlar_tab_change'
+2025-12-27 20:39:28,450 [INFO] kasapro.ui: UI screen_created | key='tanimlar', view='TanimlarHubFrame', elapsed_s=0.0889
+2025-12-27 20:39:28,450 [INFO] kasapro.ui: UI screen_registered | key='stok_wms', title='Stok/WMS'
+2025-12-27 20:39:28,451 [INFO] kasapro.ui: UI frame_created | view='StockWmsFrame'
+2025-12-27 20:39:28,458 [INFO] kasapro.ui: UI tab_added | tab='stock_card', container='stock_wms'
+2025-12-27 20:39:28,459 [INFO] kasapro.ui: UI callback_bound | handler='wms_demo_docs'
+2025-12-27 20:39:28,461 [INFO] kasapro.ui: UI screen_created | key='stok_wms', view='StockWmsFrame', elapsed_s=0.0108
+2025-12-27 20:39:28,461 [INFO] kasapro.ui: UI screen_registered | key='entegrasyonlar', title='Entegrasyonlar'
+2025-12-27 20:39:28,471 [INFO] kasapro.ui: UI screen_created | key='entegrasyonlar', view='IntegrationsHubFrame', elapsed_s=0.0094
+2025-12-27 20:39:28,471 [INFO] kasapro.ui: UI screen_registered | key='satis_raporlari', title='Satış Raporları'
+2025-12-27 20:39:28,471 [INFO] kasapro.ui: UI frame_created | view='SatisRaporlariFrame'
+2025-12-27 20:39:28,499 [INFO] kasapro.ui: UI screen_created | key='satis_raporlari', view='SatisRaporlariFrame', elapsed_s=0.028
+2025-12-27 20:39:28,499 [INFO] kasapro.ui: UI screen_registered | key='rapor_araclar', title='Rapor & Araçlar'
+2025-12-27 20:39:28,500 [INFO] kasapro.ui: UI screen_registered | key='stok', title='Stok Yönetimi'
+2025-12-27 20:39:28,500 [INFO] kasapro.ui: UI plugin_ui_registered | key='stok', title='Stok Yönetimi'
+2025-12-27 20:39:28,500 [INFO] kasapro.ui: UI screen_registered | key='advanced_invoice', title='Faturalar'
+2025-12-27 20:39:28,501 [INFO] kasapro.ui: UI plugin_ui_registered | key='advanced_invoice', title='Faturalar'
+2025-12-27 20:39:28,501 [INFO] kasapro.ui: UI screen_registered | key='banka_hareketleri', title='Banka Hareketleri'
+2025-12-27 20:39:28,501 [INFO] kasapro.ui: UI plugin_ui_registered | key='banka_hareketleri', title='Banka Hareketleri'
+2025-12-27 20:39:28,501 [INFO] kasapro.ui: UI screen_registered | key='fatura', title='Fatura'
+2025-12-27 20:39:28,501 [INFO] kasapro.ui: UI plugin_ui_registered | key='fatura', title='Fatura'
+2025-12-27 20:39:28,501 [INFO] kasapro.ui: UI screen_registered | key='satis_siparis_rapor', title='Satış Sipariş Raporları'
+2025-12-27 20:39:28,502 [INFO] kasapro.ui: UI plugin_ui_registered | key='satis_siparis_rapor', title='Satış Sipariş Raporları'
+2025-12-27 20:39:28,502 [INFO] kasapro.ui: UI screen_registered | key='trade_module', title='Gelişmiş Alış/Satış (Ticari) Modülü'
+2025-12-27 20:39:28,502 [INFO] kasapro.ui: UI plugin_ui_registered | key='trade_module', title='Gelişmiş Alış/Satış (Ticari) Modülü'
+2025-12-27 20:39:28,502 [INFO] kasapro.ui: UI screen_registered | key='hr', title='İK Modülü'
+2025-12-27 20:39:28,503 [INFO] kasapro.ui: UI plugin_ui_registered | key='hr', title='İK Modülü'
+2025-12-27 20:39:28,503 [INFO] kasapro.ui: UI screen_registered | key='diger_giderler', title='Şirket Diğer Giderler'
+2025-12-27 20:39:28,503 [INFO] kasapro.ui: UI plugin_ui_registered | key='diger_giderler', title='Şirket Diğer Giderler'
+2025-12-27 20:39:28,504 [INFO] kasapro.ui: UI screen_registered | key='cari_hareketler', title='Cari Hareketler'
+2025-12-27 20:39:28,504 [INFO] kasapro.ui: UI plugin_ui_registered | key='cari_hareketler', title='Cari Hareketler'
+2025-12-27 20:39:28,504 [INFO] kasapro.ui: UI screen_registered | key='maas_takibi', title='Şirket Maaş Takibi'
+2025-12-27 20:39:28,504 [INFO] kasapro.ui: UI plugin_ui_registered | key='maas_takibi', title='Şirket Maaş Takibi'
+2025-12-27 20:39:28,504 [INFO] kasapro.ui: UI screen_registered | key='nakliye', title='Nakliye Yönetimi'
+2025-12-27 20:39:28,505 [INFO] kasapro.ui: UI plugin_ui_registered | key='nakliye', title='Nakliye Yönetimi'
+2025-12-27 20:39:28,505 [INFO] kasapro.ui: UI screen_registered | key='cari_hareket_ekle', title='Cari Hareket Ekle'
+2025-12-27 20:39:28,505 [INFO] kasapro.ui: UI plugin_ui_registered | key='cari_hareket_ekle', title='Cari Hareket Ekle'
+2025-12-27 20:39:28,505 [INFO] kasapro.ui: UI screen_registered | key='maas_meslekler', title='Maaş Meslek Yönetimi'
+2025-12-27 20:39:28,505 [INFO] kasapro.ui: UI plugin_ui_registered | key='maas_meslekler', title='Maaş Meslek Yönetimi'
+2025-12-27 20:39:28,506 [INFO] kasapro.ui: UI screen_registered | key='dms', title='Dokümanlar'
+2025-12-27 20:39:28,506 [INFO] kasapro.ui: UI plugin_ui_registered | key='dms', title='Dokümanlar'
+2025-12-27 20:39:28,506 [INFO] kasapro.ui: UI screen_registered | key='hakedis', title='Proje/Şantiye > Hakediş Merkezi'
+2025-12-27 20:39:28,506 [INFO] kasapro.ui: UI plugin_ui_registered | key='hakedis', title='Proje/Şantiye > Hakediş Merkezi'
+2025-12-27 20:39:28,506 [INFO] kasapro.ui: UI screen_registered | key='quote_orders_quotes', title='Teklif Yönetimi'
+2025-12-27 20:39:28,507 [INFO] kasapro.ui: UI plugin_ui_registered | key='quote_orders_quotes', title='Teklif Yönetimi'
+2025-12-27 20:39:28,507 [INFO] kasapro.ui: UI screen_registered | key='quote_orders_orders', title='Sipariş Yönetimi'
+2025-12-27 20:39:28,507 [INFO] kasapro.ui: UI plugin_ui_registered | key='quote_orders_orders', title='Sipariş Yönetimi'
+2025-12-27 20:39:28,507 [INFO] kasapro.ui: UI screen_registered | key='diagnostics', title='Sistem Testleri'
+2025-12-27 20:39:28,507 [INFO] kasapro.ui: UI plugin_ui_registered | key='diagnostics', title='Sistem Testleri'
+2025-12-27 20:39:28,507 [INFO] kasapro.ui: UI screen_registered | key='kullanicilar', title='Kullanıcılar'
+2025-12-27 20:39:28,510 [INFO] kasapro.ui: UI callback_bound | handler='shortcut_help'
+2025-12-27 20:39:28,511 [INFO] kasapro.ui: UI callback_bound | target='root', tk_event='<F1>', handler='open_help'
+2025-12-27 20:39:28,511 [INFO] kasapro.ui: UI callback_bound | handler='shortcut_search'
+2025-12-27 20:39:28,511 [INFO] kasapro.ui: UI callback_bound | target='root', tk_event='<Control-f>', handler='show(search)'
+2025-12-27 20:39:28,511 [INFO] kasapro.ui: UI screen_shown | key='kasa'
+2025-12-27 20:39:28,516 [INFO] kasapro.ui: UI callback_bound | handler='on_close'
+2025-12-27 20:39:28,516 [INFO] kasapro.ui: UI callback_bound | target='root', tk_event='WM_DELETE_WINDOW', handler='on_close'
+2025-12-27 20:39:28,534 [INFO] kasapro.ui: UI callback invoked: tanimlar_tab_change
+2025-12-27 20:39:30,007 [INFO] kasapro.ui: UI callback invoked: nav:tanimlar
+2025-12-27 20:39:30,008 [INFO] kasapro.ui: UI screen_shown | key='tanimlar'
+2025-12-27 20:39:31,632 [INFO] kasapro.ui: UI callback invoked: nav:create_center
+2025-12-27 20:39:31,633 [INFO] kasapro.ui: UI screen_shown | key='create_center'
+2025-12-27 20:39:32,209 [INFO] kasapro.ui: UI callback invoked: nav:kasa
+2025-12-27 20:39:32,210 [INFO] kasapro.ui: UI screen_shown | key='kasa'
+2025-12-27 20:39:32,769 [INFO] kasapro.ui: UI callback invoked: nav:mesajlar
+2025-12-27 20:39:32,770 [INFO] kasapro.ui: UI screen_shown | key='mesajlar'
+2025-12-27 20:39:33,062 [INFO] kasapro.ui: UI callback invoked: nav:stok
+2025-12-27 20:39:33,063 [INFO] kasapro.ui: UI frame_created | view='StokFrame'
+2025-12-27 20:39:33,122 [INFO] kasapro.ui: UI screen_created | key='stok', view='StokFrame', elapsed_s=0.0595
+2025-12-27 20:39:33,123 [INFO] kasapro.ui: UI screen_shown | key='stok'
+2025-12-27 20:39:33,348 [INFO] kasapro.ui: UI callback invoked: nav:advanced_invoice
+2025-12-27 20:39:33,386 [INFO] kasapro.ui: UI screen_created | key='advanced_invoice', view='InvoiceModuleFrame', elapsed_s=0.0371
+2025-12-27 20:39:33,387 [INFO] kasapro.ui: UI screen_shown | key='advanced_invoice'
+2025-12-27 20:39:33,598 [INFO] kasapro.ui: UI callback invoked: nav:fatura
+2025-12-27 20:39:33,599 [INFO] kasapro.ui: UI frame_created | view='FaturaFrame'
+2025-12-27 20:39:34,881 [INFO] kasapro.ui: UI screen_created | key='fatura', view='FaturaFrame', elapsed_s=1.2824
+2025-12-27 20:39:34,882 [INFO] kasapro.ui: UI screen_shown | key='fatura'
+2025-12-27 20:39:35,603 [INFO] kasapro.ui: UI callback invoked: on_close
+2025-12-27 21:00:25,115 [INFO] kasapro.ui: UI container_created | view='root_container'
+2025-12-27 21:00:25,117 [INFO] kasapro.ui: UI callback_bound | handler='open_help'
+2025-12-27 21:00:25,118 [INFO] kasapro.ui: UI callback_bound | handler='open_settings'
+2025-12-27 21:00:25,126 [INFO] kasapro.ui.plugins: UI plugin loaded: advanced_invoice (advanced_invoice v0.1.0)
+2025-12-27 21:00:25,127 [INFO] kasapro.ui.plugins: UI plugin loaded: banka_hareketleri (banka_hareketleri v0.1.0)
+2025-12-27 21:00:25,128 [INFO] kasapro.ui.plugins: UI plugin loaded: cari_hareket_ekle (cari_hareket_ekle v0.1.0)
+2025-12-27 21:00:25,129 [INFO] kasapro.ui.plugins: UI plugin loaded: cari_hareketler (cari_hareketler v0.1.0)
+2025-12-27 21:00:25,131 [INFO] kasapro.ui.plugins: UI plugin loaded: diagnostics (Sistem Testleri v1.1.0)
+2025-12-27 21:00:25,132 [INFO] kasapro.ui.plugins: UI plugin loaded: diger_giderler (diger_giderler v0.1.0)
+2025-12-27 21:00:25,134 [INFO] kasapro.ui.plugins: UI plugin loaded: dms (dms v0.1.0)
+2025-12-27 21:00:25,135 [INFO] kasapro.ui.plugins: UI plugin loaded: fatura (fatura v0.1.0)
+2025-12-27 21:00:25,137 [INFO] kasapro.ui.plugins: UI plugin loaded: hakedis (hakedis v0.1.0)
+2025-12-27 21:00:25,138 [INFO] kasapro.ui.plugins: UI plugin loaded: hr (hr v0.1.0)
+2025-12-27 21:00:25,139 [INFO] kasapro.ui.plugins: UI plugin loaded: maas_eklentileri (maas_eklentileri v0.1.0)
+2025-12-27 21:00:25,140 [INFO] kasapro.ui.plugins: UI plugin loaded: maas_meslekler (maas_meslekler v0.1.0)
+2025-12-27 21:00:25,141 [INFO] kasapro.ui.plugins: UI plugin loaded: maas_takibi (maas_takibi v0.1.0)
+2025-12-27 21:00:25,142 [INFO] kasapro.ui.plugins: UI plugin loaded: nakliye (nakliye v0.1.0)
+2025-12-27 21:00:25,146 [INFO] kasapro.ui.plugins: UI plugin loaded: quote_orders_orders (quote_orders_orders v0.1.0)
+2025-12-27 21:00:25,147 [INFO] kasapro.ui.plugins: UI plugin loaded: quote_orders_quotes (quote_orders_quotes v0.1.0)
+2025-12-27 21:00:25,147 [INFO] kasapro.ui.plugins: UI plugin loaded: satis_siparis_rapor (satis_siparis_rapor v0.1.0)
+2025-12-27 21:00:25,149 [INFO] kasapro.ui.plugins: UI plugin loaded: stok (stok v0.1.0)
+2025-12-27 21:00:25,154 [INFO] kasapro.ui.plugins: UI plugin loaded: trade_module (trade_module v0.1.0)
+2025-12-27 21:00:25,454 [INFO] kasapro.ui: UI menu_section_added | title='🧾 KAYIT OLUŞTUR'
+2025-12-27 21:00:25,454 [INFO] kasapro.ui: UI menu_added | key='create_center', text='🧾 Kayıt Oluştur (Merkez)'
+2025-12-27 21:00:25,454 [INFO] kasapro.ui: UI callback_bound | handler='nav:create_center'
+2025-12-27 21:00:25,481 [INFO] kasapro.ui: UI menu_section_added | title='📚 TANIMLAR & AYARLAR'
+2025-12-27 21:00:25,481 [INFO] kasapro.ui: UI menu_added | key='tanimlar', text='📚 Tanımlar'
+2025-12-27 21:00:25,481 [INFO] kasapro.ui: UI callback_bound | handler='nav:tanimlar'
+2025-12-27 21:00:25,497 [INFO] kasapro.ui: UI menu_section_added | title='💳 İŞLEMLER'
+2025-12-27 21:00:25,497 [INFO] kasapro.ui: UI menu_added | key='kasa', text='🏦 Kasa'
+2025-12-27 21:00:25,498 [INFO] kasapro.ui: UI callback_bound | handler='nav:kasa'
+2025-12-27 21:00:25,513 [INFO] kasapro.ui: UI menu_added | key='mesajlar', text='📨 Mesajlar'
+2025-12-27 21:00:25,513 [INFO] kasapro.ui: UI callback_bound | handler='nav:mesajlar'
+2025-12-27 21:00:25,523 [INFO] kasapro.ui: UI menu_added | key='stok', text='📦 Stok'
+2025-12-27 21:00:25,523 [INFO] kasapro.ui: UI callback_bound | handler='nav:stok'
+2025-12-27 21:00:25,537 [INFO] kasapro.ui: UI menu_added | key='advanced_invoice', text='🧾 Faturalar'
+2025-12-27 21:00:25,538 [INFO] kasapro.ui: UI callback_bound | handler='nav:advanced_invoice'
+2025-12-27 21:00:25,539 [INFO] kasapro.ui: UI menu_added | key='banka_hareketleri', text='🏦 Banka'
+2025-12-27 21:00:25,539 [INFO] kasapro.ui: UI callback_bound | handler='nav:banka_hareketleri'
+2025-12-27 21:00:25,540 [INFO] kasapro.ui: UI menu_added | key='fatura', text='🧾 Fatura'
+2025-12-27 21:00:25,540 [INFO] kasapro.ui: UI callback_bound | handler='nav:fatura'
+2025-12-27 21:00:25,541 [INFO] kasapro.ui: UI menu_added | key='satis_siparis_rapor', text='🧾 Satış Siparişleri'
+2025-12-27 21:00:25,541 [INFO] kasapro.ui: UI callback_bound | handler='nav:satis_siparis_rapor'
+2025-12-27 21:00:25,542 [INFO] kasapro.ui: UI menu_added | key='trade_module', text='🏭 Ticari'
+2025-12-27 21:00:25,544 [INFO] kasapro.ui: UI callback_bound | handler='nav:trade_module'
+2025-12-27 21:00:25,558 [INFO] kasapro.ui: UI menu_added | key='hr', text='🧑\u200d💼 İK'
+2025-12-27 21:00:25,558 [INFO] kasapro.ui: UI callback_bound | handler='nav:hr'
+2025-12-27 21:00:25,590 [INFO] kasapro.ui: UI menu_added | key='diger_giderler', text='🧾 Diğer Giderler'
+2025-12-27 21:00:25,591 [INFO] kasapro.ui: UI callback_bound | handler='nav:diger_giderler'
+2025-12-27 21:00:25,592 [INFO] kasapro.ui: UI menu_added | key='cari_hareketler', text='📒 Cari Hareketler'
+2025-12-27 21:00:25,592 [INFO] kasapro.ui: UI callback_bound | handler='nav:cari_hareketler'
+2025-12-27 21:00:25,603 [INFO] kasapro.ui: UI menu_added | key='maas_takibi', text='💼 Maaş Takibi'
+2025-12-27 21:00:25,603 [INFO] kasapro.ui: UI callback_bound | handler='nav:maas_takibi'
+2025-12-27 21:00:25,604 [INFO] kasapro.ui: UI menu_added | key='nakliye', text='🚚 Nakliye'
+2025-12-27 21:00:25,604 [INFO] kasapro.ui: UI callback_bound | handler='nav:nakliye'
+2025-12-27 21:00:25,618 [INFO] kasapro.ui: UI menu_added | key='cari_hareket_ekle', text='➕ Cari Hareket Ekle'
+2025-12-27 21:00:25,618 [INFO] kasapro.ui: UI callback_bound | handler='nav:cari_hareket_ekle'
+2025-12-27 21:00:25,623 [INFO] kasapro.ui: UI menu_added | key='dms', text='📄 Dokümanlar'
+2025-12-27 21:00:25,624 [INFO] kasapro.ui: UI callback_bound | handler='nav:dms'
+2025-12-27 21:00:25,634 [INFO] kasapro.ui: UI menu_added | key='hakedis', text='🏗️ Hakediş Merkezi'
+2025-12-27 21:00:25,634 [INFO] kasapro.ui: UI callback_bound | handler='nav:hakedis'
+2025-12-27 21:00:25,644 [INFO] kasapro.ui: UI menu_added | key='quote_orders_quotes', text='Satış > Teklifler'
+2025-12-27 21:00:25,644 [INFO] kasapro.ui: UI callback_bound | handler='nav:quote_orders_quotes'
+2025-12-27 21:00:25,645 [INFO] kasapro.ui: UI menu_added | key='quote_orders_orders', text='Satış > Siparişler'
+2025-12-27 21:00:25,645 [INFO] kasapro.ui: UI callback_bound | handler='nav:quote_orders_orders'
+2025-12-27 21:00:25,646 [INFO] kasapro.ui: UI menu_added | key='diagnostics', text='🧪 Sistem Testleri'
+2025-12-27 21:00:25,646 [INFO] kasapro.ui: UI callback_bound | handler='nav:diagnostics'
+2025-12-27 21:00:25,656 [INFO] kasapro.ui: UI menu_section_added | title='📦 STOK & WMS'
+2025-12-27 21:00:25,657 [INFO] kasapro.ui: UI menu_added | key='stok_wms', text='📦 Stok/WMS'
+2025-12-27 21:00:25,657 [INFO] kasapro.ui: UI callback_bound | handler='nav:stok_wms'
+2025-12-27 21:00:25,667 [INFO] kasapro.ui: UI menu_section_added | title='🔌 ENTEGRASYONLAR'
+2025-12-27 21:00:25,668 [INFO] kasapro.ui: UI menu_added | key='entegrasyonlar', text='🔌 Entegrasyonlar'
+2025-12-27 21:00:25,668 [INFO] kasapro.ui: UI callback_bound | handler='nav:entegrasyonlar'
+2025-12-27 21:00:25,679 [INFO] kasapro.ui: UI menu_section_added | title='📈 RAPORLAR & DASHBOARD'
+2025-12-27 21:00:25,679 [INFO] kasapro.ui: UI menu_added | key='rapor_araclar', text='📈 Rapor & Araçlar'
+2025-12-27 21:00:25,679 [INFO] kasapro.ui: UI callback_bound | handler='nav:rapor_araclar'
+2025-12-27 21:00:25,680 [INFO] kasapro.ui: UI menu_added | key='satis_raporlari', text='💹 Satış Raporları'
+2025-12-27 21:00:25,680 [INFO] kasapro.ui: UI callback_bound | handler='nav:satis_raporlari'
+2025-12-27 21:00:25,690 [INFO] kasapro.ui: UI callback_bound | handler='import_excel'
+2025-12-27 21:00:25,714 [INFO] kasapro.ui: UI callback_bound | handler='export_excel'
+2025-12-27 21:00:25,723 [INFO] kasapro.ui: UI callback_bound | handler='on_close'
+2025-12-27 21:00:25,745 [INFO] kasapro.ui: UI screen_registered | key='kasa', title='Kasa'
+2025-12-27 21:00:25,745 [INFO] kasapro.ui: UI frame_created | view='KasaFrame'
+2025-12-27 21:00:25,772 [ERROR] kasapro.ui: Failed to build screen: kasa
+Traceback (most recent call last):
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\navigation.py", line 52, in _create_frame
+    frame = spec.factory(self.container, self.controller)
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\app.py", line 902, in <lambda>
+    self.screen_registry.register("kasa", lambda parent, app: KasaFrame(parent, app), title="Kasa")
+                                                              ~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\frames\kasa.py", line 37, in __init__
+    self.build_ui()
+    ~~~~~~~~~~~~~^^
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\frames\kasa.py", line 40, in build_ui
+    self._build()
+    ~~~~~~~~~~~^^
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\frames\kasa.py", line 70, in _build
+    self._build_reports(self.tab_reports)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\frames\kasa.py", line 233, in _build_reports
+    self.txt_kat = tk.Text(right, height=12)
+                   ~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "c:\Users\berke\AppData\Local\Programs\Python\Python314\Lib\tkinter\__init__.py", line 3792, in __init__
+    Widget.__init__(self, master, 'text', cnf, kw)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\berke\AppData\Local\Programs\Python\Python314\Lib\tkinter\__init__.py", line 2794, in __init__
+    self.tk.call(
+    ~~~~~~~~~~~~^
+        (widgetName, self._w) + extra + self._options(cnf))
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_tkinter.TclError: invalid color name "#5a8cff78"
+2025-12-27 21:00:25,775 [INFO] kasapro.ui: UI screen_registered | key='create_center', title='Kayıt Oluştur (Merkez)'
+2025-12-27 21:00:25,776 [INFO] kasapro.ui: UI frame_created | view='CreateCenterFrame'
+2025-12-27 21:00:25,780 [ERROR] kasapro.ui: Failed to build screen: create_center
+Traceback (most recent call last):
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\navigation.py", line 52, in _create_frame
+    frame = spec.factory(self.container, self.controller)
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\app.py", line 903, in <lambda>
+    self.screen_registry.register("create_center", lambda parent, app: CreateCenterFrame(parent, app), title="Kayıt Oluştur (Merkez)")
+                                                                       ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\frames\create_center.py", line 27, in __init__
+    self.build_ui()
+    ~~~~~~~~~~~~~^^
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\frames\create_center.py", line 50, in build_ui
+    self._build_left_panel()
+    ~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\frames\create_center.py", line 59, in _build_left_panel
+    self.category_list = tk.Listbox(cat_box, height=12)
+                         ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\berke\AppData\Local\Programs\Python\Python314\Lib\tkinter\__init__.py", line 3395, in __init__
+    Widget.__init__(self, master, 'listbox', cnf, kw)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\berke\AppData\Local\Programs\Python\Python314\Lib\tkinter\__init__.py", line 2794, in __init__
+    self.tk.call(
+    ~~~~~~~~~~~~^
+        (widgetName, self._w) + extra + self._options(cnf))
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_tkinter.TclError: invalid color name "#5a8cff78"
+2025-12-27 21:00:25,782 [INFO] kasapro.ui: UI screen_registered | key='mesajlar', title='Mesajlar'
+2025-12-27 21:00:25,783 [INFO] kasapro.ui: UI frame_created | view='MessagesFrame'
+2025-12-27 21:00:25,784 [INFO] kasapro.ui: UI callback_bound | handler='messages_folder_change'
+2025-12-27 21:00:25,785 [INFO] kasapro.ui: UI callback_bound | handler='messages_search'
+2025-12-27 21:00:25,786 [INFO] kasapro.ui: UI callback_bound | handler='messages_refresh'
+2025-12-27 21:00:25,786 [INFO] kasapro.ui: UI callback_bound | handler='messages_compose'
+2025-12-27 21:00:25,787 [INFO] kasapro.ui: UI callback_bound | handler='messages_prev'
+2025-12-27 21:00:25,788 [INFO] kasapro.ui: UI callback_bound | handler='messages_next'
+2025-12-27 21:00:25,791 [ERROR] kasapro.ui: Failed to build screen: mesajlar
+Traceback (most recent call last):
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\navigation.py", line 52, in _create_frame
+    frame = spec.factory(self.container, self.controller)
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\app.py", line 904, in <lambda>
+    self.screen_registry.register("mesajlar", lambda parent, app: MessagesFrame(parent, app), title="Mesajlar")
+                                                                  ~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\frames\messages.py", line 29, in __init__
+    self.build_ui()
+    ~~~~~~~~~~~~~^^
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\frames\messages.py", line 32, in build_ui
+    self._build()
+    ~~~~~~~~~~~^^
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\frames\messages.py", line 103, in _build
+    self.txt_body = tk.Text(detail, height=8, wrap="word")
+                    ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\berke\AppData\Local\Programs\Python\Python314\Lib\tkinter\__init__.py", line 3792, in __init__
+    Widget.__init__(self, master, 'text', cnf, kw)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\berke\AppData\Local\Programs\Python\Python314\Lib\tkinter\__init__.py", line 2794, in __init__
+    self.tk.call(
+    ~~~~~~~~~~~~^
+        (widgetName, self._w) + extra + self._options(cnf))
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_tkinter.TclError: invalid color name "#5a8cff78"
+2025-12-27 21:00:25,793 [INFO] kasapro.ui: UI screen_registered | key='tanimlar', title='Tanımlar'
+2025-12-27 21:00:25,794 [INFO] kasapro.ui: UI frame_created | view='TanimlarHubFrame'
+2025-12-27 21:00:25,795 [INFO] kasapro.ui: UI tab_added | tab='cariler', container='tanimlar'
+2025-12-27 21:00:25,795 [INFO] kasapro.ui: UI tab_added | tab='calisanlar', container='tanimlar'
+2025-12-27 21:00:25,796 [INFO] kasapro.ui: UI tab_added | tab='meslekler', container='tanimlar'
+2025-12-27 21:00:25,796 [INFO] kasapro.ui: UI frame_created | view='CarilerFrame'
+2025-12-27 21:00:25,808 [ERROR] kasapro.ui: Failed to build screen: tanimlar
+Traceback (most recent call last):
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\navigation.py", line 52, in _create_frame
+    frame = spec.factory(self.container, self.controller)
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\app.py", line 905, in <lambda>
+    self.screen_registry.register("tanimlar", lambda parent, app: TanimlarHubFrame(parent, app), title="Tanımlar")
+                                                                  ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\frames\tanimlar_hub.py", line 52, in __init__
+    self.build_ui()
+    ~~~~~~~~~~~~~^^
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\frames\tanimlar_hub.py", line 71, in build_ui
+    self._build_cariler()
+    ~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\frames\tanimlar_hub.py", line 87, in _build_cariler
+    self.cariler_frame = CarilerFrame(self.tab_cariler, self.app)
+                         ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\frames\cariler.py", line 26, in __init__
+    self.build_ui()
+    ~~~~~~~~~~~~~^^
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\frames\cariler.py", line 29, in build_ui
+    self._build()
+    ~~~~~~~~~~~^^
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\frames\cariler.py", line 103, in _build
+    self.e_not = tk.Text(right, width=28, height=6)
+                 ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\berke\AppData\Local\Programs\Python\Python314\Lib\tkinter\__init__.py", line 3792, in __init__
+    Widget.__init__(self, master, 'text', cnf, kw)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\berke\AppData\Local\Programs\Python\Python314\Lib\tkinter\__init__.py", line 2794, in __init__
+    self.tk.call(
+    ~~~~~~~~~~~~^
+        (widgetName, self._w) + extra + self._options(cnf))
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_tkinter.TclError: invalid color name "#5a8cff78"
+2025-12-27 21:00:25,811 [INFO] kasapro.ui: UI screen_registered | key='stok_wms', title='Stok/WMS'
+2025-12-27 21:00:25,811 [INFO] kasapro.ui: UI frame_created | view='StockWmsFrame'
+2025-12-27 21:00:25,818 [INFO] kasapro.ui: UI tab_added | tab='stock_card', container='stock_wms'
+2025-12-27 21:00:25,819 [INFO] kasapro.ui: UI callback_bound | handler='wms_demo_docs'
+2025-12-27 21:00:25,821 [INFO] kasapro.ui: UI screen_created | key='stok_wms', view='StockWmsFrame', elapsed_s=0.0105
+2025-12-27 21:00:25,822 [INFO] kasapro.ui: UI screen_registered | key='entegrasyonlar', title='Entegrasyonlar'
+2025-12-27 21:00:25,831 [INFO] kasapro.ui: UI screen_created | key='entegrasyonlar', view='IntegrationsHubFrame', elapsed_s=0.0089
+2025-12-27 21:00:25,831 [INFO] kasapro.ui: UI screen_registered | key='satis_raporlari', title='Satış Raporları'
+2025-12-27 21:00:25,831 [INFO] kasapro.ui: UI frame_created | view='SatisRaporlariFrame'
+2025-12-27 21:00:25,851 [ERROR] kasapro.ui: Failed to build screen: satis_raporlari
+Traceback (most recent call last):
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\navigation.py", line 52, in _create_frame
+    frame = spec.factory(self.container, self.controller)
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\app.py", line 908, in <lambda>
+    self.screen_registry.register("satis_raporlari", lambda parent, app: SatisRaporlariFrame(parent, app), title="Satış Raporları")
+                                                                         ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\frames\satis_raporlari.py", line 42, in __init__
+    self.build_ui()
+    ~~~~~~~~~~~~~^^
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\frames\satis_raporlari.py", line 45, in build_ui
+    self._build()
+    ~~~~~~~~~~~^^
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\frames\satis_raporlari.py", line 130, in _build
+    self.txt_kpi = tk.Text(kpi_box, width=42, height=18, wrap="word")
+                   ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\berke\AppData\Local\Programs\Python\Python314\Lib\tkinter\__init__.py", line 3792, in __init__
+    Widget.__init__(self, master, 'text', cnf, kw)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\berke\AppData\Local\Programs\Python\Python314\Lib\tkinter\__init__.py", line 2794, in __init__
+    self.tk.call(
+    ~~~~~~~~~~~~^
+        (widgetName, self._w) + extra + self._options(cnf))
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_tkinter.TclError: invalid color name "#5a8cff78"
+2025-12-27 21:00:25,853 [INFO] kasapro.ui: UI screen_registered | key='rapor_araclar', title='Rapor & Araçlar'
+2025-12-27 21:00:25,853 [INFO] kasapro.ui: UI screen_registered | key='stok', title='Stok Yönetimi'
+2025-12-27 21:00:25,853 [INFO] kasapro.ui: UI plugin_ui_registered | key='stok', title='Stok Yönetimi'
+2025-12-27 21:00:25,853 [INFO] kasapro.ui: UI screen_registered | key='advanced_invoice', title='Faturalar'
+2025-12-27 21:00:25,853 [INFO] kasapro.ui: UI plugin_ui_registered | key='advanced_invoice', title='Faturalar'
+2025-12-27 21:00:25,854 [INFO] kasapro.ui: UI screen_registered | key='banka_hareketleri', title='Banka Hareketleri'
+2025-12-27 21:00:25,854 [INFO] kasapro.ui: UI plugin_ui_registered | key='banka_hareketleri', title='Banka Hareketleri'
+2025-12-27 21:00:25,854 [INFO] kasapro.ui: UI screen_registered | key='fatura', title='Fatura'
+2025-12-27 21:00:25,854 [INFO] kasapro.ui: UI plugin_ui_registered | key='fatura', title='Fatura'
+2025-12-27 21:00:25,854 [INFO] kasapro.ui: UI screen_registered | key='satis_siparis_rapor', title='Satış Sipariş Raporları'
+2025-12-27 21:00:25,854 [INFO] kasapro.ui: UI plugin_ui_registered | key='satis_siparis_rapor', title='Satış Sipariş Raporları'
+2025-12-27 21:00:25,855 [INFO] kasapro.ui: UI screen_registered | key='trade_module', title='Gelişmiş Alış/Satış (Ticari) Modülü'
+2025-12-27 21:00:25,855 [INFO] kasapro.ui: UI plugin_ui_registered | key='trade_module', title='Gelişmiş Alış/Satış (Ticari) Modülü'
+2025-12-27 21:00:25,855 [INFO] kasapro.ui: UI screen_registered | key='hr', title='İK Modülü'
+2025-12-27 21:00:25,855 [INFO] kasapro.ui: UI plugin_ui_registered | key='hr', title='İK Modülü'
+2025-12-27 21:00:25,855 [INFO] kasapro.ui: UI screen_registered | key='diger_giderler', title='Şirket Diğer Giderler'
+2025-12-27 21:00:25,855 [INFO] kasapro.ui: UI plugin_ui_registered | key='diger_giderler', title='Şirket Diğer Giderler'
+2025-12-27 21:00:25,855 [INFO] kasapro.ui: UI screen_registered | key='cari_hareketler', title='Cari Hareketler'
+2025-12-27 21:00:25,856 [INFO] kasapro.ui: UI plugin_ui_registered | key='cari_hareketler', title='Cari Hareketler'
+2025-12-27 21:00:25,856 [INFO] kasapro.ui: UI screen_registered | key='maas_takibi', title='Şirket Maaş Takibi'
+2025-12-27 21:00:25,856 [INFO] kasapro.ui: UI plugin_ui_registered | key='maas_takibi', title='Şirket Maaş Takibi'
+2025-12-27 21:00:25,856 [INFO] kasapro.ui: UI screen_registered | key='nakliye', title='Nakliye Yönetimi'
+2025-12-27 21:00:25,856 [INFO] kasapro.ui: UI plugin_ui_registered | key='nakliye', title='Nakliye Yönetimi'
+2025-12-27 21:00:25,856 [INFO] kasapro.ui: UI screen_registered | key='cari_hareket_ekle', title='Cari Hareket Ekle'
+2025-12-27 21:00:25,856 [INFO] kasapro.ui: UI plugin_ui_registered | key='cari_hareket_ekle', title='Cari Hareket Ekle'
+2025-12-27 21:00:25,856 [INFO] kasapro.ui: UI screen_registered | key='maas_meslekler', title='Maaş Meslek Yönetimi'
+2025-12-27 21:00:25,857 [INFO] kasapro.ui: UI plugin_ui_registered | key='maas_meslekler', title='Maaş Meslek Yönetimi'
+2025-12-27 21:00:25,857 [INFO] kasapro.ui: UI screen_registered | key='dms', title='Dokümanlar'
+2025-12-27 21:00:25,857 [INFO] kasapro.ui: UI plugin_ui_registered | key='dms', title='Dokümanlar'
+2025-12-27 21:00:25,857 [INFO] kasapro.ui: UI screen_registered | key='hakedis', title='Proje/Şantiye > Hakediş Merkezi'
+2025-12-27 21:00:25,857 [INFO] kasapro.ui: UI plugin_ui_registered | key='hakedis', title='Proje/Şantiye > Hakediş Merkezi'
+2025-12-27 21:00:25,857 [INFO] kasapro.ui: UI screen_registered | key='quote_orders_quotes', title='Teklif Yönetimi'
+2025-12-27 21:00:25,858 [INFO] kasapro.ui: UI plugin_ui_registered | key='quote_orders_quotes', title='Teklif Yönetimi'
+2025-12-27 21:00:25,858 [INFO] kasapro.ui: UI screen_registered | key='quote_orders_orders', title='Sipariş Yönetimi'
+2025-12-27 21:00:25,858 [INFO] kasapro.ui: UI plugin_ui_registered | key='quote_orders_orders', title='Sipariş Yönetimi'
+2025-12-27 21:00:25,858 [INFO] kasapro.ui: UI screen_registered | key='diagnostics', title='Sistem Testleri'
+2025-12-27 21:00:25,858 [INFO] kasapro.ui: UI plugin_ui_registered | key='diagnostics', title='Sistem Testleri'
+2025-12-27 21:00:25,858 [INFO] kasapro.ui: UI screen_registered | key='kullanicilar', title='Kullanıcılar'
+2025-12-27 21:00:25,858 [INFO] kasapro.ui: UI callback_bound | handler='shortcut_help'
+2025-12-27 21:00:25,859 [INFO] kasapro.ui: UI callback_bound | target='root', tk_event='<F1>', handler='open_help'
+2025-12-27 21:00:25,859 [INFO] kasapro.ui: UI callback_bound | handler='shortcut_search'
+2025-12-27 21:00:25,859 [INFO] kasapro.ui: UI callback_bound | target='root', tk_event='<Control-f>', handler='show(search)'
+2025-12-27 21:00:25,860 [INFO] kasapro.ui: UI frame_created | view='KasaFrame'
+2025-12-27 21:00:25,886 [ERROR] kasapro.ui: Failed to build screen: kasa
+Traceback (most recent call last):
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\navigation.py", line 52, in _create_frame
+    frame = spec.factory(self.container, self.controller)
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\app.py", line 902, in <lambda>
+    self.screen_registry.register("kasa", lambda parent, app: KasaFrame(parent, app), title="Kasa")
+                                                              ~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\frames\kasa.py", line 37, in __init__
+    self.build_ui()
+    ~~~~~~~~~~~~~^^
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\frames\kasa.py", line 40, in build_ui
+    self._build()
+    ~~~~~~~~~~~^^
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\frames\kasa.py", line 70, in _build
+    self._build_reports(self.tab_reports)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\frames\kasa.py", line 233, in _build_reports
+    self.txt_kat = tk.Text(right, height=12)
+                   ~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "c:\Users\berke\AppData\Local\Programs\Python\Python314\Lib\tkinter\__init__.py", line 3792, in __init__
+    Widget.__init__(self, master, 'text', cnf, kw)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\berke\AppData\Local\Programs\Python\Python314\Lib\tkinter\__init__.py", line 2794, in __init__
+    self.tk.call(
+    ~~~~~~~~~~~~^
+        (widgetName, self._w) + extra + self._options(cnf))
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_tkinter.TclError: invalid color name "#5a8cff78"
+2025-12-27 21:00:25,890 [INFO] kasapro.ui: UI callback_bound | handler='on_close'
+2025-12-27 21:00:25,890 [INFO] kasapro.ui: UI callback_bound | target='root', tk_event='WM_DELETE_WINDOW', handler='on_close'
+2025-12-27 21:00:32,744 [INFO] kasapro.ui: UI callback invoked: nav:create_center
+2025-12-27 21:00:32,745 [INFO] kasapro.ui: UI frame_created | view='CreateCenterFrame'
+2025-12-27 21:00:32,748 [ERROR] kasapro.ui: Failed to build screen: create_center
+Traceback (most recent call last):
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\navigation.py", line 52, in _create_frame
+    frame = spec.factory(self.container, self.controller)
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\app.py", line 903, in <lambda>
+    self.screen_registry.register("create_center", lambda parent, app: CreateCenterFrame(parent, app), title="Kayıt Oluştur (Merkez)")
+                                                                       ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\frames\create_center.py", line 27, in __init__
+    self.build_ui()
+    ~~~~~~~~~~~~~^^
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\frames\create_center.py", line 50, in build_ui
+    self._build_left_panel()
+    ~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\frames\create_center.py", line 59, in _build_left_panel
+    self.category_list = tk.Listbox(cat_box, height=12)
+                         ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\berke\AppData\Local\Programs\Python\Python314\Lib\tkinter\__init__.py", line 3395, in __init__
+    Widget.__init__(self, master, 'listbox', cnf, kw)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\berke\AppData\Local\Programs\Python\Python314\Lib\tkinter\__init__.py", line 2794, in __init__
+    self.tk.call(
+    ~~~~~~~~~~~~^
+        (widgetName, self._w) + extra + self._options(cnf))
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_tkinter.TclError: invalid color name "#5a8cff78"
+2025-12-27 21:00:33,967 [INFO] kasapro.ui: UI callback invoked: nav:tanimlar
+2025-12-27 21:00:33,968 [INFO] kasapro.ui: UI frame_created | view='TanimlarHubFrame'
+2025-12-27 21:00:33,969 [INFO] kasapro.ui: UI tab_added | tab='cariler', container='tanimlar'
+2025-12-27 21:00:33,969 [INFO] kasapro.ui: UI tab_added | tab='calisanlar', container='tanimlar'
+2025-12-27 21:00:33,969 [INFO] kasapro.ui: UI tab_added | tab='meslekler', container='tanimlar'
+2025-12-27 21:00:33,970 [INFO] kasapro.ui: UI frame_created | view='CarilerFrame'
+2025-12-27 21:00:33,980 [ERROR] kasapro.ui: Failed to build screen: tanimlar
+Traceback (most recent call last):
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\navigation.py", line 52, in _create_frame
+    frame = spec.factory(self.container, self.controller)
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\app.py", line 905, in <lambda>
+    self.screen_registry.register("tanimlar", lambda parent, app: TanimlarHubFrame(parent, app), title="Tanımlar")
+                                                                  ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\frames\tanimlar_hub.py", line 52, in __init__
+    self.build_ui()
+    ~~~~~~~~~~~~~^^
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\frames\tanimlar_hub.py", line 71, in build_ui
+    self._build_cariler()
+    ~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\frames\tanimlar_hub.py", line 87, in _build_cariler
+    self.cariler_frame = CarilerFrame(self.tab_cariler, self.app)
+                         ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\frames\cariler.py", line 26, in __init__
+    self.build_ui()
+    ~~~~~~~~~~~~~^^
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\frames\cariler.py", line 29, in build_ui
+    self._build()
+    ~~~~~~~~~~~^^
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\frames\cariler.py", line 103, in _build
+    self.e_not = tk.Text(right, width=28, height=6)
+                 ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\berke\AppData\Local\Programs\Python\Python314\Lib\tkinter\__init__.py", line 3792, in __init__
+    Widget.__init__(self, master, 'text', cnf, kw)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\berke\AppData\Local\Programs\Python\Python314\Lib\tkinter\__init__.py", line 2794, in __init__
+    self.tk.call(
+    ~~~~~~~~~~~~^
+        (widgetName, self._w) + extra + self._options(cnf))
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_tkinter.TclError: invalid color name "#5a8cff78"
+2025-12-27 21:00:34,770 [INFO] kasapro.ui: UI callback invoked: nav:kasa
+2025-12-27 21:00:34,771 [INFO] kasapro.ui: UI frame_created | view='KasaFrame'
+2025-12-27 21:00:34,798 [ERROR] kasapro.ui: Failed to build screen: kasa
+Traceback (most recent call last):
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\navigation.py", line 52, in _create_frame
+    frame = spec.factory(self.container, self.controller)
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\app.py", line 902, in <lambda>
+    self.screen_registry.register("kasa", lambda parent, app: KasaFrame(parent, app), title="Kasa")
+                                                              ~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\frames\kasa.py", line 37, in __init__
+    self.build_ui()
+    ~~~~~~~~~~~~~^^
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\frames\kasa.py", line 40, in build_ui
+    self._build()
+    ~~~~~~~~~~~^^
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\frames\kasa.py", line 70, in _build
+    self._build_reports(self.tab_reports)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\frames\kasa.py", line 233, in _build_reports
+    self.txt_kat = tk.Text(right, height=12)
+                   ~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "c:\Users\berke\AppData\Local\Programs\Python\Python314\Lib\tkinter\__init__.py", line 3792, in __init__
+    Widget.__init__(self, master, 'text', cnf, kw)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\berke\AppData\Local\Programs\Python\Python314\Lib\tkinter\__init__.py", line 2794, in __init__
+    self.tk.call(
+    ~~~~~~~~~~~~^
+        (widgetName, self._w) + extra + self._options(cnf))
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_tkinter.TclError: invalid color name "#5a8cff78"
+2025-12-27 21:00:35,310 [INFO] kasapro.ui: UI callback invoked: nav:mesajlar
+2025-12-27 21:00:35,311 [INFO] kasapro.ui: UI frame_created | view='MessagesFrame'
+2025-12-27 21:00:35,312 [INFO] kasapro.ui: UI callback_bound | handler='messages_folder_change'
+2025-12-27 21:00:35,313 [INFO] kasapro.ui: UI callback_bound | handler='messages_search'
+2025-12-27 21:00:35,313 [INFO] kasapro.ui: UI callback_bound | handler='messages_refresh'
+2025-12-27 21:00:35,314 [INFO] kasapro.ui: UI callback_bound | handler='messages_compose'
+2025-12-27 21:00:35,314 [INFO] kasapro.ui: UI callback_bound | handler='messages_prev'
+2025-12-27 21:00:35,315 [INFO] kasapro.ui: UI callback_bound | handler='messages_next'
+2025-12-27 21:00:35,318 [ERROR] kasapro.ui: Failed to build screen: mesajlar
+Traceback (most recent call last):
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\navigation.py", line 52, in _create_frame
+    frame = spec.factory(self.container, self.controller)
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\app.py", line 904, in <lambda>
+    self.screen_registry.register("mesajlar", lambda parent, app: MessagesFrame(parent, app), title="Mesajlar")
+                                                                  ~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\frames\messages.py", line 29, in __init__
+    self.build_ui()
+    ~~~~~~~~~~~~~^^
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\frames\messages.py", line 32, in build_ui
+    self._build()
+    ~~~~~~~~~~~^^
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\frames\messages.py", line 103, in _build
+    self.txt_body = tk.Text(detail, height=8, wrap="word")
+                    ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\berke\AppData\Local\Programs\Python\Python314\Lib\tkinter\__init__.py", line 3792, in __init__
+    Widget.__init__(self, master, 'text', cnf, kw)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\berke\AppData\Local\Programs\Python\Python314\Lib\tkinter\__init__.py", line 2794, in __init__
+    self.tk.call(
+    ~~~~~~~~~~~~^
+        (widgetName, self._w) + extra + self._options(cnf))
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_tkinter.TclError: invalid color name "#5a8cff78"
+2025-12-27 21:00:41,159 [INFO] kasapro.ui: UI callback invoked: nav:stok
+2025-12-27 21:00:41,159 [INFO] kasapro.ui: UI frame_created | view='StokFrame'
+2025-12-27 21:00:41,220 [INFO] kasapro.ui: UI screen_created | key='stok', view='StokFrame', elapsed_s=0.0608
+2025-12-27 21:00:41,220 [INFO] kasapro.ui: UI screen_shown | key='stok'
+2025-12-27 21:00:42,973 [INFO] kasapro.ui: UI callback invoked: nav:advanced_invoice
+2025-12-27 21:00:43,004 [INFO] kasapro.ui: UI screen_created | key='advanced_invoice', view='InvoiceModuleFrame', elapsed_s=0.0314
+2025-12-27 21:00:43,005 [INFO] kasapro.ui: UI screen_shown | key='advanced_invoice'
+2025-12-27 21:00:44,711 [INFO] kasapro.ui: UI callback invoked: nav:banka_hareketleri
+2025-12-27 21:00:44,711 [INFO] kasapro.ui: UI frame_created | view='BankaHareketleriFrame'
+2025-12-27 21:00:44,728 [INFO] kasapro.ui: UI screen_created | key='banka_hareketleri', view='BankaHareketleriFrame', elapsed_s=0.0169
+2025-12-27 21:00:44,729 [INFO] kasapro.ui: UI screen_shown | key='banka_hareketleri'
+2025-12-27 21:00:45,384 [INFO] kasapro.ui: UI callback invoked: nav:fatura
+2025-12-27 21:00:45,385 [INFO] kasapro.ui: UI frame_created | view='FaturaFrame'
+2025-12-27 21:00:46,676 [INFO] kasapro.ui: UI screen_created | key='fatura', view='FaturaFrame', elapsed_s=1.2922
+2025-12-27 21:00:46,677 [INFO] kasapro.ui: UI screen_shown | key='fatura'
+2025-12-27 21:00:48,640 [INFO] kasapro.ui: UI callback invoked: nav:banka_hareketleri
+2025-12-27 21:00:48,641 [INFO] kasapro.ui: UI screen_shown | key='banka_hareketleri'
+2025-12-27 21:00:49,329 [INFO] kasapro.ui: UI callback invoked: nav:fatura
+2025-12-27 21:00:49,330 [INFO] kasapro.ui: UI screen_shown | key='fatura'
+2025-12-27 21:00:49,858 [INFO] kasapro.ui: UI callback invoked: nav:satis_siparis_rapor
+2025-12-27 21:00:49,859 [INFO] kasapro.ui: UI frame_created | view='SatisSiparisRaporFrame'
+2025-12-27 21:00:49,875 [INFO] kasapro.ui: UI screen_created | key='satis_siparis_rapor', view='SatisSiparisRaporFrame', elapsed_s=0.0162
+2025-12-27 21:00:49,877 [INFO] kasapro.ui: UI screen_shown | key='satis_siparis_rapor'
+2025-12-27 21:00:50,299 [INFO] kasapro.ui: UI callback invoked: nav:trade_module
+2025-12-27 21:00:50,351 [INFO] kasapro.ui: UI screen_created | key='trade_module', view='TradeModuleFrame', elapsed_s=0.0515
+2025-12-27 21:00:50,352 [INFO] kasapro.ui: UI screen_shown | key='trade_module'
+2025-12-27 21:00:53,275 [INFO] kasapro.ui: UI callback invoked: nav:hr
+2025-12-27 21:00:53,287 [ERROR] kasapro.ui: Failed to build screen: hr
+Traceback (most recent call last):
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\navigation.py", line 52, in _create_frame
+    frame = spec.factory(self.container, self.controller)
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\plugins\hr.py", line 1609, in build
+    return HRFrame(master, app)
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\plugins\hr.py", line 28, in __init__
+    self._init_ui()
+    ~~~~~~~~~~~~~^^
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\plugins\hr.py", line 35, in _init_ui
+    self.tabs["personel"] = self._build_personnel_tab()
+                            ~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\plugins\hr.py", line 140, in _build_personnel_tab
+    self.txt_address = tk.Text(form, width=62, height=3)
+                       ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\berke\AppData\Local\Programs\Python\Python314\Lib\tkinter\__init__.py", line 3792, in __init__
+    Widget.__init__(self, master, 'text', cnf, kw)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\berke\AppData\Local\Programs\Python\Python314\Lib\tkinter\__init__.py", line 2794, in __init__
+    self.tk.call(
+    ~~~~~~~~~~~~^
+        (widgetName, self._w) + extra + self._options(cnf))
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_tkinter.TclError: invalid color name "#5a8cff78"
+2025-12-27 21:01:01,209 [INFO] kasapro.ui: UI callback invoked: nav:diagnostics
+2025-12-27 21:01:01,210 [INFO] kasapro.ui: UI frame_created | view='DiagnosticsFrame'
+2025-12-27 21:01:01,214 [INFO] kasapro.ui: UI callback_bound | handler='diagnostics_run'
+2025-12-27 21:01:01,214 [INFO] kasapro.ui: UI callback_bound | handler='diagnostics_clear'
+2025-12-27 21:01:01,215 [INFO] kasapro.ui: UI callback_bound | handler='diagnostics_copy'
+2025-12-27 21:01:01,217 [INFO] kasapro.ui: UI callback_bound | handler='diagnostics_save_cfg'
+2025-12-27 21:01:01,218 [INFO] kasapro.ui: UI screen_created | key='diagnostics', view='DiagnosticsFrame', elapsed_s=0.009
+2025-12-27 21:01:01,220 [INFO] kasapro.ui: UI screen_shown | key='diagnostics'
+2025-12-27 21:01:04,078 [INFO] kasapro.ui: UI callback invoked: diagnostics_run
+2025-12-27 21:01:04,081 INFO kasapro.plugins.diagnostics Diagnostics run started
+2025-12-27 21:01:04,081 [INFO] kasapro.plugins.diagnostics: Diagnostics run started
+2025-12-27 21:01:04,184 INFO kasapro.plugins.diagnostics Diagnostics run finished: total=15 ok=15 fail=0
+2025-12-27 21:01:04,184 [INFO] kasapro.plugins.diagnostics: Diagnostics run finished: total=15 ok=15 fail=0
+2025-12-27 21:01:06,657 [INFO] kasapro.ui: UI callback invoked: on_close
+2025-12-27 21:03:15,307 [INFO] kasapro.ui: UI container_created | view='root_container'
+2025-12-27 21:03:15,309 [INFO] kasapro.ui: UI callback_bound | handler='open_help'
+2025-12-27 21:03:15,422 [INFO] kasapro.ui: UI callback_bound | handler='open_settings'
+2025-12-27 21:03:15,441 [INFO] kasapro.ui.plugins: UI plugin loaded: advanced_invoice (advanced_invoice v0.1.0)
+2025-12-27 21:03:15,442 [INFO] kasapro.ui.plugins: UI plugin loaded: banka_hareketleri (banka_hareketleri v0.1.0)
+2025-12-27 21:03:15,443 [INFO] kasapro.ui.plugins: UI plugin loaded: cari_hareket_ekle (cari_hareket_ekle v0.1.0)
+2025-12-27 21:03:15,444 [INFO] kasapro.ui.plugins: UI plugin loaded: cari_hareketler (cari_hareketler v0.1.0)
+2025-12-27 21:03:15,445 [INFO] kasapro.ui.plugins: UI plugin loaded: diagnostics (Sistem Testleri v1.1.0)
+2025-12-27 21:03:15,446 [INFO] kasapro.ui.plugins: UI plugin loaded: diger_giderler (diger_giderler v0.1.0)
+2025-12-27 21:03:15,449 [INFO] kasapro.ui.plugins: UI plugin loaded: dms (dms v0.1.0)
+2025-12-27 21:03:15,450 [INFO] kasapro.ui.plugins: UI plugin loaded: fatura (fatura v0.1.0)
+2025-12-27 21:03:15,451 [INFO] kasapro.ui.plugins: UI plugin loaded: hakedis (hakedis v0.1.0)
+2025-12-27 21:03:15,452 [INFO] kasapro.ui.plugins: UI plugin loaded: hr (hr v0.1.0)
+2025-12-27 21:03:15,453 [INFO] kasapro.ui.plugins: UI plugin loaded: maas_eklentileri (maas_eklentileri v0.1.0)
+2025-12-27 21:03:15,454 [INFO] kasapro.ui.plugins: UI plugin loaded: maas_meslekler (maas_meslekler v0.1.0)
+2025-12-27 21:03:15,455 [INFO] kasapro.ui.plugins: UI plugin loaded: maas_takibi (maas_takibi v0.1.0)
+2025-12-27 21:03:15,456 [INFO] kasapro.ui.plugins: UI plugin loaded: nakliye (nakliye v0.1.0)
+2025-12-27 21:03:15,460 [INFO] kasapro.ui.plugins: UI plugin loaded: quote_orders_orders (quote_orders_orders v0.1.0)
+2025-12-27 21:03:15,461 [INFO] kasapro.ui.plugins: UI plugin loaded: quote_orders_quotes (quote_orders_quotes v0.1.0)
+2025-12-27 21:03:15,461 [INFO] kasapro.ui.plugins: UI plugin loaded: satis_siparis_rapor (satis_siparis_rapor v0.1.0)
+2025-12-27 21:03:15,462 [INFO] kasapro.ui.plugins: UI plugin loaded: stok (stok v0.1.0)
+2025-12-27 21:03:15,467 [INFO] kasapro.ui.plugins: UI plugin loaded: trade_module (trade_module v0.1.0)
+2025-12-27 21:03:15,691 [INFO] kasapro.ui: UI menu_section_added | title='🧾 KAYIT OLUŞTUR'
+2025-12-27 21:03:15,692 [INFO] kasapro.ui: UI menu_added | key='create_center', text='🧾 Kayıt Oluştur (Merkez)'
+2025-12-27 21:03:15,692 [INFO] kasapro.ui: UI callback_bound | handler='nav:create_center'
+2025-12-27 21:03:15,719 [INFO] kasapro.ui: UI menu_section_added | title='📚 TANIMLAR & AYARLAR'
+2025-12-27 21:03:15,719 [INFO] kasapro.ui: UI menu_added | key='tanimlar', text='📚 Tanımlar'
+2025-12-27 21:03:15,719 [INFO] kasapro.ui: UI callback_bound | handler='nav:tanimlar'
+2025-12-27 21:03:15,735 [INFO] kasapro.ui: UI menu_section_added | title='💳 İŞLEMLER'
+2025-12-27 21:03:15,736 [INFO] kasapro.ui: UI menu_added | key='kasa', text='🏦 Kasa'
+2025-12-27 21:03:15,736 [INFO] kasapro.ui: UI callback_bound | handler='nav:kasa'
+2025-12-27 21:03:15,757 [INFO] kasapro.ui: UI menu_added | key='mesajlar', text='📨 Mesajlar'
+2025-12-27 21:03:15,758 [INFO] kasapro.ui: UI callback_bound | handler='nav:mesajlar'
+2025-12-27 21:03:15,767 [INFO] kasapro.ui: UI menu_added | key='stok', text='📦 Stok'
+2025-12-27 21:03:15,767 [INFO] kasapro.ui: UI callback_bound | handler='nav:stok'
+2025-12-27 21:03:15,778 [INFO] kasapro.ui: UI menu_added | key='advanced_invoice', text='🧾 Faturalar'
+2025-12-27 21:03:15,778 [INFO] kasapro.ui: UI callback_bound | handler='nav:advanced_invoice'
+2025-12-27 21:03:15,779 [INFO] kasapro.ui: UI menu_added | key='banka_hareketleri', text='🏦 Banka'
+2025-12-27 21:03:15,779 [INFO] kasapro.ui: UI callback_bound | handler='nav:banka_hareketleri'
+2025-12-27 21:03:15,780 [INFO] kasapro.ui: UI menu_added | key='fatura', text='🧾 Fatura'
+2025-12-27 21:03:15,780 [INFO] kasapro.ui: UI callback_bound | handler='nav:fatura'
+2025-12-27 21:03:15,781 [INFO] kasapro.ui: UI menu_added | key='satis_siparis_rapor', text='🧾 Satış Siparişleri'
+2025-12-27 21:03:15,781 [INFO] kasapro.ui: UI callback_bound | handler='nav:satis_siparis_rapor'
+2025-12-27 21:03:15,782 [INFO] kasapro.ui: UI menu_added | key='trade_module', text='🏭 Ticari'
+2025-12-27 21:03:15,782 [INFO] kasapro.ui: UI callback_bound | handler='nav:trade_module'
+2025-12-27 21:03:15,791 [INFO] kasapro.ui: UI menu_added | key='hr', text='🧑\u200d💼 İK'
+2025-12-27 21:03:15,792 [INFO] kasapro.ui: UI callback_bound | handler='nav:hr'
+2025-12-27 21:03:15,816 [INFO] kasapro.ui: UI menu_added | key='diger_giderler', text='🧾 Diğer Giderler'
+2025-12-27 21:03:15,816 [INFO] kasapro.ui: UI callback_bound | handler='nav:diger_giderler'
+2025-12-27 21:03:15,817 [INFO] kasapro.ui: UI menu_added | key='cari_hareketler', text='📒 Cari Hareketler'
+2025-12-27 21:03:15,817 [INFO] kasapro.ui: UI callback_bound | handler='nav:cari_hareketler'
+2025-12-27 21:03:15,830 [INFO] kasapro.ui: UI menu_added | key='maas_takibi', text='💼 Maaş Takibi'
+2025-12-27 21:03:15,830 [INFO] kasapro.ui: UI callback_bound | handler='nav:maas_takibi'
+2025-12-27 21:03:15,831 [INFO] kasapro.ui: UI menu_added | key='nakliye', text='🚚 Nakliye'
+2025-12-27 21:03:15,831 [INFO] kasapro.ui: UI callback_bound | handler='nav:nakliye'
+2025-12-27 21:03:15,846 [INFO] kasapro.ui: UI menu_added | key='cari_hareket_ekle', text='➕ Cari Hareket Ekle'
+2025-12-27 21:03:15,847 [INFO] kasapro.ui: UI callback_bound | handler='nav:cari_hareket_ekle'
+2025-12-27 21:03:15,848 [INFO] kasapro.ui: UI menu_added | key='dms', text='📄 Dokümanlar'
+2025-12-27 21:03:15,848 [INFO] kasapro.ui: UI callback_bound | handler='nav:dms'
+2025-12-27 21:03:15,861 [INFO] kasapro.ui: UI menu_added | key='hakedis', text='🏗️ Hakediş Merkezi'
+2025-12-27 21:03:15,862 [INFO] kasapro.ui: UI callback_bound | handler='nav:hakedis'
+2025-12-27 21:03:15,873 [INFO] kasapro.ui: UI menu_added | key='quote_orders_quotes', text='Satış > Teklifler'
+2025-12-27 21:03:15,874 [INFO] kasapro.ui: UI callback_bound | handler='nav:quote_orders_quotes'
+2025-12-27 21:03:15,874 [INFO] kasapro.ui: UI menu_added | key='quote_orders_orders', text='Satış > Siparişler'
+2025-12-27 21:03:15,874 [INFO] kasapro.ui: UI callback_bound | handler='nav:quote_orders_orders'
+2025-12-27 21:03:15,875 [INFO] kasapro.ui: UI menu_added | key='diagnostics', text='🧪 Sistem Testleri'
+2025-12-27 21:03:15,875 [INFO] kasapro.ui: UI callback_bound | handler='nav:diagnostics'
+2025-12-27 21:03:15,890 [INFO] kasapro.ui: UI menu_section_added | title='📦 STOK & WMS'
+2025-12-27 21:03:15,890 [INFO] kasapro.ui: UI menu_added | key='stok_wms', text='📦 Stok/WMS'
+2025-12-27 21:03:15,890 [INFO] kasapro.ui: UI callback_bound | handler='nav:stok_wms'
+2025-12-27 21:03:15,901 [INFO] kasapro.ui: UI menu_section_added | title='🔌 ENTEGRASYONLAR'
+2025-12-27 21:03:15,901 [INFO] kasapro.ui: UI menu_added | key='entegrasyonlar', text='🔌 Entegrasyonlar'
+2025-12-27 21:03:15,901 [INFO] kasapro.ui: UI callback_bound | handler='nav:entegrasyonlar'
+2025-12-27 21:03:15,912 [INFO] kasapro.ui: UI menu_section_added | title='📈 RAPORLAR & DASHBOARD'
+2025-12-27 21:03:15,912 [INFO] kasapro.ui: UI menu_added | key='rapor_araclar', text='📈 Rapor & Araçlar'
+2025-12-27 21:03:15,913 [INFO] kasapro.ui: UI callback_bound | handler='nav:rapor_araclar'
+2025-12-27 21:03:15,914 [INFO] kasapro.ui: UI menu_added | key='satis_raporlari', text='💹 Satış Raporları'
+2025-12-27 21:03:15,914 [INFO] kasapro.ui: UI callback_bound | handler='nav:satis_raporlari'
+2025-12-27 21:03:15,926 [INFO] kasapro.ui: UI callback_bound | handler='import_excel'
+2025-12-27 21:03:15,949 [INFO] kasapro.ui: UI callback_bound | handler='export_excel'
+2025-12-27 21:03:15,958 [INFO] kasapro.ui: UI callback_bound | handler='on_close'
+2025-12-27 21:03:15,977 [INFO] kasapro.ui: UI screen_registered | key='kasa', title='Kasa'
+2025-12-27 21:03:15,978 [INFO] kasapro.ui: UI frame_created | view='KasaFrame'
+2025-12-27 21:03:16,012 [INFO] kasapro.ui: UI screen_created | key='kasa', view='KasaFrame', elapsed_s=0.0342
+2025-12-27 21:03:16,012 [INFO] kasapro.ui: UI screen_registered | key='create_center', title='Kayıt Oluştur (Merkez)'
+2025-12-27 21:03:16,012 [INFO] kasapro.ui: UI frame_created | view='CreateCenterFrame'
+2025-12-27 21:03:16,035 [INFO] kasapro.ui: UI create_form_selected | form='cari'
+2025-12-27 21:03:16,035 [INFO] kasapro.ui: UI screen_created | key='create_center', view='CreateCenterFrame', elapsed_s=0.0231
+2025-12-27 21:03:16,035 [INFO] kasapro.ui: UI screen_registered | key='mesajlar', title='Mesajlar'
+2025-12-27 21:03:16,036 [INFO] kasapro.ui: UI frame_created | view='MessagesFrame'
+2025-12-27 21:03:16,037 [INFO] kasapro.ui: UI callback_bound | handler='messages_folder_change'
+2025-12-27 21:03:16,038 [INFO] kasapro.ui: UI callback_bound | handler='messages_search'
+2025-12-27 21:03:16,039 [INFO] kasapro.ui: UI callback_bound | handler='messages_refresh'
+2025-12-27 21:03:16,048 [INFO] kasapro.ui: UI callback_bound | handler='messages_compose'
+2025-12-27 21:03:16,049 [INFO] kasapro.ui: UI callback_bound | handler='messages_prev'
+2025-12-27 21:03:16,050 [INFO] kasapro.ui: UI callback_bound | handler='messages_next'
+2025-12-27 21:03:16,064 [INFO] kasapro.ui: UI screen_created | key='mesajlar', view='MessagesFrame', elapsed_s=0.0282
+2025-12-27 21:03:16,064 [INFO] kasapro.ui: UI screen_registered | key='tanimlar', title='Tanımlar'
+2025-12-27 21:03:16,065 [INFO] kasapro.ui: UI frame_created | view='TanimlarHubFrame'
+2025-12-27 21:03:16,066 [INFO] kasapro.ui: UI tab_added | tab='cariler', container='tanimlar'
+2025-12-27 21:03:16,066 [INFO] kasapro.ui: UI tab_added | tab='calisanlar', container='tanimlar'
+2025-12-27 21:03:16,067 [INFO] kasapro.ui: UI tab_added | tab='meslekler', container='tanimlar'
+2025-12-27 21:03:16,067 [INFO] kasapro.ui: UI frame_created | view='CarilerFrame'
+2025-12-27 21:03:16,079 [INFO] kasapro.ui: UI frame_created | view='MaasTakibiFrame'
+2025-12-27 21:03:16,146 [INFO] kasapro.ui: UI frame_created | view='MaasMesleklerFrame'
+2025-12-27 21:03:16,155 [INFO] kasapro.ui: UI callback_bound | handler='tanimlar_tab_change'
+2025-12-27 21:03:16,155 [INFO] kasapro.ui: UI screen_created | key='tanimlar', view='TanimlarHubFrame', elapsed_s=0.0906
+2025-12-27 21:03:16,155 [INFO] kasapro.ui: UI screen_registered | key='stok_wms', title='Stok/WMS'
+2025-12-27 21:03:16,156 [INFO] kasapro.ui: UI frame_created | view='StockWmsFrame'
+2025-12-27 21:03:16,162 [INFO] kasapro.ui: UI tab_added | tab='stock_card', container='stock_wms'
+2025-12-27 21:03:16,163 [INFO] kasapro.ui: UI callback_bound | handler='wms_demo_docs'
+2025-12-27 21:03:16,165 [INFO] kasapro.ui: UI screen_created | key='stok_wms', view='StockWmsFrame', elapsed_s=0.0096
+2025-12-27 21:03:16,165 [INFO] kasapro.ui: UI screen_registered | key='entegrasyonlar', title='Entegrasyonlar'
+2025-12-27 21:03:16,176 [INFO] kasapro.ui: UI screen_created | key='entegrasyonlar', view='IntegrationsHubFrame', elapsed_s=0.0104
+2025-12-27 21:03:16,176 [INFO] kasapro.ui: UI screen_registered | key='satis_raporlari', title='Satış Raporları'
+2025-12-27 21:03:16,177 [INFO] kasapro.ui: UI frame_created | view='SatisRaporlariFrame'
+2025-12-27 21:03:16,199 [INFO] kasapro.ui: UI screen_created | key='satis_raporlari', view='SatisRaporlariFrame', elapsed_s=0.0225
+2025-12-27 21:03:16,199 [INFO] kasapro.ui: UI screen_registered | key='rapor_araclar', title='Rapor & Araçlar'
+2025-12-27 21:03:16,199 [INFO] kasapro.ui: UI screen_registered | key='stok', title='Stok Yönetimi'
+2025-12-27 21:03:16,199 [INFO] kasapro.ui: UI plugin_ui_registered | key='stok', title='Stok Yönetimi'
+2025-12-27 21:03:16,199 [INFO] kasapro.ui: UI screen_registered | key='advanced_invoice', title='Faturalar'
+2025-12-27 21:03:16,200 [INFO] kasapro.ui: UI plugin_ui_registered | key='advanced_invoice', title='Faturalar'
+2025-12-27 21:03:16,200 [INFO] kasapro.ui: UI screen_registered | key='banka_hareketleri', title='Banka Hareketleri'
+2025-12-27 21:03:16,200 [INFO] kasapro.ui: UI plugin_ui_registered | key='banka_hareketleri', title='Banka Hareketleri'
+2025-12-27 21:03:16,200 [INFO] kasapro.ui: UI screen_registered | key='fatura', title='Fatura'
+2025-12-27 21:03:16,200 [INFO] kasapro.ui: UI plugin_ui_registered | key='fatura', title='Fatura'
+2025-12-27 21:03:16,200 [INFO] kasapro.ui: UI screen_registered | key='satis_siparis_rapor', title='Satış Sipariş Raporları'
+2025-12-27 21:03:16,200 [INFO] kasapro.ui: UI plugin_ui_registered | key='satis_siparis_rapor', title='Satış Sipariş Raporları'
+2025-12-27 21:03:16,200 [INFO] kasapro.ui: UI screen_registered | key='trade_module', title='Gelişmiş Alış/Satış (Ticari) Modülü'
+2025-12-27 21:03:16,201 [INFO] kasapro.ui: UI plugin_ui_registered | key='trade_module', title='Gelişmiş Alış/Satış (Ticari) Modülü'
+2025-12-27 21:03:16,201 [INFO] kasapro.ui: UI screen_registered | key='hr', title='İK Modülü'
+2025-12-27 21:03:16,201 [INFO] kasapro.ui: UI plugin_ui_registered | key='hr', title='İK Modülü'
+2025-12-27 21:03:16,201 [INFO] kasapro.ui: UI screen_registered | key='diger_giderler', title='Şirket Diğer Giderler'
+2025-12-27 21:03:16,201 [INFO] kasapro.ui: UI plugin_ui_registered | key='diger_giderler', title='Şirket Diğer Giderler'
+2025-12-27 21:03:16,201 [INFO] kasapro.ui: UI screen_registered | key='cari_hareketler', title='Cari Hareketler'
+2025-12-27 21:03:16,201 [INFO] kasapro.ui: UI plugin_ui_registered | key='cari_hareketler', title='Cari Hareketler'
+2025-12-27 21:03:16,202 [INFO] kasapro.ui: UI screen_registered | key='maas_takibi', title='Şirket Maaş Takibi'
+2025-12-27 21:03:16,202 [INFO] kasapro.ui: UI plugin_ui_registered | key='maas_takibi', title='Şirket Maaş Takibi'
+2025-12-27 21:03:16,202 [INFO] kasapro.ui: UI screen_registered | key='nakliye', title='Nakliye Yönetimi'
+2025-12-27 21:03:16,202 [INFO] kasapro.ui: UI plugin_ui_registered | key='nakliye', title='Nakliye Yönetimi'
+2025-12-27 21:03:16,202 [INFO] kasapro.ui: UI screen_registered | key='cari_hareket_ekle', title='Cari Hareket Ekle'
+2025-12-27 21:03:16,202 [INFO] kasapro.ui: UI plugin_ui_registered | key='cari_hareket_ekle', title='Cari Hareket Ekle'
+2025-12-27 21:03:16,202 [INFO] kasapro.ui: UI screen_registered | key='maas_meslekler', title='Maaş Meslek Yönetimi'
+2025-12-27 21:03:16,202 [INFO] kasapro.ui: UI plugin_ui_registered | key='maas_meslekler', title='Maaş Meslek Yönetimi'
+2025-12-27 21:03:16,203 [INFO] kasapro.ui: UI screen_registered | key='dms', title='Dokümanlar'
+2025-12-27 21:03:16,203 [INFO] kasapro.ui: UI plugin_ui_registered | key='dms', title='Dokümanlar'
+2025-12-27 21:03:16,203 [INFO] kasapro.ui: UI screen_registered | key='hakedis', title='Proje/Şantiye > Hakediş Merkezi'
+2025-12-27 21:03:16,203 [INFO] kasapro.ui: UI plugin_ui_registered | key='hakedis', title='Proje/Şantiye > Hakediş Merkezi'
+2025-12-27 21:03:16,203 [INFO] kasapro.ui: UI screen_registered | key='quote_orders_quotes', title='Teklif Yönetimi'
+2025-12-27 21:03:16,203 [INFO] kasapro.ui: UI plugin_ui_registered | key='quote_orders_quotes', title='Teklif Yönetimi'
+2025-12-27 21:03:16,203 [INFO] kasapro.ui: UI screen_registered | key='quote_orders_orders', title='Sipariş Yönetimi'
+2025-12-27 21:03:16,203 [INFO] kasapro.ui: UI plugin_ui_registered | key='quote_orders_orders', title='Sipariş Yönetimi'
+2025-12-27 21:03:16,204 [INFO] kasapro.ui: UI screen_registered | key='diagnostics', title='Sistem Testleri'
+2025-12-27 21:03:16,204 [INFO] kasapro.ui: UI plugin_ui_registered | key='diagnostics', title='Sistem Testleri'
+2025-12-27 21:03:16,204 [INFO] kasapro.ui: UI screen_registered | key='kullanicilar', title='Kullanıcılar'
+2025-12-27 21:03:16,206 [INFO] kasapro.ui: UI callback_bound | handler='shortcut_help'
+2025-12-27 21:03:16,207 [INFO] kasapro.ui: UI callback_bound | target='root', tk_event='<F1>', handler='open_help'
+2025-12-27 21:03:16,207 [INFO] kasapro.ui: UI callback_bound | handler='shortcut_search'
+2025-12-27 21:03:16,207 [INFO] kasapro.ui: UI callback_bound | target='root', tk_event='<Control-f>', handler='show(search)'
+2025-12-27 21:03:16,207 [INFO] kasapro.ui: UI screen_shown | key='kasa'
+2025-12-27 21:03:16,215 [INFO] kasapro.ui: UI callback_bound | handler='on_close'
+2025-12-27 21:03:16,215 [INFO] kasapro.ui: UI callback_bound | target='root', tk_event='WM_DELETE_WINDOW', handler='on_close'
+2025-12-27 21:03:16,232 [INFO] kasapro.ui: UI callback invoked: tanimlar_tab_change
+2025-12-27 21:03:18,258 [INFO] kasapro.ui: UI callback invoked: nav:create_center
+2025-12-27 21:03:18,260 [INFO] kasapro.ui: UI screen_shown | key='create_center'
+2025-12-27 21:03:20,248 [INFO] kasapro.ui: UI callback invoked: nav:tanimlar
+2025-12-27 21:03:20,249 [INFO] kasapro.ui: UI screen_shown | key='tanimlar'
+2025-12-27 21:03:22,097 [INFO] kasapro.ui: UI callback invoked: nav:kasa
+2025-12-27 21:03:22,098 [INFO] kasapro.ui: UI screen_shown | key='kasa'
+2025-12-27 21:03:22,951 [INFO] kasapro.ui: UI callback invoked: nav:mesajlar
+2025-12-27 21:03:22,952 [INFO] kasapro.ui: UI screen_shown | key='mesajlar'
+2025-12-27 21:03:24,306 [INFO] kasapro.ui: UI callback invoked: nav:stok
+2025-12-27 21:03:24,307 [INFO] kasapro.ui: UI frame_created | view='StokFrame'
+2025-12-27 21:03:24,363 [INFO] kasapro.ui: UI screen_created | key='stok', view='StokFrame', elapsed_s=0.0567
+2025-12-27 21:03:24,365 [INFO] kasapro.ui: UI screen_shown | key='stok'
+2025-12-27 21:03:25,199 [INFO] kasapro.ui: UI callback invoked: nav:advanced_invoice
+2025-12-27 21:03:25,232 [INFO] kasapro.ui: UI screen_created | key='advanced_invoice', view='InvoiceModuleFrame', elapsed_s=0.0322
+2025-12-27 21:03:25,233 [INFO] kasapro.ui: UI screen_shown | key='advanced_invoice'
+2025-12-27 21:03:26,110 [INFO] kasapro.ui: UI callback invoked: nav:banka_hareketleri
+2025-12-27 21:03:26,111 [INFO] kasapro.ui: UI frame_created | view='BankaHareketleriFrame'
+2025-12-27 21:03:26,129 [INFO] kasapro.ui: UI screen_created | key='banka_hareketleri', view='BankaHareketleriFrame', elapsed_s=0.0187
+2025-12-27 21:03:26,130 [INFO] kasapro.ui: UI screen_shown | key='banka_hareketleri'
+2025-12-27 21:03:26,773 [INFO] kasapro.ui: UI callback invoked: nav:fatura
+2025-12-27 21:03:26,774 [INFO] kasapro.ui: UI frame_created | view='FaturaFrame'
+2025-12-27 21:03:29,565 [INFO] kasapro.ui: UI screen_created | key='fatura', view='FaturaFrame', elapsed_s=2.7916
+2025-12-27 21:03:29,566 [INFO] kasapro.ui: UI screen_shown | key='fatura'
+2025-12-27 21:03:31,766 [INFO] kasapro.ui: UI callback invoked: nav:satis_siparis_rapor
+2025-12-27 21:03:31,767 [INFO] kasapro.ui: UI frame_created | view='SatisSiparisRaporFrame'
+2025-12-27 21:03:31,783 [INFO] kasapro.ui: UI screen_created | key='satis_siparis_rapor', view='SatisSiparisRaporFrame', elapsed_s=0.0167
+2025-12-27 21:03:31,785 [INFO] kasapro.ui: UI screen_shown | key='satis_siparis_rapor'
+2025-12-27 21:03:32,591 [INFO] kasapro.ui: UI callback invoked: nav:trade_module
+2025-12-27 21:03:32,644 [INFO] kasapro.ui: UI screen_created | key='trade_module', view='TradeModuleFrame', elapsed_s=0.0523
+2025-12-27 21:03:32,645 [INFO] kasapro.ui: UI screen_shown | key='trade_module'
+2025-12-27 21:03:37,013 [INFO] kasapro.ui: UI callback invoked: nav:diagnostics
+2025-12-27 21:03:37,014 [INFO] kasapro.ui: UI frame_created | view='DiagnosticsFrame'
+2025-12-27 21:03:37,018 [INFO] kasapro.ui: UI callback_bound | handler='diagnostics_run'
+2025-12-27 21:03:37,018 [INFO] kasapro.ui: UI callback_bound | handler='diagnostics_clear'
+2025-12-27 21:03:37,019 [INFO] kasapro.ui: UI callback_bound | handler='diagnostics_copy'
+2025-12-27 21:03:37,022 [INFO] kasapro.ui: UI callback_bound | handler='diagnostics_save_cfg'
+2025-12-27 21:03:37,024 [INFO] kasapro.ui: UI screen_created | key='diagnostics', view='DiagnosticsFrame', elapsed_s=0.0109
+2025-12-27 21:03:37,025 [INFO] kasapro.ui: UI screen_shown | key='diagnostics'
+2025-12-27 21:03:37,729 [INFO] kasapro.ui: UI callback invoked: nav:quote_orders_orders
+2025-12-27 21:03:37,736 [INFO] kasapro.ui: UI screen_created | key='quote_orders_orders', view='OrdersFrame', elapsed_s=0.0069
+2025-12-27 21:03:37,738 [INFO] kasapro.ui: UI screen_shown | key='quote_orders_orders'
+2025-12-27 21:03:38,517 [INFO] kasapro.ui: UI callback invoked: nav:quote_orders_quotes
+2025-12-27 21:03:38,525 [INFO] kasapro.ui: UI screen_created | key='quote_orders_quotes', view='QuotesFrame', elapsed_s=0.0084
+2025-12-27 21:03:38,526 [INFO] kasapro.ui: UI screen_shown | key='quote_orders_quotes'
+2025-12-27 21:03:38,941 [INFO] kasapro.ui: UI callback invoked: nav:hakedis
+2025-12-27 21:03:38,972 [INFO] kasapro.ui: UI screen_created | key='hakedis', view='HakedisFrame', elapsed_s=0.0309
+2025-12-27 21:03:38,973 [INFO] kasapro.ui: UI screen_shown | key='hakedis'
+2025-12-27 21:03:39,351 [INFO] kasapro.ui: UI callback invoked: nav:dms
+2025-12-27 21:03:39,364 [INFO] kasapro.ui: UI screen_created | key='dms', view='DmsHubFrame', elapsed_s=0.0132
+2025-12-27 21:03:39,365 [INFO] kasapro.ui: UI screen_shown | key='dms'
+2025-12-27 21:03:39,750 [INFO] kasapro.ui: UI callback invoked: nav:cari_hareket_ekle
+2025-12-27 21:03:39,751 [INFO] kasapro.ui: UI frame_created | view='CariHareketEkleFrame'
+2025-12-27 21:03:39,762 [INFO] kasapro.ui: UI screen_created | key='cari_hareket_ekle', view='CariHareketEkleFrame', elapsed_s=0.0115
+2025-12-27 21:03:39,763 [INFO] kasapro.ui: UI screen_shown | key='cari_hareket_ekle'
+2025-12-27 21:03:40,546 [INFO] kasapro.ui: UI callback invoked: nav:nakliye
+2025-12-27 21:03:40,546 [INFO] kasapro.ui: UI frame_created | view='NakliyeFrame'
+2025-12-27 21:03:40,620 [INFO] kasapro.ui: UI screen_created | key='nakliye', view='NakliyeFrame', elapsed_s=0.0743
+2025-12-27 21:03:40,622 [INFO] kasapro.ui: UI screen_shown | key='nakliye'
+2025-12-27 21:03:40,967 [INFO] kasapro.ui: UI callback invoked: nav:maas_takibi
+2025-12-27 21:03:40,968 [INFO] kasapro.ui: UI frame_created | view='MaasTakibiFrame'
+2025-12-27 21:03:41,013 [INFO] kasapro.ui: UI screen_created | key='maas_takibi', view='MaasTakibiFrame', elapsed_s=0.0458
+2025-12-27 21:03:41,014 [INFO] kasapro.ui: UI screen_shown | key='maas_takibi'
+2025-12-27 21:03:41,446 [INFO] kasapro.ui: UI callback invoked: nav:cari_hareketler
+2025-12-27 21:03:41,446 [INFO] kasapro.ui: UI frame_created | view='CariHareketlerFrame'
+2025-12-27 21:03:41,454 [INFO] kasapro.ui: UI screen_created | key='cari_hareketler', view='CariHareketlerFrame', elapsed_s=0.0086
+2025-12-27 21:03:41,456 [INFO] kasapro.ui: UI screen_shown | key='cari_hareketler'
+2025-12-27 21:03:43,371 [INFO] kasapro.ui: UI callback invoked: nav:create_center
+2025-12-27 21:03:43,372 [INFO] kasapro.ui: UI screen_shown | key='create_center'
+2025-12-27 21:03:45,175 [ERROR] kasapro.app: Tkinter callback exception
+Traceback (most recent call last):
+  File "C:\Users\berke\AppData\Local\Programs\Python\Python314\Lib\tkinter\__init__.py", line 2088, in __call__
+    return self.func(*args)
+           ~~~~~~~~~^^^^^^^
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\frames\create_center.py", line 106, in <lambda>
+    self.form_list.bind("<<ListboxSelect>>", lambda _e: self._on_form_select())
+                                                        ~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\frames\create_center.py", line 210, in _on_form_select
+    self.select_form(form_id)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\frames\create_center.py", line 218, in select_form
+    form = spec.factory(self.form_container, self.app)
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\create_form_registry.py", line 51, in _satis_fatura_factory
+    return SatisFaturaCreateForm(parent, app)
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\create_forms\satis_fatura.py", line 27, in __init__
+    app_role=str(getattr(app, "user", {}).get("role", "")),
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'sqlite3.Row' object has no attribute 'get'
+2025-12-27 21:03:47,351 [ERROR] kasapro.app: Tkinter callback exception
+Traceback (most recent call last):
+  File "C:\Users\berke\AppData\Local\Programs\Python\Python314\Lib\tkinter\__init__.py", line 2088, in __call__
+    return self.func(*args)
+           ~~~~~~~~~^^^^^^^
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\frames\create_center.py", line 106, in <lambda>
+    self.form_list.bind("<<ListboxSelect>>", lambda _e: self._on_form_select())
+                                                        ~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\frames\create_center.py", line 210, in _on_form_select
+    self.select_form(form_id)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\frames\create_center.py", line 218, in select_form
+    form = spec.factory(self.form_container, self.app)
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\create_form_registry.py", line 56, in _siparis_factory
+    return SiparisCreateForm(parent, app)
+  File "C:\Users\berke\Documents\GitHub\kasa\kasapro\ui\create_forms\siparis.py", line 27, in __init__
+    app_role=str(getattr(app, "user", {}).get("role", "")),
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'sqlite3.Row' object has no attribute 'get'
+2025-12-27 21:03:52,749 [INFO] kasapro.ui: UI callback invoked: nav:kasa
+2025-12-27 21:03:52,751 [INFO] kasapro.ui: UI screen_shown | key='kasa'
+2025-12-27 21:03:55,642 [INFO] kasapro.ui: UI callback invoked: nav:mesajlar
+2025-12-27 21:03:55,644 [INFO] kasapro.ui: UI screen_shown | key='mesajlar'
+2025-12-27 21:03:56,715 [INFO] kasapro.ui: UI callback invoked: messages_prev
+2025-12-27 21:03:57,065 [INFO] kasapro.ui: UI callback invoked: messages_next
+2025-12-27 21:03:58,113 [INFO] kasapro.ui: UI callback invoked: nav:stok
+2025-12-27 21:03:58,115 [INFO] kasapro.ui: UI screen_shown | key='stok'
+2025-12-27 21:04:01,187 [INFO] kasapro.ui: UI callback invoked: nav:banka_hareketleri
+2025-12-27 21:04:01,189 [INFO] kasapro.ui: UI screen_shown | key='banka_hareketleri'
+2025-12-27 21:04:02,761 [INFO] kasapro.ui: UI callback invoked: nav:fatura
+2025-12-27 21:04:02,763 [INFO] kasapro.ui: UI screen_shown | key='fatura'
+2025-12-27 21:04:06,569 [INFO] kasapro.ui: UI callback invoked: nav:trade_module
+2025-12-27 21:04:06,571 [INFO] kasapro.ui: UI screen_shown | key='trade_module'
+2025-12-27 21:04:29,763 [INFO] kasapro.ui: UI callback invoked: on_close
