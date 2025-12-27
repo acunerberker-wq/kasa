@@ -1,0 +1,182 @@
+{
+  "1.png": {
+    "filename": "1.png",
+    "size": [
+      347,
+      116
+    ],
+    "has_alpha": true,
+    "blur_score": 0.0,
+    "noise_score": 0.0,
+    "edge_quality": "unknown",
+    "halo_detected": false,
+    "banding_detected": false,
+    "jpeg_artifacts": false,
+    "issues_found": [
+      "Gelişmiş analiz için OpenCV gerekli"
+    ],
+    "recommendations": [
+      "pip install opencv-python numpy"
+    ]
+  },
+  "10.png": {
+    "filename": "10.png",
+    "size": [
+      1208,
+      734
+    ],
+    "has_alpha": true,
+    "blur_score": 0.0,
+    "noise_score": 0.0,
+    "edge_quality": "unknown",
+    "halo_detected": false,
+    "banding_detected": false,
+    "jpeg_artifacts": false,
+    "issues_found": [
+      "Gelişmiş analiz için OpenCV gerekli"
+    ],
+    "recommendations": [
+      "pip install opencv-python numpy"
+    ]
+  },
+  "3.png": {
+    "filename": "3.png",
+    "size": [
+      364,
+      116
+    ],
+    "has_alpha": true,
+    "blur_score": 0.0,
+    "noise_score": 0.0,
+    "edge_quality": "unknown",
+    "halo_detected": false,
+    "banding_detected": false,
+    "jpeg_artifacts": false,
+    "issues_found": [
+      "Gelişmiş analiz için OpenCV gerekli"
+    ],
+    "recommendations": [
+      "pip install opencv-python numpy"
+    ]
+  },
+  "4.png": {
+    "filename": "4.png",
+    "size": [
+      307,
+      138
+    ],
+    "has_alpha": true,
+    "blur_score": 0.0,
+    "noise_score": 0.0,
+    "edge_quality": "unknown",
+    "halo_detected": false,
+    "banding_detected": false,
+    "jpeg_artifacts": false,
+    "issues_found": [
+      "Gelişmiş analiz için OpenCV gerekli"
+    ],
+    "recommendations": [
+      "pip install opencv-python numpy"
+    ]
+  },
+  "5.png": {
+    "filename": "5.png",
+    "size": [
+      111,
+      53
+    ],
+    "has_alpha": true,
+    "blur_score": 0.0,
+    "noise_score": 0.0,
+    "edge_quality": "unknown",
+    "halo_detected": false,
+    "banding_detected": false,
+    "jpeg_artifacts": false,
+    "issues_found": [
+      "Gelişmiş analiz için OpenCV gerekli"
+    ],
+    "recommendations": [
+      "pip install opencv-python numpy"
+    ]
+  },
+  "6.png": {
+    "filename": "6.png",
+    "size": [
+      299,
+      129
+    ],
+    "has_alpha": true,
+    "blur_score": 0.0,
+    "noise_score": 0.0,
+    "edge_quality": "unknown",
+    "halo_detected": false,
+    "banding_detected": false,
+    "jpeg_artifacts": false,
+    "issues_found": [
+      "Gelişmiş analiz için OpenCV gerekli"
+    ],
+    "recommendations": [
+      "pip install opencv-python numpy"
+    ]
+  },
+  "7.png": {
+    "filename": "7.png",
+    "size": [
+      1536,
+      198
+    ],
+    "has_alpha": true,
+    "blur_score": 0.0,
+    "noise_score": 0.0,
+    "edge_quality": "unknown",
+    "halo_detected": false,
+    "banding_detected": false,
+    "jpeg_artifacts": false,
+    "issues_found": [
+      "Gelişmiş analiz için OpenCV gerekli"
+    ],
+    "recommendations": [
+      "pip install opencv-python numpy"
+    ]
+  },
+  "8.png": {
+    "filename": "8.png",
+    "size": [
+      326,
+      1024
+    ],
+    "has_alpha": true,
+    "blur_score": 0.0,
+    "noise_score": 0.0,
+    "edge_quality": "unknown",
+    "halo_detected": false,
+    "banding_detected": false,
+    "jpeg_artifacts": false,
+    "issues_found": [
+      "Gelişmiş analiz için OpenCV gerekli"
+    ],
+    "recommendations": [
+      "pip install opencv-python numpy"
+    ]
+  },
+  "9.png": {
+    "filename": "9.png",
+    "size": [
+      680,
+      302
+    ],
+    "has_alpha": true,
+    "blur_score": 0.0,
+    "noise_score": 0.0,
+    "edge_quality": "unknown",
+    "halo_detected": false,
+    "banding_detected": false,
+    "jpeg_artifacts": false,
+    "issues_found": [
+      "Gelişmiş analiz için OpenCV gerekli"
+    ],
+    "recommendations": [
+      "pip install opencv-python numpy"
+    ]
+  }
+}

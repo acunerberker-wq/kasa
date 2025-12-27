@@ -19,90 +19,140 @@ class Button3D(tk.Canvas):
         btn = Button3D(parent, text="Kaydet", command=save_func, style="primary")
         btn.pack()
     
-    Stiller: "primary", "secondary", "danger", "success", "ghost", "toolbar"
+    Stiller: "primary", "secondary", "pill", "danger", "success", "ghost", "toolbar"
     """
     
     STYLES = {
         "primary": {
-            # Mavi gradient buton (Yeni Sipariş, Kaydet, Ara gibi)
-            "bg_top": "#5588cc",       # Üst gradient
-            "bg_bottom": "#3366aa",    # Alt gradient
-            "bg_hover_top": "#6699dd",
-            "bg_hover_bottom": "#4477bb",
-            "bg_pressed_top": "#3355aa",
-            "bg_pressed_bottom": "#224499",
-            "fg": "#ffffff",
-            "border": "#2a4a7a",        # İnce koyu kenar
-            "border_light": "#6699cc",  # Üst ışık kenar
-            "glow": "#4080c0",          # Dış glow
+            # Primary Accent - Koyu lacivert
+            "bg_top": "#0a1268",       # Biraz açık üst
+            "bg_bottom": "#02095B",    # Ana primary
+            "bg_hover_top": "#252c78",
+            "bg_hover_bottom": "#20276F",
+            "bg_pressed_top": "#020854",
+            "bg_pressed_bottom": "#010745",
+            "fg": "#EDEBF3",           # Text on Dark
+            "fg_disabled": "#898CB2",
+            "border": "#010538",
+            "border_light": "#3a4088",
+            "glow": "#20276F",
         },
         "secondary": {
-            # Koyu buton (Ara, Durum Güncelle gibi)
-            "bg_top": "#1a2535",
-            "bg_bottom": "#141c28",
-            "bg_hover_top": "#202d40",
-            "bg_hover_bottom": "#1a2535",
-            "bg_pressed_top": "#101820",
-            "bg_pressed_bottom": "#0c1418",
-            "fg": "#c0d0e0",
-            "border": "#2a3848",
-            "border_light": "#2a3545",
+            # Secondary Deep - Çok koyu lacivert
+            "bg_top": "#0a0c45",
+            "bg_bottom": "#000537",
+            "bg_hover_top": "#252858",
+            "bg_hover_bottom": "#1F234F",
+            "bg_pressed_top": "#000533",
+            "bg_pressed_bottom": "#000428",
+            "fg": "#EDEBF3",
+            "fg_disabled": "#888AA2",
+            "border": "#000320",
+            "border_light": "#2a2d55",
+            "glow": None,
+        },
+        "pill": {
+            # Pill / Sekme - Açık gri butonlar
+            "bg_top": "#e2e1ed",
+            "bg_bottom": "#DBDAE8",
+            "bg_hover_top": "#e5e4ef",
+            "bg_hover_bottom": "#DFDEEA",
+            "bg_pressed_top": "#CECDDA",
+            "bg_pressed_bottom": "#c5c4d2",
+            "fg": "#181839",           # Pill Text
+            "fg_disabled": "#888AA2",
+            "border": "#C9C8D9",        # Pill Border
+            "border_light": "#e8e7f0",
             "glow": None,
         },
         "danger": {
-            "bg_top": "#cc4455",
-            "bg_bottom": "#aa3344",
-            "bg_hover_top": "#dd5566",
-            "bg_hover_bottom": "#bb4455",
-            "bg_pressed_top": "#aa3344",
-            "bg_pressed_bottom": "#882233",
+            # Danger - Kırmızı
+            "bg_top": "#f55555",
+            "bg_bottom": "#EF4444",
+            "bg_hover_top": "#f76666",
+            "bg_hover_bottom": "#f55555",
+            "bg_pressed_top": "#dc3333",
+            "bg_pressed_bottom": "#cc2222",
             "fg": "#ffffff",
-            "border": "#802030",
-            "border_light": "#dd6677",
-            "glow": "#aa4455",
+            "fg_disabled": "#888888",
+            "border": "#cc3333",
+            "border_light": "#ff7777",
+            "glow": "#EF4444",
         },
         "success": {
-            "bg_top": "#40a868",
-            "bg_bottom": "#308850",
-            "bg_hover_top": "#50b878",
-            "bg_hover_bottom": "#409860",
-            "bg_pressed_top": "#308850",
-            "bg_pressed_bottom": "#207040",
+            # Success - Yeşil
+            "bg_top": "#1cb855",
+            "bg_bottom": "#16A34A",
+            "bg_hover_top": "#22c85f",
+            "bg_hover_bottom": "#1cb855",
+            "bg_pressed_top": "#128a3d",
+            "bg_pressed_bottom": "#0e7533",
             "fg": "#ffffff",
-            "border": "#206838",
-            "border_light": "#60c888",
-            "glow": "#40a060",
+            "fg_disabled": "#888888",
+            "border": "#0e7533",
+            "border_light": "#40d875",
+            "glow": "#16A34A",
+        },
+        "warning": {
+            # Warning - Turuncu
+            "bg_top": "#f7ab20",
+            "bg_bottom": "#F59E0B",
+            "bg_hover_top": "#f8b535",
+            "bg_hover_bottom": "#f7ab20",
+            "bg_pressed_top": "#e08a00",
+            "bg_pressed_bottom": "#cc7a00",
+            "fg": "#181839",
+            "fg_disabled": "#888888",
+            "border": "#cc7a00",
+            "border_light": "#ffc040",
+            "glow": "#F59E0B",
+        },
+        "info": {
+            # Info - Mavi
+            "bg_top": "#4a90f8",
+            "bg_bottom": "#3B82F6",
+            "bg_hover_top": "#5a9af9",
+            "bg_hover_bottom": "#4a90f8",
+            "bg_pressed_top": "#2a70e5",
+            "bg_pressed_bottom": "#2060d5",
+            "fg": "#ffffff",
+            "fg_disabled": "#888888",
+            "border": "#2060d5",
+            "border_light": "#70a8fa",
+            "glow": "#3B82F6",
         },
         "ghost": {
-            # Çok subtle buton (Önceki, pagination gibi)
-            "bg_top": "#141c28",
-            "bg_bottom": "#101820",
-            "bg_hover_top": "#1a2433",
-            "bg_hover_bottom": "#141c28",
-            "bg_pressed_top": "#0c1418",
-            "bg_pressed_bottom": "#080c14",
-            "fg": "#8898a8",
-            "border": "#1a2535",
-            "border_light": "#1e2838",
-            "glow": None,
+            # Ghost - Sidebar/koyu alanda kullanım (Yeni Sipariş butonu gibi)
+            "bg_top": "#1e1e45",       # Daha açık üst
+            "bg_bottom": "#141432",    # Koyu alt
+            "bg_hover_top": "#2a2a58", # Hover üst
+            "bg_hover_bottom": "#1e1e45", # Hover alt
+            "bg_pressed_top": "#0f0f28",
+            "bg_pressed_bottom": "#0a0a1e",
+            "fg": "#c8c8e8",           # Açık metin
+            "fg_disabled": "#4A4A6D",
+            "border": "#2a2a55",       # Görünür kenar
+            "border_light": "#3a3a68", # Üst highlight
+            "glow": "#3535a0",         # Mavi-mor glow
         },
         "toolbar": {
-            # Toolbar butonları (ikon butonları)
-            "bg_top": "#1a2535",
-            "bg_bottom": "#141c28",
-            "bg_hover_top": "#202d40",
-            "bg_hover_bottom": "#1a2535",
-            "bg_pressed_top": "#101820",
-            "bg_pressed_bottom": "#0c1418",
-            "fg": "#a0b0c0",
-            "border": "#252f40",
-            "border_light": "#2a3545",
+            # Toolbar - Muted yüzeyde kullanım
+            "bg_top": "#f0eff5",
+            "bg_bottom": "#EBE9F2",
+            "bg_hover_top": "#f5f4f8",
+            "bg_hover_bottom": "#f0eff5",
+            "bg_pressed_top": "#e0dfe8",
+            "bg_pressed_bottom": "#d8d7e2",
+            "fg": "#181839",
+            "fg_disabled": "#888AA2",
+            "border": "#CBCADA",
+            "border_light": "#f5f4f8",
             "glow": None,
         },
     }
     
-    # Varsayılan arka plan rengi (tema ile uyumlu)
-    DEFAULT_BG = "#0a1018"
+    # Varsayılan arka plan rengi (tema ile uyumlu - sidebar)
+    DEFAULT_BG = "#111125"
     
     def __init__(
         self, 
@@ -277,77 +327,90 @@ class Button3D(tk.Canvas):
         return self.create_polygon(points, smooth=False, **kwargs)
     
     def _draw(self):
-        """Butonu çiz - KasaPro UI stiline uygun modern görünüm."""
+        """Butonu çiz - KasaPro UI stiline uygun ultra kaliteli görünüm."""
         self.delete("all")
         
         w, h = self.btn_width, self.btn_height
         ox, oy = 3, 3  # Gölge alanı
-        radius = 6  # Köşe yuvarlaklığı
+        radius = 8  # Daha yumuşak köşeler
         
         colors = self.colors
         
         # Durum bazlı renkler
         if self._state == "disabled":
             bg_top = "#2a2a2a"
-            bg_bottom = "#222222"
+            bg_mid = "#252525"
+            bg_bottom = "#202020"
             fg = "#555555"
             border = "#333333"
             border_light = "#333333"
             glow = None
+            inner_glow = None
         elif self._state == "pressed":
             bg_top = colors["bg_pressed_top"]
+            bg_mid = self._blend_color(colors["bg_pressed_top"], colors["bg_pressed_bottom"], 0.5)
             bg_bottom = colors["bg_pressed_bottom"]
             fg = colors["fg"]
             border = colors["border"]
-            border_light = self._blend_color(colors["border_light"], "#000000", 0.3)
+            border_light = self._blend_color(colors["border_light"], "#000000", 0.4)
             glow = None
+            inner_glow = None
         elif self._state == "hover":
             bg_top = colors["bg_hover_top"]
+            bg_mid = self._blend_color(colors["bg_hover_top"], colors["bg_hover_bottom"], 0.45)
             bg_bottom = colors["bg_hover_bottom"]
             fg = colors["fg"]
             border = colors["border"]
             border_light = colors["border_light"]
             glow = colors.get("glow")
+            inner_glow = self._blend_color(colors["bg_hover_top"], "#ffffff", 0.15)
         else:
             bg_top = colors["bg_top"]
+            bg_mid = self._blend_color(colors["bg_top"], colors["bg_bottom"], 0.45)
             bg_bottom = colors["bg_bottom"]
             fg = colors["fg"]
             border = colors["border"]
             border_light = colors["border_light"]
             glow = colors.get("glow")
+            inner_glow = self._blend_color(colors["bg_top"], "#ffffff", 0.08)
         
         import math
         
         # ============================================
-        # GÖLGE (Çok hafif, sadece hover/normal'de)
+        # GÖLGE (Çok yumuşak, çok katmanlı)
         # ============================================
         if self._state not in ("pressed", "disabled"):
-            # Basit 3 katmanlı gölge
-            for i in range(3):
-                alpha = 0.06 - i * 0.015
+            # 5 katmanlı ultra yumuşak gölge
+            for i in range(5):
+                alpha = 0.08 - i * 0.012
                 shadow_color = self._blend_color(self.canvas_bg, "#000000", alpha)
-                offset = 3 - i
+                offset = (5 - i) * 0.6
+                blur = i * 0.4
                 self._create_rounded_rect(
-                    ox + offset * 0.3, oy + offset + 1,
-                    ox + w - offset * 0.3, oy + h + offset,
-                    radius + 1,
+                    ox + blur, oy + offset + blur,
+                    ox + w - blur, oy + h + offset,
+                    radius + 2,
                     fill=shadow_color, outline=""
                 )
         
         # ============================================
-        # DIŞ GLOW (Primary butonlar için)
+        # DIŞ GLOW (Hover efekti)
         # ============================================
         if glow and self._state == "hover":
-            glow_color = self._blend_color(self.canvas_bg, glow, 0.15)
-            self._create_rounded_rect(
-                ox - 2, oy - 1,
-                ox + w + 2, oy + h + 2,
-                radius + 3,
-                fill=glow_color, outline=""
-            )
+            # 3 katmanlı glow
+            for i in range(3):
+                glow_alpha = 0.12 - i * 0.03
+                glow_color = self._blend_color(self.canvas_bg, glow, glow_alpha)
+                expand = 3 - i
+                self._create_rounded_rect(
+                    ox - expand, oy - expand + 1,
+                    ox + w + expand, oy + h + expand,
+                    radius + expand + 2,
+                    fill=glow_color, outline=""
+                )
         
         # ============================================
-        # KENAR (İnce border)
+        # KENAR (Gradient border)
         # ============================================
         self._create_rounded_rect(
             ox, oy, ox + w, oy + h,
@@ -356,38 +419,50 @@ class Button3D(tk.Canvas):
         )
         
         # ============================================
-        # ÜST IŞIK KENARI (Sadece pressed değilse)
+        # ÜST IŞIK KENARI (İnce highlight - bevel efekti)
         # ============================================
         if self._state != "pressed":
-            # Üst kenarda ince açık çizgi efekti
+            # Üst kenar - açık çizgi
             self._create_rounded_rect(
-                ox + 1, oy + 1, ox + w - 1, oy + h - 1,
+                ox + 1, oy + 1, ox + w - 1, oy + 2,
                 radius - 1,
                 fill=border_light, outline=""
             )
         
         # ============================================
-        # ANA YÜZEY (Gradient)
+        # ANA YÜZEY (3 Noktalı Ultra Kalite Gradient)
         # ============================================
         surface_x1 = ox + 1
-        surface_y1 = oy + 1 if self._state == "pressed" else oy + 2
+        surface_y1 = oy + 2 if self._state != "pressed" else oy + 1
         surface_x2 = ox + w - 1
         surface_y2 = oy + h - 1
         surface_h = surface_y2 - surface_y1
         
-        # Gradient çiz
+        # 3 noktalı gradient (üst -> orta -> alt)
         if surface_h > 0:
+            mid_point = 0.35  # Orta renk %35'te
+            
             for i in range(int(surface_h)):
                 t = i / max(surface_h - 1, 1)
-                # Yumuşak S-curve
-                smooth_t = self._smoothstep(t)
-                line_color = self._blend_color(bg_top, bg_bottom, smooth_t)
+                
+                # Ultra smooth 3-noktalı interpolasyon
+                if t <= mid_point:
+                    # Üst -> Orta
+                    local_t = t / mid_point
+                    smooth_t = self._smootherstep(local_t)
+                    line_color = self._blend_color(bg_top, bg_mid, smooth_t)
+                else:
+                    # Orta -> Alt
+                    local_t = (t - mid_point) / (1 - mid_point)
+                    smooth_t = self._smootherstep(local_t)
+                    line_color = self._blend_color(bg_mid, bg_bottom, smooth_t)
                 
                 y = surface_y1 + i
                 
-                # Köşe hesabı
+                # Köşe hesabı - daha düzgün
                 r_inner = radius - 2
                 if i < r_inner:
+                    progress = (r_inner - i) / r_inner
                     corner_offset = r_inner - int(math.sqrt(max(0, r_inner**2 - (r_inner - i)**2)))
                 elif i > surface_h - r_inner - 1:
                     remaining = surface_h - 1 - i
@@ -402,22 +477,23 @@ class Button3D(tk.Canvas):
                     self.create_line(x1, y, x2, y, fill=line_color)
         
         # ============================================
-        # ÜST PARLAKLIK (Hafif gloss)
+        # İÇ KENAR PARLAMASI (Inner glow - edge highlight)
         # ============================================
-        if self._state != "pressed":
-            gloss_height = min((h - 4) // 3, 8)
-            gloss_intensity = 0.12 if self._state == "hover" else 0.08
+        if self._state != "pressed" and inner_glow:
+            # Üst kenar parlama (daha belirgin)
+            gloss_height = min((h - 6) // 4, 10)
             
             for i in range(max(gloss_height, 1)):
                 t = i / max(gloss_height - 1, 1)
-                falloff = (1 - t) ** 2.5
-                alpha = falloff * gloss_intensity
+                # Çok yumuşak düşüş
+                falloff = (1 - self._smootherstep(t)) ** 1.5
+                alpha = falloff * (0.18 if self._state == "hover" else 0.12)
                 
-                if alpha < 0.01:
+                if alpha < 0.005:
                     continue
                 
                 line_color = self._blend_color(bg_top, "#ffffff", alpha)
-                y = oy + 3 + i
+                y = surface_y1 + i
                 
                 # Köşe
                 r_inner = radius - 3
@@ -431,17 +507,48 @@ class Button3D(tk.Canvas):
                 
                 if x2 > x1:
                     self.create_line(x1, y, x2, y, fill=line_color)
+            
+            # Sol ve sağ kenar ince parlama
+            edge_glow_width = 3
+            for j in range(edge_glow_width):
+                edge_alpha = (1 - j / edge_glow_width) * 0.04
+                edge_color = self._blend_color(bg_mid, "#ffffff", edge_alpha)
+                
+                # Sol kenar
+                for i in range(int(surface_h * 0.6)):
+                    y = surface_y1 + gloss_height + i
+                    if y < surface_y2 - radius:
+                        self.create_line(
+                            surface_x1 + 2 + j, y,
+                            surface_x1 + 3 + j, y,
+                            fill=edge_color
+                        )
+                
+                # Sağ kenar
+                for i in range(int(surface_h * 0.6)):
+                    y = surface_y1 + gloss_height + i
+                    if y < surface_y2 - radius:
+                        self.create_line(
+                            surface_x2 - 3 - j, y,
+                            surface_x2 - 2 - j, y,
+                            fill=edge_color
+                        )
         
         # ============================================
-        # ALT PARLAKLIK (İnce rim light)
+        # ALT RIM LIGHT (İnce parlak çizgi)
         # ============================================
         if self._state not in ("pressed", "disabled"):
-            rim_color = self._blend_color(bg_bottom, "#ffffff", 0.06)
-            self.create_line(
-                ox + radius, oy + h - 3,
-                ox + w - radius, oy + h - 3,
-                fill=rim_color
-            )
+            # Gradient rim light
+            rim_width = w - 2 * radius - 4
+            rim_center = ox + w // 2
+            
+            for i in range(int(rim_width)):
+                rx = rim_center - rim_width // 2 + i
+                # Ortada parlak, kenarlarda sönük
+                t = abs(i - rim_width / 2) / (rim_width / 2)
+                rim_alpha = (1 - t ** 2) * 0.08
+                rim_color = self._blend_color(bg_bottom, "#ffffff", rim_alpha)
+                self.create_line(rx, oy + h - 3, rx + 1, oy + h - 3, fill=rim_color)
         
         # ============================================
         # METİN

@@ -23,101 +23,174 @@ import tkinter.font as tkfont
 
 
 # ============================================================================
-# RENK PALETİ (Qt .ui dosyalarından çıkarıldı)
+# RENK PALETİ - KasaPro Tasarım Sistemi
 # ============================================================================
 
-# Light theme (varsayılan - legacy uyumluluk için korunuyor)
+# Light theme (Ana tema - yeni renk paleti)
 COLORS_LIGHT: Dict[str, str] = {
-    "bg": "#F5F6FA",
-    "panel": "#FFFFFF",
-    "border": "#E5E7EB",
-    "text": "#111827",
-    "muted": "#6B7280",
-    "accent": "#2563EB",
-    "accent_light": "#DBEAFE",
-    "danger": "#DC2626",
-    "success": "#16A34A",
-    "warning": "#F59E0B",
-}
-
-# Premium Dark Glass Theme (Qt UI'dan alındı)
-# NOT: Tkinter alpha desteklemez, tüm renkler koyu arka plana göre blend edildi
-# Görsel referanslar: 15 ekran görüntüsünden analiz edildi
-COLORS_DARK: Dict[str, str] = {
-    # Ana arka planlar - daha derin lacivert tonları
-    "bg": "#080c14",                # Ana arka plan (daha koyu)
-    "bg_glow": "#101828",           # Glow efekt alanı
-    "bg_dark": "#050810",           # En koyu arka plan
+    # Arkaplan / Yüzeyler
+    "bg": "#F8F7FA",                # App arkaplan (çok açık soğuk gri)
+    "bg_workspace": "#FFFFFF",      # Çalışma alanı (okunurluk için beyaz)
+    "panel": "#F3F1F7",             # Card / panel yüzeyi
+    "panel_hover": "#EBE9F2",       # Panel hover
+    "muted_surface": "#EBE9F2",     # Muted yüzey (toolbar/şerit)
     
-    # Panel/Kart renkleri - görsellerle uyumlu
-    "panel": "#0f1520",             # Kart zemini (daha koyu)
-    "panel_hover": "#141c2a",       # Kart hover
-    "panel_border": "#243040",      # Kart kenarı (mavi tonlu)
-    "sidebar": "#0a1018",           # Sidebar (en koyu)
-    "sidebar_active": "#0f1828",    # Aktif sidebar item arka planı
+    # Sidebar / Koyu Alanlar
+    "sidebar": "#111125",           # Sidebar BG
+    "sidebar_hover": "#242545",     # Sidebar hover
+    "sidebar_active": "#242545",    # Koyu üst bar / panel
     
-    # Kenar renkleri - mavi tonlu
-    "border": "#1a2535",            # Genel kenar (mavi tonlu)
-    "border_light": "#141c28",      # Hafif kenar
-    "border_accent": "#2a4a6a",     # Vurgulu kenar (aktif tab gibi)
+    # Metin
+    "text": "#181839",              # Text Primary
+    "text_secondary": "#4A4A6D",    # Text Muted
+    "text_on_dark": "#EDEBF3",      # Text on Dark
+    "muted": "#4A4A6D",             # Muted text
+    "placeholder": "#888AA2",       # Placeholder
     
-    # Metin renkleri
-    "text": "#e8f0ff",              # Ana metin (biraz daha açık)
-    "text_secondary": "#b8c8e0",    # İkincil
-    "muted": "#6080a0",             # Soluk (daha mavi)
-    "placeholder": "#506080",       # Placeholder
+    # Border / Ayraçlar
+    "border": "#CBCADA",            # Border
+    "border_strong": "#A6AABE",     # Border Strong
+    "border_light": "#DBDAE8",      # Hafif border
     
-    # Aksan renkleri - parlak mavi
-    "accent": "#3a8fff",            # Ana aksan (daha parlak)
-    "accent_dark": "#1a5cc0",       # Koyu aksan
-    "accent_light": "#1a3050",      # Açık aksan (hover/selection)
-    "accent_bright": "#50a0ff",     # En parlak (aktif tab)
-    "accent_hover": "#4a9fff",      # Hover
-    "accent_glow": "#5ab0ff",       # Glow efekt
+    # Marka / Accent
+    "accent": "#02095B",            # Primary Accent
+    "accent_hover": "#20276F",      # Hover
+    "accent_pressed": "#020854",    # Pressed
+    "accent_disabled": "#898CB2",   # Disabled
+    "accent_light": "#DBDAE8",      # Açık aksan (selection)
     
-    # Input stilleri - daha belirgin
-    "input_bg": "#0c1018",          # Input arka plan (koyu)
-    "input_border": "#1a2838",      # Input kenar
-    "input_focus": "#2a5080",       # Focus kenar (mavi)
+    # Secondary (Deep)
+    "secondary": "#000537",         # Secondary
+    "secondary_hover": "#1F234F",   # Secondary Hover
+    "secondary_pressed": "#000533", # Secondary Pressed
+    "secondary_disabled": "#888AA2",# Secondary Disabled
+    
+    # Pill / Sekme (açık gri butonlar)
+    "pill_bg": "#DBDAE8",           # Pill BG
+    "pill_hover": "#DFDEEA",        # Pill Hover
+    "pill_pressed": "#CECDDA",      # Pill Pressed
+    "pill_disabled": "#ECEBF3",     # Pill Disabled
+    "pill_border": "#C9C8D9",       # Pill Border
+    "pill_text": "#181839",         # Pill Text
     
     # Durum renkleri
-    "danger": "#ff5a5a",            # Tehlike
-    "danger_bg": "#201418",         # Tehlike arka plan
-    "success": "#20c060",           # Başarı (daha parlak)
-    "success_bg": "#102018",        # Başarı arka plan
-    "warning": "#f5a020",           # Uyarı
-    "warning_bg": "#201810",        # Uyarı arka plan
+    "success": "#16A34A",           # Success
+    "success_bg": "#e8f5ec",        # Success arka plan
+    "warning": "#F59E0B",           # Warning
+    "warning_bg": "#fef3e0",        # Warning arka plan
+    "danger": "#EF4444",            # Danger
+    "danger_bg": "#fde8e8",         # Danger arka plan
+    "info": "#3B82F6",              # Info
+    "info_bg": "#e8f0fe",           # Info arka plan
     
-    # Tablo/Treeview - görsellerle uyumlu
-    "table_header": "#0c1420",      # Header arka plan
-    "table_header_border": "#1a2838", # Header alt border
-    "table_row": "#0f1520",         # Normal satır
-    "table_row_alt": "#0a1018",     # Alternatif satır
-    "selection": "#1a3858",         # Seçim
-    "gridline": "#141c28",          # Tablo çizgileri
+    # Input stilleri
+    "input_bg": "#FFFFFF",          # Input arka plan
+    "input_border": "#CBCADA",      # Input kenar
+    "input_focus": "#02095B",       # Focus kenar
     
-    # Tab stilleri - görsellerle uyumlu
-    "tab_bg": "#0c1420",            # Pasif tab
-    "tab_active_bg": "#1a3858",     # Aktif tab arka plan
-    "tab_active_text": "#50a0ff",   # Aktif tab metin
-    "tab_border": "#1a2838",        # Tab border
+    # Tablo/Treeview
+    "table_header": "#EBE9F2",      # Header arka plan
+    "table_header_border": "#CBCADA", # Header alt border
+    "table_row": "#FFFFFF",         # Normal satır
+    "table_row_alt": "#F8F7FA",     # Alternatif satır
+    "selection": "#DBDAE8",         # Seçim
+    "gridline": "#CBCADA",          # Tablo çizgileri
+    
+    # Tab stilleri
+    "tab_bg": "#EBE9F2",            # Pasif tab
+    "tab_active_bg": "#02095B",     # Aktif tab arka plan
+    "tab_active_text": "#EDEBF3",   # Aktif tab metin
+    "tab_border": "#CBCADA",        # Tab border
+    
+    # Buton stilleri
+    "btn_primary_bg": "#02095B",    # Primary arka plan
+    "btn_primary_hover": "#20276F", # Primary hover
+    "btn_primary_border": "#010538",# Primary kenar
+    "btn_secondary_bg": "#000537",  # Secondary arka plan
+    "btn_secondary_border": "#000320", # Secondary kenar
+    "btn_ghost_bg": "#F3F1F7",      # Ghost arka plan
+    "btn_ghost_border": "#CBCADA",  # Ghost kenar
+    "btn_ghost_hover": "#EBE9F2",   # Ghost hover
+}
+
+# Dark theme (Sidebar ve koyu alanlar için)
+COLORS_DARK: Dict[str, str] = {
+    # Ana arka planlar - Sidebar/Koyu alanlar
+    "bg": "#111125",                # Sidebar BG
+    "bg_glow": "#1a1a35",           # Glow efekt alanı
+    "bg_dark": "#0a0a18",           # En koyu arka plan
+    
+    # Panel/Kart renkleri
+    "panel": "#1a1a35",             # Kart zemini
+    "panel_hover": "#242545",       # Kart hover
+    "panel_border": "#303055",      # Kart kenarı
+    "sidebar": "#111125",           # Sidebar
+    "sidebar_active": "#242545",    # Aktif sidebar item
+    
+    # Kenar renkleri
+    "border": "#303055",            # Genel kenar
+    "border_light": "#242545",      # Hafif kenar
+    "border_accent": "#02095B",     # Vurgulu kenar
+    
+    # Metin renkleri
+    "text": "#EDEBF3",              # Ana metin (Text on Dark)
+    "text_secondary": "#b8b8d0",    # İkincil
+    "muted": "#4A4A6D",             # Soluk
+    "placeholder": "#606080",       # Placeholder
+    
+    # Aksan renkleri - Primary
+    "accent": "#02095B",            # Ana aksan
+    "accent_dark": "#000537",       # Koyu aksan
+    "accent_light": "#20276F",      # Açık aksan
+    "accent_bright": "#3a4088",     # En parlak
+    "accent_hover": "#20276F",      # Hover
+    "accent_glow": "#02095B",       # Glow efekt
+    
+    # Input stilleri
+    "input_bg": "#1a1a35",          # Input arka plan
+    "input_border": "#303055",      # Input kenar
+    "input_focus": "#02095B",       # Focus kenar
+    
+    # Durum renkleri
+    "danger": "#EF4444",            # Tehlike
+    "danger_bg": "#2a1a1a",         # Tehlike arka plan
+    "success": "#16A34A",           # Başarı
+    "success_bg": "#1a2a1a",        # Başarı arka plan
+    "warning": "#F59E0B",           # Uyarı
+    "warning_bg": "#2a2518",        # Uyarı arka plan
+    "info": "#3B82F6",              # Info
+    "info_bg": "#1a2035",           # Info arka plan
+    
+    # Tablo/Treeview
+    "table_header": "#1a1a35",      # Header arka plan
+    "table_header_border": "#303055", # Header alt border
+    "table_row": "#111125",         # Normal satır
+    "table_row_alt": "#0a0a18",     # Alternatif satır
+    "selection": "#242545",         # Seçim
+    "gridline": "#242545",          # Tablo çizgileri
+    
+    # Tab stilleri
+    "tab_bg": "#1a1a35",            # Pasif tab
+    "tab_active_bg": "#02095B",     # Aktif tab arka plan
+    "tab_active_text": "#EDEBF3",   # Aktif tab metin
+    "tab_border": "#303055",        # Tab border
     
     # Badge/Etiket renkleri
-    "badge_in_bg": "#102820",       # Giriş badge
-    "badge_in_border": "#184030",   # Giriş kenar
-    "badge_in_text": "#80e0a0",     # Giriş metin
-    "badge_out_bg": "#281418",      # Çıkış badge
-    "badge_out_border": "#402028",  # Çıkış kenar
-    "badge_out_text": "#ffa0a0",    # Çıkış metin
+    "badge_in_bg": "#1a2a1a",       # Giriş badge
+    "badge_in_border": "#16A34A",   # Giriş kenar
+    "badge_in_text": "#16A34A",     # Giriş metin
+    "badge_out_bg": "#2a1a1a",      # Çıkış badge
+    "badge_out_border": "#EF4444",  # Çıkış kenar
+    "badge_out_text": "#EF4444",    # Çıkış metin
     
-    # Buton stilleri - görsellerle uyumlu
-    "btn_primary_bg": "#3a8fff",    # Primary arka plan
-    "btn_primary_hover": "#4a9fff", # Primary hover
-    "btn_primary_border": "#5aafff",# Primary kenar
-    "btn_secondary_bg": "#141c28",  # Secondary arka plan
-    "btn_secondary_border": "#1a2838", # Secondary kenar
-    "btn_ghost_bg": "#0c1420",      # Ghost arka plan
-    "btn_ghost_border": "#1a2838",  # Ghost kenar
+    # Buton stilleri
+    "btn_primary_bg": "#02095B",    # Primary arka plan
+    "btn_primary_hover": "#20276F", # Primary hover
+    "btn_primary_border": "#3a4088",# Primary kenar
+    "btn_secondary_bg": "#1a1a35",  # Secondary arka plan
+    "btn_secondary_border": "#303055", # Secondary kenar
+    "btn_ghost_bg": "#1a1a35",      # Ghost arka plan
+    "btn_ghost_border": "#303055",  # Ghost kenar
     "btn_ghost_hover": "#141c30",   # Ghost hover
     
     # Pagination stilleri
