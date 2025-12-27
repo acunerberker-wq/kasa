@@ -373,13 +373,14 @@ class SatisRaporlariFrame(BaseView):
         if children:
             self.tree.delete(*children)
 
+        row_values = []
         if self._report_key == "daily":
             headers = ["Tarih", "Satış", "İade", "Ciro", "İskonto", "İade Tutar", "Net Ciro", "Tahsilat"]
             for r in rows:
                 ciro = float(safe_float(r.get("ciro")))
                 iade = float(safe_float(r.get("iade")))
                 net = ciro - iade
-                self.tree.insert("", tk.END, values=(
+                row_values.append((
                     fmt_tr_date(r.get("tarih")),
                     int(r.get("satis_adet") or 0),
                     int(r.get("iade_adet") or 0),
@@ -392,7 +393,7 @@ class SatisRaporlariFrame(BaseView):
         elif self._report_key == "customer":
             headers = ["Müşteri", "Satış", "İade", "İskonto", "Tahsilat", "Net", "Bakiye"]
             for r in rows:
-                self.tree.insert("", tk.END, values=(
+                row_values.append((
                     r.get("cari_ad"),
                     fmt_amount(r.get("satis")),
                     fmt_amount(r.get("iade")),
@@ -404,7 +405,7 @@ class SatisRaporlariFrame(BaseView):
         elif self._report_key == "product":
             headers = ["Ürün", "Kategori", "Miktar", "Ciro", "Maliyet", "Kâr"]
             for r in rows:
-                self.tree.insert("", tk.END, values=(
+                row_values.append((
                     r.get("urun"),
                     r.get("kategori"),
                     fmt_amount(r.get("miktar")),
@@ -415,7 +416,7 @@ class SatisRaporlariFrame(BaseView):
         else:
             headers = ["Temsilci", "Satış", "İade", "İskonto", "Tahsilat", "Net", "Bakiye"]
             for r in rows:
-                self.tree.insert("", tk.END, values=(
+                row_values.append((
                     r.get("temsilci"),
                     fmt_amount(r.get("satis")),
                     fmt_amount(r.get("iade")),
@@ -428,6 +429,19 @@ class SatisRaporlariFrame(BaseView):
         self._current_headers = headers
         self._update_kpis(kpis)
         self._update_warnings(warnings)
+
+        if row_values:
+            batch_size = 200
+            total = len(row_values)
+
+            def insert_batch(start: int = 0) -> None:
+                end = min(start + batch_size, total)
+                for values in row_values[start:end]:
+                    self.tree.insert("", tk.END, values=values)
+                if end < total:
+                    self.after(1, lambda: insert_batch(end))
+
+            insert_batch()
 
         page_total = (total // self._page_size) + (1 if total % self._page_size else 0)
         self.lbl_page.config(text=f"Sayfa: {self._page + 1} / {max(page_total, 1)}  (Kayıt: {total})")
