@@ -433,11 +433,14 @@ class SatisRaporlariFrame(BaseView):
         if row_values:
             batch_size = 200
             total = len(row_values)
+            tree = self.tree
+            insert = tree.insert
+            tk_end = tk.END
 
             def insert_batch(start: int = 0) -> None:
                 end = min(start + batch_size, total)
                 for values in row_values[start:end]:
-                    self.tree.insert("", tk.END, values=values)
+                    insert("", tk_end, values=values)
                 if end < total:
                     self.after(1, lambda: insert_batch(end))
 

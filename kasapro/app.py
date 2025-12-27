@@ -25,7 +25,19 @@ from .db.users_db import UsersDB
 from .services import Services
 from .ui.style import apply_modern_style
 from .ui.ui_logging import log_ui_event, wrap_callback
-from modules.hr.service import HRContext
+from .ui.windows import LoginWindow, SettingsWindow, HelpWindow, ImportWizard
+from .ui.frames import (
+    KasaFrame,
+    TanimlarHubFrame,
+    RaporAraclarHubFrame,
+    KullanicilarFrame,
+    MessagesFrame,
+    IntegrationsHubFrame,
+    CreateCenterFrame,
+    SatisRaporlariFrame,
+    StockWmsFrame,
+)
+from .ui.plugins.loader import discover_ui_plugins
 from .modules.notes_reminders.scheduler import ReminderScheduler
 
 # Import HRContext for typing
@@ -887,13 +899,13 @@ class App:
         ).pack(fill=tk.X, padx=4, pady=(8, 2))
 
         # Ekranlar
-        self.screen_registry.register("kasa", lambda parent, app: KasaFrame(parent, app), title="Kasa", create=True)
-        self.screen_registry.register("create_center", lambda parent, app: CreateCenterFrame(parent, app), title="Kayıt Oluştur (Merkez)", create=False)
-        self.screen_registry.register("mesajlar", lambda parent, app: MessagesFrame(parent, app), title="Mesajlar", create=False)
-        self.screen_registry.register("tanimlar", lambda parent, app: TanimlarHubFrame(parent, app), title="Tanımlar", create=False)
-        self.screen_registry.register("stok_wms", lambda parent, app: StockWmsFrame(parent, app), title="Stok/WMS", create=False)
-        self.screen_registry.register("entegrasyonlar", lambda parent, app: IntegrationsHubFrame(parent, app), title="Entegrasyonlar", create=False)
-        self.screen_registry.register("satis_raporlari", lambda parent, app: SatisRaporlariFrame(parent, app), title="Satış Raporları", create=False)
+        self.screen_registry.register("kasa", lambda parent, app: KasaFrame(parent, app), title="Kasa")
+        self.screen_registry.register("create_center", lambda parent, app: CreateCenterFrame(parent, app), title="Kayıt Oluştur (Merkez)")
+        self.screen_registry.register("mesajlar", lambda parent, app: MessagesFrame(parent, app), title="Mesajlar")
+        self.screen_registry.register("tanimlar", lambda parent, app: TanimlarHubFrame(parent, app), title="Tanımlar")
+        self.screen_registry.register("stok_wms", lambda parent, app: StockWmsFrame(parent, app), title="Stok/WMS")
+        self.screen_registry.register("entegrasyonlar", lambda parent, app: IntegrationsHubFrame(parent, app), title="Entegrasyonlar")
+        self.screen_registry.register("satis_raporlari", lambda parent, app: SatisRaporlariFrame(parent, app), title="Satış Raporları")
         self.screen_registry.register(
             "rapor_araclar",
             lambda parent, app: RaporAraclarHubFrame(parent, app),

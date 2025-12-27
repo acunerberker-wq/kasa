@@ -101,7 +101,6 @@ class ImportWizard(tk.Toplevel):
         self.result_counts: Optional[Dict[str, int]] = None
         self.mappings: Dict[str, Dict[str, Any]] = {}
         self._import_in_progress = False
-        self._cleanup_done = False
 
         self._build()
         center_window(self, app.root)
@@ -967,7 +966,6 @@ class ImportWizard(tk.Toplevel):
         if "maas" in counts:
             msg_lines.append(f"Maaş: {counts['maas']}")
         messagebox.showinfo(APP_TITLE, "İçe aktarıldı:\n" + "\n".join(msg_lines))
-        self._cleanup()
         self.destroy()
 
     def _finish_import_error(self, exc: Exception) -> None:
