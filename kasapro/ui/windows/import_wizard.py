@@ -101,9 +101,33 @@ class ImportWizard(tk.Toplevel):
         self.result_counts: Optional[Dict[str, int]] = None
         self.mappings: Dict[str, Dict[str, Any]] = {}
         self._import_in_progress = False
+        self._cleanup_done = False
 
         self._build()
         center_window(self, app.root)
+        try:
+            self.protocol("WM_DELETE_WINDOW", self._on_close)
+        except Exception:
+            pass
+
+    def _on_close(self) -> None:
+        self._cleanup()
+        self.destroy()
+
+    def _cleanup(self) -> None:
+        if self._cleanup_done:
+            return
+        self._cleanup_done = True
+        try:
+            wb = getattr(self, "wb", None)
+            if wb is not None and hasattr(wb, "close"):
+                wb.close()
+        except Exception:
+            pass
+        try:
+            self.wb = None  # type: ignore[assignment]
+        except Exception:
+            pass
 
     def _build(self):
         ttk.Label(self, text=f"Dosya: {os.path.basename(self.xlsx_path)}", font=("Calibri", 12, "bold")).pack(anchor="w", padx=12, pady=(10, 4))
@@ -943,6 +967,7 @@ class ImportWizard(tk.Toplevel):
         if "maas" in counts:
             msg_lines.append(f"Maaş: {counts['maas']}")
         messagebox.showinfo(APP_TITLE, "İçe aktarıldı:\n" + "\n".join(msg_lines))
+        self._cleanup()
         self.destroy()
 
     def _finish_import_error(self, exc: Exception) -> None:
