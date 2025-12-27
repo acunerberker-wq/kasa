@@ -371,14 +371,16 @@ def apply_dark_glass_theme(root: tk.Tk) -> Dict[str, str]:
     # BUTTON STİLLERİ - Görsellerden
     # ========================================
     
-    # Genel buton (Ghost tarzı)
+    # Genel buton (3D görünüm)
     style.configure("TButton", 
         padding=(16, 8),
         font=(base_font, 10),
         background=colors["btn_ghost_bg"],
         foreground=colors["text_secondary"],
-        borderwidth=1,
-        relief="flat",
+        borderwidth=2,
+        relief="raised",
+        lightcolor=colors["border_accent"],
+        darkcolor=colors["bg_dark"],
     )
     style.map("TButton",
         background=[
@@ -390,6 +392,10 @@ def apply_dark_glass_theme(root: tk.Tk) -> Dict[str, str]:
             ("disabled", colors["muted"]),
             ("!disabled", colors["text_secondary"]),
         ],
+        relief=[
+            ("pressed", "sunken"),
+            ("!pressed", "raised"),
+        ],
     )
     
     # Primary Button (Parlak mavi - "Yeni", "Kaydet + Yeni", "Yenile")
@@ -398,7 +404,10 @@ def apply_dark_glass_theme(root: tk.Tk) -> Dict[str, str]:
         font=(base_font, 10, "bold"),
         background=colors["btn_primary_bg"],
         foreground="#ffffff",
-        borderwidth=0,
+        borderwidth=2,
+        relief="raised",
+        lightcolor=colors["accent_glow"],
+        darkcolor=colors["accent_dark"],
     )
     style.map("Primary.TButton",
         background=[
@@ -411,6 +420,10 @@ def apply_dark_glass_theme(root: tk.Tk) -> Dict[str, str]:
             ("disabled", "#666666"),
             ("!disabled", "#ffffff"),
         ],
+        relief=[
+            ("pressed", "sunken"),
+            ("!pressed", "raised"),
+        ],
     )
     
     # Secondary Button (Koyu arka plan, açık kenar - "Detay", "İptal")
@@ -419,7 +432,10 @@ def apply_dark_glass_theme(root: tk.Tk) -> Dict[str, str]:
         font=(base_font, 10),
         background=colors["btn_secondary_bg"],
         foreground=colors["text"],
-        borderwidth=1,
+        borderwidth=2,
+        relief="raised",
+        lightcolor=colors["border_accent"],
+        darkcolor=colors["bg_dark"],
     )
     style.map("Secondary.TButton",
         background=[
@@ -430,15 +446,22 @@ def apply_dark_glass_theme(root: tk.Tk) -> Dict[str, str]:
             ("disabled", colors["muted"]),
             ("!disabled", colors["text"]),
         ],
+        relief=[
+            ("pressed", "sunken"),
+            ("!pressed", "raised"),
+        ],
     )
     
-    # Ghost Button (Tamamen saydam görünüm)
+    # Ghost Button (Hafif 3D görünüm)
     style.configure("Ghost.TButton", 
         padding=(16, 8),
         font=(base_font, 10),
         background=colors["btn_ghost_bg"],
         foreground=colors["text_secondary"],
-        borderwidth=1,
+        borderwidth=2,
+        relief="raised",
+        lightcolor=colors["border"],
+        darkcolor=colors["bg_dark"],
     )
     style.map("Ghost.TButton",
         background=[
@@ -449,6 +472,10 @@ def apply_dark_glass_theme(root: tk.Tk) -> Dict[str, str]:
             ("disabled", colors["muted"]),
             ("!disabled", colors["text_secondary"]),
         ],
+        relief=[
+            ("pressed", "sunken"),
+            ("!pressed", "raised"),
+        ],
     )
     
     # Toolbar Button (Araç çubuğu - "Excel ile Aktar", "PDF", "Sil")
@@ -457,12 +484,19 @@ def apply_dark_glass_theme(root: tk.Tk) -> Dict[str, str]:
         font=(base_font, 10),
         background=colors["btn_secondary_bg"],
         foreground=colors["text_secondary"],
-        borderwidth=1,
+        borderwidth=2,
+        relief="raised",
+        lightcolor=colors["border"],
+        darkcolor=colors["bg_dark"],
     )
     style.map("Toolbar.TButton",
         background=[
             ("active", colors["accent_light"]),
             ("!active", colors["btn_secondary_bg"]),
+        ],
+        relief=[
+            ("pressed", "sunken"),
+            ("!pressed", "raised"),
         ],
     )
     
@@ -472,6 +506,10 @@ def apply_dark_glass_theme(root: tk.Tk) -> Dict[str, str]:
         font=(base_font, 10, "bold"),
         background=colors["danger"],
         foreground="#ffffff",
+        borderwidth=2,
+        relief="raised",
+        lightcolor="#ff8080",
+        darkcolor="#aa2020",
     )
     style.map("Danger.TButton",
         background=[
@@ -483,6 +521,10 @@ def apply_dark_glass_theme(root: tk.Tk) -> Dict[str, str]:
             ("disabled", "#888888"),
             ("!disabled", "#ffffff"),
         ],
+        relief=[
+            ("pressed", "sunken"),
+            ("!pressed", "raised"),
+        ],
     )
     
     # Success Button
@@ -491,12 +533,20 @@ def apply_dark_glass_theme(root: tk.Tk) -> Dict[str, str]:
         font=(base_font, 10, "bold"),
         background=colors["success"],
         foreground="#ffffff",
+        borderwidth=2,
+        relief="raised",
+        lightcolor="#40e080",
+        darkcolor="#108040",
     )
     style.map("Success.TButton",
         background=[
             ("active", "#30d070"),
             ("pressed", "#18a050"),
             ("!active", colors["success"]),
+        ],
+        relief=[
+            ("pressed", "sunken"),
+            ("!pressed", "raised"),
         ],
     )
     
@@ -506,12 +556,19 @@ def apply_dark_glass_theme(root: tk.Tk) -> Dict[str, str]:
         font=(base_font, 10),
         background=colors["pager_bg"],
         foreground=colors["pager_text"],
-        borderwidth=1,
+        borderwidth=2,
+        relief="raised",
+        lightcolor=colors["border"],
+        darkcolor=colors["bg_dark"],
     )
     style.map("Pager.TButton",
         background=[
             ("active", colors["accent_light"]),
             ("!active", colors["pager_bg"]),
+        ],
+        relief=[
+            ("pressed", "sunken"),
+            ("!pressed", "raised"),
         ],
     )
     
